@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "Vue.volar",
+    "dbaeumer.vscode-eslint",
+    "EditorConfig.EditorConfig",
+    "oxc.oxc-vscode",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "usernamehw.errorlens",
+    "lokalise.i18n-ally",
+    "christian-kohler.path-intellisense",
+    "aaron-bond.better-comments"
+  ]
+}

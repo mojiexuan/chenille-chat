@@ -1,0 +1,1 @@
+export type AiAbort = (abort: () => void) => void;
