@@ -8,7 +8,7 @@ import type { Config, EnvSchema } from "@/types";
  */
 export const schema = {
   NODE_ENV: "development",
-  APP_NAME: "Chenille Agent",
+  APP_NAME: "AiChat",
   APP_PORT: "3000",
   OPENAI_API_KEY: undefined,
   OPENAI_API_BASE: undefined,
