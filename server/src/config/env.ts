@@ -13,6 +13,8 @@ export const schema = {
   OPENAI_API_KEY: undefined,
   OPENAI_API_BASE: undefined,
   OPENAI_API_MODEL: "gpt-5.4",
+  REDIS_HOST: "127.0.0.1",
+  REDIS_PORT: "6379",
   ALIBABA_CLOUD_SMS_ACCESS_KEY_ID: undefined,
   ALIBABA_CLOUD_SMS_ACCESS_KEY_SECRET: undefined,
 } satisfies EnvSchema;

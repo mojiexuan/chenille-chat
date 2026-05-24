@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import { config } from "@/config";
-import { responsePlugin, errorHandlerPlugin, autoControllerPlugin } from "@/plugins";
+import { responsePlugin, errorHandlerPlugin, autoControllerPlugin, redisClientPlugin } from "@/plugins";
 import { logger } from "@/utils";
 
 const app = Fastify({
@@ -11,6 +11,8 @@ const app = Fastify({
 app.register(errorHandlerPlugin);
 // 注册响应插件
 app.register(responsePlugin);
+// 注册Redis插件
+app.register(redisClientPlugin);
 // 注册自动控制器插件
 app.register(autoControllerPlugin);
 
