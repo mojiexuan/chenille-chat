@@ -2,6 +2,10 @@ import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import * as fs from "fs";
 import * as path from "path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * 自动注册控制器插件
@@ -17,7 +21,7 @@ async function autoControllerPluginFn(fastify: FastifyInstance) {
     );
 
     for (const file of files) {
-        const mod = await import(path.join(dir, file));
+        const mod = await import(pathToFileURL(path.join(dir, file)).href);
         for (const exportName of Object.keys(mod)) {
             const exported = mod[exportName];
             if (typeof exported === "function" && exportName.endsWith("Controller")) {
