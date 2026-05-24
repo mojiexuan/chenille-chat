@@ -1,3 +1,4 @@
+import "dotenv/config";
 import type { Config, EnvSchema } from "@/types";
 
 /**
@@ -12,6 +13,8 @@ export const schema = {
   OPENAI_API_KEY: undefined,
   OPENAI_API_BASE: undefined,
   OPENAI_API_MODEL: "gpt-5.4",
+  ALIBABA_CLOUD_SMS_ACCESS_KEY_ID: undefined,
+  ALIBABA_CLOUD_SMS_ACCESS_KEY_SECRET: undefined,
 } satisfies EnvSchema;
 
 const cache = new Map<string, string>();

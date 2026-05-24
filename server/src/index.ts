@@ -1,26 +1,10 @@
 import Fastify from "fastify";
 import { config } from "@/config";
 import { responsePlugin, errorHandlerPlugin, autoControllerPlugin } from "@/plugins";
+import { logger } from "@/utils";
 
 const app = Fastify({
-  logger: {
-    level: "info",
-    name: config.APP_NAME,
-    redact: ["req.headers.authorization"],
-    ...(
-      config.NODE_ENV === "development" ? {
-        transport: {
-          target: "pino-pretty",
-          options: {
-            colorize: true,
-            translateTime: "SYS:yyyy-mm-dd HH:MM:ss.l",
-            ignore: "pid,hostname",
-            singleLine: false,
-          }
-        }
-      } : {}
-    )
-  }
+  logger,
 });
 
 // 注册错误处理插件

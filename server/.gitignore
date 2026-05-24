@@ -4,3 +4,7 @@ dist
 *.d.ts.map
 
 *.env
+
+.trae/
+
+*.test.ts
