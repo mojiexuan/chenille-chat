@@ -1,5 +1,8 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyRequest, FastifyReply } from "fastify";
 import { SmsService, AuthService } from "@/services";
+import { sendPhoneCodeDto, phoneCodeAuthDto } from "@/dto";
+import { BizException } from "@/exception";
+import { BizCode } from "@/enumeration";
 
 /**
  * 发送手机号验证码
@@ -9,6 +12,12 @@ import { SmsService, AuthService } from "@/services";
 export async function sendPhoneCodeHandler(request: FastifyRequest, reply: FastifyReply) {
     const { redis } = request.server;
     const authService = new AuthService(redis, new SmsService());
+    const parsed = sendPhoneCodeDto.safeParse(request.body);
+    if (!parsed.success) {
+        throw new BizException(BizCode.PARAM_INVALID, parsed.error.issues[0]?.message);
+    }
+    await authService.sendPhoneLoginCode(parsed.data.phone);
+    return reply.success(null, "验证码已发送");
 }
 
 /**
@@ -17,4 +26,14 @@ export async function sendPhoneCodeHandler(request: FastifyRequest, reply: Fasti
  * @param reply 响应
  */
 export async function phoneCodeLoginHandler(request: FastifyRequest, reply: FastifyReply) {
+    const parsed = phoneCodeAuthDto.safeParse(request.body);
+    if (!parsed.success) {
+        throw new BizException(BizCode.PARAM_INVALID, parsed.error.issues[0]?.message);
+    }
+    const ip = request.ip;
+    const userAgent = request.headers["user-agent"];
+    const { redis } = request.server;
+    const authService = new AuthService(redis, new SmsService());
+    const result = await authService.phoneCodeLogin(parsed.data.phone, parsed.data.code, ip, userAgent);
+    return reply.success(result, "登录成功");
 }

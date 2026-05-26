@@ -20,6 +20,8 @@ export const schema = {
   DB_USER: undefined,
   DB_PASSWORD: undefined,
   DB_NAME: undefined,
+  JWT_SECRET: undefined,
+  JWT_EXPIRES_IN: "604800",
   ALIBABA_CLOUD_SMS_ACCESS_KEY_ID: undefined,
   ALIBABA_CLOUD_SMS_ACCESS_KEY_SECRET: undefined,
 } satisfies EnvSchema;

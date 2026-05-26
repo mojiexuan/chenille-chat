@@ -10,10 +10,10 @@ export const sendPhoneCodeDto = z.object({
 /**
  * 手机号认证DTO
  */
-export const phoneAuthDto = z.object({
+export const phoneCodeAuthDto = z.object({
     phone: z.string().regex(/^1[3-9]\d{9}$/, "手机号格式不正确"),
     code: z.string().length(6, "验证码为6位数字"),
 });
 
 export type SendPhoneCodeDto = z.infer<typeof sendPhoneCodeDto>;
-export type PhoneAuthDto = z.infer<typeof phoneAuthDto>;
+export type PhoneCodeAuthDto = z.infer<typeof phoneCodeAuthDto>;
