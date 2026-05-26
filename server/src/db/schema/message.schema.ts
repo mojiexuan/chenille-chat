@@ -1,11 +1,6 @@
-import { pgTable, pgEnum, serial, integer, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, jsonb, timestamp } from "drizzle-orm/pg-core";
 import { sessions } from "./session.schema";
-import { Role } from "@/enumeration";
-
-/**
- * 消息角色
- */
-export const roleEnum = pgEnum("role", Object.values(Role) as [string, ...string[]]);
+import { roleEnum } from "@/enumeration";
 
 export const messages = pgTable("c_messages", {
     id: serial("id").primaryKey(),

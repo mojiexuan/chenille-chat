@@ -1,16 +1,6 @@
-import { pgTable, pgEnum, serial, integer, varchar, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, varchar, text, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./user.schema";
-import { LoginType, LoginStatus } from "@/enumeration";
-
-/**
- * 登录类型
- */
-export const loginTypeEnum = pgEnum("login_type", Object.values(LoginType) as [string, ...string[]]);
-
-/**
- * 登录状态
- */
-export const loginStatusEnum = pgEnum("login_status", Object.values(LoginStatus) as [string, ...string[]]);
+import { loginTypeEnum, loginStatusEnum } from "@/enumeration";
 
 export const loginLogs = pgTable("c_login_logs", {
     id: serial("id").primaryKey(),

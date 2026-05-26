@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, varchar, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, varchar, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./user.schema";
 
 export const sessions = pgTable("c_sessions", {

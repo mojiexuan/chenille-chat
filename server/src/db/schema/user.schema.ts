@@ -1,10 +1,5 @@
-import { pgTable, pgEnum, serial, varchar, timestamp, text } from "drizzle-orm/pg-core";
-import { Gender } from "@/enumeration";
-
-/**
- * 性别枚举
- */
-export const genderEnum = pgEnum("gender", Object.values(Gender) as [string, ...string[]]);
+import { pgTable, serial, varchar, timestamp, text } from "drizzle-orm/pg-core";
+import { genderEnum, Gender } from "@/enumeration";
 
 /**
  * 用户表
