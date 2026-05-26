@@ -1,4 +1,5 @@
-import { pgTable, serial, integer, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, jsonb, timestamp, date, index } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { sessions } from "./session.schema";
 import { roleEnum } from "@/enumeration";
 
@@ -12,5 +13,9 @@ export const messages = pgTable("c_messages", {
     role: roleEnum("role").notNull(),          // "user" | "assistant" | "system"
     content: jsonb("content").notNull(),   // 存完整的 Message 内容（文本/多模态/工具调用）
     meta: jsonb("meta"),                   // isMeta、isVirtual、toolUseResult 等元信息
+    createdDate: date("created_date").default(sql`CURRENT_DATE`).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+    index("idx_messages_session_id").on(table.sessionId, table.createdAt),
+    index("idx_messages_created_date").on(table.createdDate),
+]);
