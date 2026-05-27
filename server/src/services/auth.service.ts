@@ -9,6 +9,7 @@ import { BizCode, LoginType, LoginStatus } from "@/enumeration";
 import { db, loginLogs, users } from "@/db";
 import { eq } from "drizzle-orm";
 import { config } from "@/config";
+import type { JwtPayload } from "@/types/jwt.type";
 
 const SMS_CODE_TTL = 300;
 const SMS_RATE_TTL = 60;
@@ -75,7 +76,7 @@ export class AuthService {
             userId = existingUser.id;
         }
 
-        const token = jwt.sign({ userId }, config.JWT_SECRET, {
+        const token = jwt.sign({ userId } as JwtPayload, config.JWT_SECRET, {
             expiresIn: Number(config.JWT_EXPIRES_IN),
         });
         await this.loginLog({ userId, loginType: LoginType.Sms, status: LoginStatus.Success, failReason: "登录成功", ip, userAgent, token });

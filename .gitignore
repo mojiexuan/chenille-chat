@@ -8,3 +8,5 @@ dist
 .trae/
 
 *.test.ts
+
+volumes/

@@ -10,3 +10,4 @@ export type * from "./session.type";
 export type * from "./skill.type";
 export type * from "./mcp.type";
 export type * from "./agent.type";
+export type * from "./jwt.type";

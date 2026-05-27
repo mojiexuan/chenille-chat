@@ -15,4 +15,5 @@ export class BizCode {
     static readonly SMS_RATE_LIMIT = new BizCode(40006, 429, "验证码发送过于频繁，请稍后再试");
     static readonly SMS_SEND_FAIL = new BizCode(40007, 500, "验证码发送失败");
     static readonly SMS_CODE_INVALID = new BizCode(40008, 400, "验证码错误或已过期");
+    static readonly AUTH_EXPIRED = new BizCode(40009, 401, "登录已过期，请重新登录");
 }
