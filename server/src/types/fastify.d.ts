@@ -6,4 +6,7 @@ declare module "fastify" {
         redis: Redis;
         db: typeof db;
     }
+    interface FastifyRequest {
+        userId?: number;
+    }
 }

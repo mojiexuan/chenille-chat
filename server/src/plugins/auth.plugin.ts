@@ -18,7 +18,7 @@ export async function verifyJwt(request: FastifyRequest) {
 
     try {
         const payload = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
-        (request as any).userId = payload.userId;
+        request.userId = payload.userId;
     } catch {
         throw new BizException(BizCode.AUTH_EXPIRED);
     }

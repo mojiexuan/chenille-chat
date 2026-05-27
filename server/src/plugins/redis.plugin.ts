@@ -13,7 +13,7 @@ async function redisPlugin(fastify: FastifyInstance) {
     const redis = new Redis({
         host: config.REDIS_HOST,
         port: Number(config.REDIS_PORT),
-        password: undefined,
+        password: void 0,
         lazyConnect: true,
         retryStrategy: (times) => {
             if (times >= 3) {

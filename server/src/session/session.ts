@@ -14,11 +14,11 @@ import { randomUUID } from "@/utils";
 class Session {
   private options: SessionOption;
   private data: SessionData = {
-    title: undefined,
+    title: void 0,
     timestamp: Date.now(),
     messages: [],
     sessionId: randomUUID() as SessionId,
-    parentSessionId: undefined,
+    parentSessionId: void 0,
   };
 
   constructor(options?: SessionOption) {

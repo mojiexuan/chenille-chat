@@ -106,7 +106,7 @@ class OpenAiModel extends AiModel {
                 return {
                   id: call.id,
                   name: call.function?.name,
-                  arguments: call.function?.arguments || undefined,
+                  arguments: call.function?.arguments || void 0,
                 } as ChatToolCall;
               }
               return [];

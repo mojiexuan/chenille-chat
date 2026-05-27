@@ -95,7 +95,7 @@ async function handleResponse<T>(
         if (showSuccessToast && apiResponse.message) {
             toast.success(apiResponse.message);
         }
-        // 返回 data 字段，如果 data 不存在则返回 undefined
+        // 返回 data 字段，如果 data 不存在则返回 void 0
         return apiResponse.data as T;
     } else {
         // 业务错误，显示错误提示
@@ -175,10 +175,10 @@ export async function request<T = unknown, P = unknown>(
             // GET/DELETE 请求，将参数添加到 URL
             const searchParams = new URLSearchParams(params as Record<string, string>);
             const separator = fullUrl.includes('?') ? '&' : '?';
-            requestInit.body = undefined;
+            requestInit.body = void 0;
             return request<T>(`${fullUrl}${separator}${searchParams.toString()}`, {
                 ...options,
-                params: undefined,
+                params: void 0,
             });
         } else {
             // POST/PUT/PATCH 请求，将参数放到 body

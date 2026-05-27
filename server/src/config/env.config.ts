@@ -4,26 +4,26 @@ import type { Config, EnvSchema } from "@/types";
 /**
  * 集中定义所有环境变量。
  * - value 为 string：默认值，env 中未设置时使用
- * - value 为 undefined：必填项，env 中未设置则退出程序
+ * - value 为 void 0：必填项，env 中未设置则退出程序
  */
 export const schema = {
   NODE_ENV: "development",
   APP_NAME: "AiChat",
   APP_PORT: "3000",
-  OPENAI_API_KEY: undefined,
-  OPENAI_API_BASE: undefined,
+  OPENAI_API_KEY: void 0,
+  OPENAI_API_BASE: void 0,
   OPENAI_API_MODEL: "gpt-5.4",
   REDIS_HOST: "127.0.0.1",
   REDIS_PORT: "6379",
   DB_HOST: "127.0.0.1",
   DB_PORT: "5432",
-  DB_USER: undefined,
-  DB_PASSWORD: undefined,
-  DB_NAME: undefined,
-  JWT_SECRET: undefined,
+  DB_USER: void 0,
+  DB_PASSWORD: void 0,
+  DB_NAME: void 0,
+  JWT_SECRET: void 0,
   JWT_EXPIRES_IN: "604800",
-  ALIBABA_CLOUD_SMS_ACCESS_KEY_ID: undefined,
-  ALIBABA_CLOUD_SMS_ACCESS_KEY_SECRET: undefined,
+  ALIBABA_CLOUD_SMS_ACCESS_KEY_ID: void 0,
+  ALIBABA_CLOUD_SMS_ACCESS_KEY_SECRET: void 0,
 } satisfies EnvSchema;
 
 const cache = new Map<string, string>();
@@ -43,13 +43,13 @@ export const config: Config = new Proxy(schema, {
     }
 
     const value = process.env[prop];
-    if (value !== undefined) {
+    if (value !== void 0) {
       cache.set(prop, value);
       return value;
     }
 
     const defaultValue = schema[prop as keyof typeof schema];
-    if (defaultValue !== undefined) {
+    if (defaultValue !== void 0) {
       cache.set(prop, defaultValue);
       return defaultValue;
     }
@@ -59,6 +59,6 @@ export const config: Config = new Proxy(schema, {
       process.exit(1);
     }
 
-    return undefined;
+    return void 0;
   },
 }) as unknown as Config;

@@ -50,9 +50,9 @@ class AnthropicModel extends AiModel {
     const messages = this.buildMessages(options.messages);
     const tools = options.tools
       ? await Promise.all(
-          options.tools.map((tool) => this.toolToAnthropicSchema(tool)),
-        )
-      : undefined;
+        options.tools.map((tool) => this.toolToAnthropicSchema(tool)),
+      )
+      : void 0;
 
     try {
       if (options.stream) {
@@ -187,10 +187,10 @@ class AnthropicModel extends AiModel {
   private buildSystemPrompt(
     systemPrompt?: SystemPrompt,
   ): string | undefined {
-    if (!systemPrompt) return undefined;
+    if (!systemPrompt) return void 0;
     if (typeof systemPrompt === "string") return systemPrompt;
     if (Array.isArray(systemPrompt)) return systemPrompt.join("\n");
-    return undefined;
+    return void 0;
   }
 
   private buildMessages(
@@ -207,14 +207,14 @@ class AnthropicModel extends AiModel {
         }
         const blocks = Array.isArray(content)
           ? content.map((block) => {
-              if (block.type === "text" && "text" in block) {
-                return {
-                  type: "text" as const,
-                  text: (block as { text: string }).text,
-                };
-              }
-              return { type: "text" as const, text: JSON.stringify(block) };
-            })
+            if (block.type === "text" && "text" in block) {
+              return {
+                type: "text" as const,
+                text: (block as { text: string }).text,
+              };
+            }
+            return { type: "text" as const, text: JSON.stringify(block) };
+          })
           : [{ type: "text" as const, text: JSON.stringify(content) }];
         return { role: "user", content: blocks } as Anthropic.Messages.MessageParam;
       }

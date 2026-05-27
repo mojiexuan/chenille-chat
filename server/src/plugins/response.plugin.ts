@@ -19,7 +19,7 @@ async function responsePluginFn(fastify: FastifyInstance) {
             code: BizCode.SUCCESS.code,
             message: message || BizCode.SUCCESS.message,
         };
-        if (data !== null && data !== undefined) {
+        if (data !== null && data !== void 0) {
             body.data = data;
         }
         return this.send(body);
