@@ -1,19 +1,21 @@
 import type { User } from '@/types';
-import { post, get } from './fetch';
+import { post } from './fetch';
 
 /**
- * 邮箱登录
+ * 获取手机号验证码
  */
-export const emailLoginRequest = (email: string, code: string) => {
-    return post<User>('/auth/email/login', {
-        email,
-        code,
+export const phoneCodeRequest = (phone: string) => {
+    return post<void>('/auth/phone/code', {
+        phone,
     });
 }
 
 /**
- * 获取邮箱验证码
+ * 手机号登录
  */
-export const emailCodeRequest = (email: string) => {
-    return get<void>(`/auth/email/code?email=${email}`);
+export const phoneLoginRequest = (phone: string, code: string) => {
+    return post<User>('/auth/phone/login', {
+        phone,
+        code,
+    });
 }
