@@ -1,8 +1,8 @@
 import { users } from "@/db";
 
 export const userSafeInfo = {
-    id: users.id,
     username: users.username,
+    nickname: users.nickname,
     email: users.email,
     phone: users.phone,
     gender: users.gender,

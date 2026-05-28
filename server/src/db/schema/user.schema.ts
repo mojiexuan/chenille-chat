@@ -7,6 +7,7 @@ import { genderEnum, Gender } from "@/enumeration";
 export const users = pgTable("c_users", {
     id: serial("id").primaryKey(),
     username: varchar("username", { length: 50 }).notNull().unique(),
+    nickname: varchar("nickname", { length: 50 }).notNull(),
     email: varchar("email", { length: 255 }).unique(),
     phone: varchar("phone", { length: 20 }).notNull().unique(),
     password: varchar("password", { length: 255 }),

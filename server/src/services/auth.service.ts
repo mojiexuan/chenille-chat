@@ -7,7 +7,7 @@ import { REDIS_SMS_PHONE_LOGIN_CODE_PREFIX, REDIS_SMS_PHONE_LOGIN_RATE_PREFIX } 
 import { BizException } from "@/exception";
 import { BizCode, LoginType, LoginStatus } from "@/enumeration";
 import { db, loginLogs, users } from "@/db";
-import { eq } from "drizzle-orm";
+import { eq, max } from "drizzle-orm";
 import { config } from "@/config";
 import type { JwtPayload } from "@/types/jwt.type";
 
@@ -70,7 +70,13 @@ export class AuthService {
         let userId: number;
 
         if (!existingUser) {
-            const [newUser] = await db.insert(users).values({ phone, username: phone }).returning({ id: users.id });
+            const [{ maxId }] = await db.select({ maxId: max(users.id) }).from(users);
+            const username = String(100000000 + (maxId ?? 0) + 1);
+            const [newUser] = await db.insert(users).values({
+                phone,
+                username,
+                nickname: randomStr(4, CharType.Upper),
+            }).returning({ id: users.id });
             userId = newUser.id;
         } else {
             userId = existingUser.id;
@@ -81,7 +87,7 @@ export class AuthService {
         });
         await this.loginLog({ userId, loginType: LoginType.Sms, status: LoginStatus.Success, failReason: "登录成功", ip, userAgent, token });
 
-        return { userId, token };
+        return token;
     }
 
     /**

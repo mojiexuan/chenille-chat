@@ -34,6 +34,6 @@ export async function phoneCodeLoginHandler(request: FastifyRequest, reply: Fast
     const userAgent = request.headers["user-agent"];
     const { redis } = request.server;
     const authService = new AuthService(redis, new SmsService());
-    const result = await authService.phoneCodeLogin(parsed.data.phone, parsed.data.code, ip, userAgent);
-    return reply.success(result, "登录成功");
+    const token = await authService.phoneCodeLogin(parsed.data.phone, parsed.data.code, ip, userAgent);
+    return reply.success(token, "登录成功");
 }

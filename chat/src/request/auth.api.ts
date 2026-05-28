@@ -1,4 +1,3 @@
-import type { User } from '@/types';
 import { post } from './fetch';
 
 /**
@@ -14,7 +13,7 @@ export const phoneCodeRequest = (phone: string) => {
  * 手机号登录
  */
 export const phoneLoginRequest = (phone: string, code: string) => {
-    return post<User>('/auth/phone/login', {
+    return post<string>('/auth/phone/login', {
         phone,
         code,
     });

@@ -6,7 +6,7 @@ import { defineStore } from 'pinia'
 import router from '@/router'
 import { TOKEN_KEY } from '@/config'
 import { useAuth, useToast } from '@/composables'
-import { emailLoginRequest, userInfoRequest } from '@/request'
+import { phoneLoginRequest, userInfoRequest } from '@/request'
 
 /**
  * 用户store
@@ -42,25 +42,18 @@ export const useUserStore = defineStore('user', () => {
      * @author 陈佳宝
      * @date 2026-01-12
      */
-    async function emailLogin(email: string, code: string): Promise<void> {
-        const data = await emailLoginRequest(email, code)
-        if (data.token) {
+    async function phoneLogin(phone: string, code: string): Promise<void> {
+        const token = await phoneLoginRequest(phone, code)
+        if (token) {
             // 设置token
-            setToken(data.token)
+            setToken(token)
         } else {
             // 登示错误提示
             useToast().error('登录结果异常')
             return
         }
-        if (data.avatar) {
-            user.value.avatar = data.avatar
-        }
-        if (data.nickname) {
-            user.value.nickname = data.nickname
-        }
-        if (data.email) {
-            user.value.email = data.email
-        }
+        // 刷新用户信息
+        refreshUserInfo();
         // 隐藏AuthModal
         useAuth().hide()
         // 跳转首页
@@ -74,6 +67,9 @@ export const useUserStore = defineStore('user', () => {
      */
     async function refreshUserInfo(): Promise<void> {
         const data = await userInfoRequest()
+        if (data.username) {
+            user.value.username = data.username
+        }
         if (data.avatar) {
             user.value.avatar = data.avatar
         }
@@ -82,6 +78,12 @@ export const useUserStore = defineStore('user', () => {
         }
         if (data.email) {
             user.value.email = data.email
+        }
+        if (data.phone) {
+            user.value.phone = data.phone
+        }
+        if (data.gender) {
+            user.value.gender = data.gender
         }
     }
 
@@ -102,7 +104,7 @@ export const useUserStore = defineStore('user', () => {
         user,
         isLogin,
         setToken,
-        emailLogin,
+        phoneLogin,
         refreshUserInfo,
         logout,
     }
