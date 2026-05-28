@@ -26,3 +26,14 @@ export function isNumeric(value: string): boolean {
     // 返回校验结果
     return numericRegex.test(text);
 }
+
+/**
+ * 判断是否为合法手机号
+ * @param value 待校验字符串
+ * @returns 是否为合法手机号
+ */
+export function isPhone(value: string): boolean {
+    const phone = value.trim();
+    const phoneRegex = /^1[3-9]\d{9}$/;
+    return phoneRegex.test(phone);
+}

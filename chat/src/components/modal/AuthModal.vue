@@ -10,23 +10,23 @@
                             stroke-linejoin="round" />
                     </svg>
                 </button>
-                <h2 class="auth-modal-content-title">邮箱验证码登录</h2>
+                <h2 class="auth-modal-content-title">手机验证码登录</h2>
                 <section class="auth-modal-content-form">
                     <div class="auth-modal-content-form-item">
-                        <input v-model="userEmail" @change="userEmailChange" type="text" placeholder="请输入邮箱"
-                            maxlength="50" minlength="4">
+                        <input v-model="userPhone" @change="userPhoneChange" type="text" placeholder="请输入手机号"
+                            maxlength="11" minlength="11">
                     </div>
-                    <div class="auth-modal-content-form-item-tip">{{ emailTip }}</div>
+                    <div class="auth-modal-content-form-item-tip">{{ phoneTip }}</div>
                     <div class="auth-modal-content-form-item">
                         <input v-model="userCode" @change="userCodeChange" type="text" placeholder="请输入验证码"
                             maxlength="6" minlength="6">
                         <span class="auth-modal-content-form-item-separator">|</span>
                         <a class="auth-modal-content-form-item-get-code" :disabled="isDisabledCodeButton"
-                            @click="getEmailCode">{{ codeButtonText }}</a>
+                            @click="getPhoneCode">{{ codeButtonText }}</a>
                     </div>
                     <div class="auth-modal-content-form-item-tip">{{ codeTip }}</div>
                     <button class="auth-modal-content-form-item auth-modal-content-form-item-login"
-                        @click="emailLogin">登录</button>
+                        @click="phoneLogin">登录</button>
                 </section>
             </div>
         </div>
@@ -37,26 +37,26 @@
 import { computed, ref } from 'vue';
 import { visible } from '@/composables';
 import { useUserStore } from '@/stores';
-import { isEmail, isNumeric } from '@/utils';
-import { emailCodeRequest } from '@/request';
+import { isPhone, isNumeric } from '@/utils';
+import { phoneCodeRequest } from '@/request';
 
 const isShow = computed(() => visible.value);
 // 用户store
 const userStore = useUserStore();
 
-// 邮箱验证码登录提示
-const emailTip = ref('');
+// 手机号验证码登录提示
+const phoneTip = ref('');
 const codeTip = ref('');
-const userEmail = ref('');
+const userPhone = ref('');
 const userCode = ref('');
 const codeButtonText = ref('获取验证码');
 const isDisabledCodeButton = ref(false);
 
 /**
- * 邮箱输入框改变事件
+ * 手机号输入框改变事件
  */
-function userEmailChange() {
-    emailTip.value = '';
+function userPhoneChange() {
+    phoneTip.value = '';
 }
 
 /**
@@ -67,14 +67,14 @@ function userCodeChange() {
 }
 
 /**
- * 获取邮箱验证码
+ * 获取手机号验证码
  */
-async function getEmailCode() {
-    if (validateEmail()) {
-        emailCodeRequest(userEmail.value)
+async function getPhoneCode() {
+    if (validatePhone()) {
+        phoneCodeRequest(userPhone.value)
             .then(() => {
                 isDisabledCodeButton.value = true;
-                emailTip.value = '';
+                phoneTip.value = '';
                 codeTip.value = '';
                 // 60秒倒计时，从60开始
                 let count = 60;
@@ -96,24 +96,24 @@ async function getEmailCode() {
 }
 
 /**
- * 验证邮箱格式
+ * 验证手机号格式
  */
-function validateEmail() {
-    if (userEmail.value.length < 4 || userEmail.value.length > 50) {
-        emailTip.value = '邮箱长度应该在4-50个字符之间';
+function validatePhone() {
+    if (userPhone.value.length < 4 || userPhone.value.length > 50) {
+        phoneTip.value = '手机号长度应该在4-50个字符之间';
         return false;
     }
-    if (!isEmail(userEmail.value)) {
-        emailTip.value = '请输入正确的邮箱格式';
+    if (!isPhone(userPhone.value)) {
+        phoneTip.value = '请输入正确的手机号格式';
         return false;
     }
 }
 
 /**
- * 邮箱登录
+ * 手机号登录
  */
-async function emailLogin() {
-    if (validateEmail()) {
+async function phoneLogin() {
+    if (validatePhone()) {
         if (userCode.value.length !== 6) {
             codeTip.value = '请输入6位验证码';
             return false;
@@ -122,7 +122,7 @@ async function emailLogin() {
             codeTip.value = '请输入数字验证码';
             return false;
         }
-        userStore.emailLogin(userEmail.value, userCode.value)
+        userStore.phoneLogin(userPhone.value, userCode.value)
     }
 }
 </script>
