@@ -4,9 +4,8 @@ import { responsePlugin, errorHandlerPlugin, redisClientPlugin, dbClientPlugin }
 import { logger } from "@/utils";
 import { v1Controller } from "@/router/v1";
 
-const app = Fastify({
-  logger,
-});
+const app = Fastify({});
+app.log = logger;
 
 // 注册错误处理插件
 app.register(errorHandlerPlugin);

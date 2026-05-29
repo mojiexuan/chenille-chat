@@ -44,7 +44,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         // 注释
-        // target: 'http://127.0.0.1:33003/',
+        target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       },
     },
