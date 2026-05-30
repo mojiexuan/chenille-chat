@@ -6,14 +6,14 @@
                 <div class="home-input-area-box-editor-wrapper" :data-message="editorMessage">
                     <textarea class="home-input-area-box-editor" v-model="editorMessage"
                         placeholder="聊点什么？shift+enter换行" spellcheck="false" autocomplete="off" autocapitalize="off"
-                        enterkeyhint="send" @keydown="handleEditorKeydown" @change="handleEditorChange"></textarea>
+                        enterkeyhint="send" @keydown="handleEditorKeydown" @input="handleEditorInput"></textarea>
                 </div>
                 <!-- 功能区域 -->
                 <div class="home-input-area-box-editor-end">
                     <div class="home-input-area-box-editor-end-left"></div>
                     <div class="home-input-area-box-editor-end-right">
                         <a class="home-input-area-box-editor-end-right-send-button"
-                            :class="{ 'active': isSendButtonActive }">
+                            :class="{ 'active': isSendButtonActive }" @click="sendClick">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path d="M24.0083 12.1006V36.0001" stroke="#ffffff" stroke-width="4"
@@ -32,6 +32,8 @@
 
 <script setup lang="ts" name="home">
 import { ref } from 'vue';
+import { aiChatSse } from '@/request';
+
 // 编辑器消息
 const editorMessage = ref('');
 // 发送按钮是否激活
@@ -53,7 +55,7 @@ function handleEditorKeydown(e: KeyboardEvent) {
 /**
  * 编辑器内容事件处理
  */
-function handleEditorChange() {
+function handleEditorInput() {
     isSendButtonActive.value = editorMessage.value.trim().length > 0;
 }
 
@@ -64,6 +66,9 @@ function sendClick() {
     if (!isSendButtonActive.value) {
         return;
     }
+    aiChatSse(editorMessage.value, (msg) => {
+        console.log(msg);
+    })
 }
 </script>
 
@@ -161,6 +166,10 @@ function sendClick() {
     align-items: center;
     justify-content: center;
     cursor: not-allowed;
+}
+
+.home-input-area-box-editor-end-right-send-button:hover {
+    background-color: var(--ch-main-hover-color);
 }
 
 .home-input-area-box-editor-end-right-send-button.active {

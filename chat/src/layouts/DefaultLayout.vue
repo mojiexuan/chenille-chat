@@ -48,7 +48,7 @@
                         <div class="default-layout-nav-footer-me-content-item">
                             <img class="default-layout-nav-footer-me-content-item-icon" :src="userAvatar" alt="用户头像" />
                             <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{ userNameNickname
-                            }}</span>
+                                }}</span>
                         </div>
                     </menu>
                     <!-- 用户信息 -->
@@ -313,6 +313,7 @@ function switchSidebarClick() {
     width: 100%;
     max-width: 960px;
     height: calc(100vh - var(--ch-height-header) - 12px);
+    padding: 0 20px;
     overflow-y: auto;
     overflow-x: hidden;
     margin: 0 auto;
