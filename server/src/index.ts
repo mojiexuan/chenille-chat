@@ -2,7 +2,7 @@ import Fastify from "fastify";
 import { config } from "@/config";
 import { responsePlugin, errorHandlerPlugin, redisClientPlugin, dbClientPlugin } from "@/plugins";
 import { logger } from "@/utils";
-import { v1Controller } from "@/router/v1";
+import { v1Router } from "@/router/v1";
 
 const app = Fastify({});
 app.log = logger;
@@ -16,7 +16,7 @@ app.register(redisClientPlugin);
 // 注册数据库插件
 app.register(dbClientPlugin);
 // 注册V1控制器插件
-app.register(v1Controller, { prefix: "/api/v1" });
+app.register(v1Router, { prefix: "/api/v1" });
 
 app.listen({ port: Number(config.APP_PORT) }, (err) => {
   if (err) throw err;
