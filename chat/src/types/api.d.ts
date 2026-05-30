@@ -27,3 +27,10 @@ export interface FetchOptions<P = unknown> extends RequestInit {
     /** 是否显示成功提示，默认 false */
     showSuccessToast?: boolean;
 }
+
+/**
+ * 服务端发送事件格式
+ */
+export interface SSEEvent<T = unknown> {
+    data: T;
+}

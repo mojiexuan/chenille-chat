@@ -16,4 +16,5 @@ export class BizCode {
     static readonly SMS_SEND_FAIL = new BizCode(40007, 500, "验证码发送失败");
     static readonly SMS_CODE_INVALID = new BizCode(40008, 400, "验证码错误或已过期");
     static readonly AUTH_EXPIRED = new BizCode(40009, 401, "登录已过期，请重新登录");
+    static readonly AI_CHAT_ERROR = new BizCode(40010, 500, "AI会话意外中断，请重试");
 }

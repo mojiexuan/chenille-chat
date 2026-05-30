@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { sendPhoneCodeHandler, phoneCodeLoginHandler, meInfoHandler } from "@/controllers";
+import { sendPhoneCodeHandler, phoneCodeLoginHandler, meInfoHandler, chatSseHandler } from "@/controllers";
 import { verifyJwt } from "@/plugins/auth.plugin";
 
 export async function v1Router(fastify: FastifyInstance) {
@@ -9,5 +9,6 @@ export async function v1Router(fastify: FastifyInstance) {
     fastify.register(async (protectedScope) => {
         protectedScope.addHook("preHandler", verifyJwt);
         protectedScope.get("/user/me", meInfoHandler);
+        protectedScope.post("/chat/sse", chatSseHandler);
     })
 }
