@@ -9,4 +9,4 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 export const TOKEN_KEY = 'access_token';
 
 /** 成功状态码 */
-export const SUCCESS_CODE = 200;
+export const SUCCESS_CODE = 20000;
