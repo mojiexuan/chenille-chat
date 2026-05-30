@@ -305,16 +305,17 @@ function switchSidebarClick() {
 
 .default-layout-content-main {
     width: 100%;
-    height: calc(100vh - var(--ch-height-header));
+    height: calc(100vh - var(--ch-height-header) - 12px);
     overflow: hidden;
 }
 
 .default-layout-content-main-container {
     width: 100%;
     max-width: 960px;
-    height: calc(100vh - var(--ch-height-header));
+    height: calc(100vh - var(--ch-height-header) - 12px);
     overflow-y: auto;
     overflow-x: hidden;
     margin: 0 auto;
+    transition: all .3s ease;
 }
 </style>

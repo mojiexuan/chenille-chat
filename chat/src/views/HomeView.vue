@@ -1,15 +1,179 @@
 <template>
     <div class="home">
-        132456
+        <div class="home-container"></div>
+        <div class="home-input-area">
+            <div class="home-input-area-box">
+                <div class="home-input-area-box-editor-wrapper" :data-message="editorMessage">
+                    <textarea class="home-input-area-box-editor" v-model="editorMessage"
+                        placeholder="聊点什么？shift+enter换行" spellcheck="false" autocomplete="off" autocapitalize="off"
+                        enterkeyhint="send" @keydown="handleEditorKeydown" @change="handleEditorChange"></textarea>
+                </div>
+                <!-- 功能区域 -->
+                <div class="home-input-area-box-editor-end">
+                    <div class="home-input-area-box-editor-end-left"></div>
+                    <div class="home-input-area-box-editor-end-right">
+                        <a class="home-input-area-box-editor-end-right-send-button"
+                            :class="{ 'active': isSendButtonActive }">
+                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M24.0083 12.1006V36.0001" stroke="#ffffff" stroke-width="4"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 24L24 12L36 24" stroke="#ffffff" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="home-input-area-tip">内容由AI生成，请仔细甄别</div>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts" name="home">
+import { ref } from 'vue';
+// 编辑器消息
+const editorMessage = ref('');
+// 发送按钮是否激活
+const isSendButtonActive = ref(false);
+
+/**
+ * 编辑器键盘事件处理
+ */
+function handleEditorKeydown(e: KeyboardEvent) {
+    if (e.shiftKey && e.key === 'Enter') {
+        return;
+    }
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        sendClick();
+    }
+}
+
+/**
+ * 编辑器内容事件处理
+ */
+function handleEditorChange() {
+    isSendButtonActive.value = editorMessage.value.trim().length > 0;
+}
+
+/**
+ * 发送按钮点击事件处理
+ */
+function sendClick() {
+    if (!isSendButtonActive.value) {
+        return;
+    }
+}
 </script>
 
 <style scoped>
 .home {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-container {
+    flex: 1;
+    width: 100%;
+}
+
+.home-input-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-input-area-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    background-color: var(--ch-bg-color-card);
+    box-shadow: var(--ch-box-shadow-2);
+    border-radius: 10px;
+    border: 1px solid var(--ch-border-card-color);
+    padding: 16px 16px 10px 16px;
+}
+
+.home-input-area-box-editor-wrapper {
+    display: grid;
+    max-height: 132px;
+    overflow: hidden;
+}
+
+.home-input-area-box-editor-wrapper::after {
+    content: attr(data-message) ' ';
+    white-space: pre-wrap;
+    word-break: break-word;
+    visibility: hidden;
+    grid-area: 1 / 1;
+    font: inherit;
+}
+
+.home-input-area-box-editor-wrapper::after,
+.home-input-area-box-editor {
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.home-input-area-box-editor {
+    grid-area: 1 / 1;
+    width: 100%;
+    max-height: 132px;
+    resize: none;
+    transition: all 0.2s linear;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.home-input-area-box-editor-end {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.home-input-area-box-editor-end-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.home-input-area-box-editor-end-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.home-input-area-box-editor-end-right-send-button {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: var(--ch-main-color);
+    opacity: 0.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: not-allowed;
+}
+
+.home-input-area-box-editor-end-right-send-button.active {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.home-input-area-tip {
+    max-width: 100%;
+    color: var(--ch-text-color-2);
+    user-select: none;
+    padding: 6px 0;
+    font-size: 11px;
+    line-height: 16px;
 }
 </style>

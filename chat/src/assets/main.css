@@ -5,6 +5,7 @@ html[data-theme="light"] {
   --ch-feature-card-bg: #f6f6f7;
   --ch-feature-card-hover-bg: #e7e8ec;
   --ch-text-color-1: #3c3c43;
+  --ch-text-color-2: #81858c;
   --ch-text-white-color: #ffffff;
   --ch-mask-active: rgba(0, 0, 0, 0.6);
   --ch-black-bg-white: #1b1b1f;
@@ -17,6 +18,7 @@ html[data-theme="light"] {
   --ch-border-card-color: rgba(60, 60, 60, 0.12);
   --ch-border-divider-color: #e2e2e3;
   --ch-box-shadow-1: 0 12px 32px #0000001a, 0 2px 6px #00000014;
+  --ch-box-shadow-2: 0 6px 30px 0 rgba(0, 0, 0, 0.08);
   --ch-height-header: 52px;
 }
 
