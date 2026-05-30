@@ -7,6 +7,7 @@ import router from '@/router'
 import { TOKEN_KEY } from '@/config'
 import { useAuth, useToast } from '@/composables'
 import { phoneLoginRequest, userInfoRequest } from '@/request'
+import defaultAvatar from '@/assets/images/avatar.png'
 
 /**
  * 用户store
@@ -15,6 +16,8 @@ import { phoneLoginRequest, userInfoRequest } from '@/request'
  */
 export const useUserStore = defineStore('user', () => {
     const user = ref<User>({
+        nickname: '未登录',
+        avatar: defaultAvatar,
         token: localStorage.getItem(TOKEN_KEY),
     })
 
@@ -93,6 +96,13 @@ export const useUserStore = defineStore('user', () => {
     function logout(): void {
         // 移除token
         user.value.token = null
+        // 清空用户信息
+        user.value.nickname = '未登录'
+        user.value.avatar = defaultAvatar
+        user.value.username = ''
+        user.value.email = ''
+        user.value.phone = ''
+        user.value.gender = ''
         localStorage.removeItem(TOKEN_KEY)
         // 展示AuthModal
         useAuth().show()

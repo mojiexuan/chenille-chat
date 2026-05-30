@@ -3,6 +3,7 @@ html[data-theme="light"] {
   --ch-main-hover-color: #e23914;
   --ch-bg-color-card: #ffffff;
   --ch-feature-card-bg: #f6f6f7;
+  --ch-feature-card-hover-bg: #e7e8ec;
   --ch-text-color-1: #3c3c43;
   --ch-text-white-color: #ffffff;
   --ch-mask-active: rgba(0, 0, 0, 0.6);
@@ -45,6 +46,7 @@ a {
 }
 
 img {
+  user-select: none;
   /* user-drag: none; */
   -webkit-user-drag: none;
   -moz-user-drag: none;
@@ -80,4 +82,10 @@ select {
   border: none;
   background-color: transparent;
   font: inherit;
+}
+
+.ellipsis {
+  overflow: hidden; /* 超出隐藏 */
+  white-space: nowrap; /* 不换行 */
+  text-overflow: ellipsis; /* 显示省略号 */
 }

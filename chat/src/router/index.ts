@@ -18,23 +18,9 @@ const routes: RouteRecordRaw[] = [
     redirect: '/home',
   },
   // 使用默认布局的路由
-  // {
-  //   path: '/',
-  //   component: DefaultLayout,
-  //   meta: { layout: 'default' },
-  //   children: [
-  //     {
-  //       path: 'home',
-  //       name: 'Home',
-  //       component: () => import('@/views/HomeView.vue'),
-  //       meta: { title: '首页', requiresAuth: true },
-  //     },
-  //   ],
-  // },
-  // 使用空白布局的路由（如登录页）
   {
     path: '/',
-    component: BlankLayout,
+    component: DefaultLayout,
     meta: { layout: 'default' },
     children: [
       {
@@ -45,6 +31,20 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
+  // 使用空白布局的路由（如登录页）
+  // {
+  //   path: '/',
+  //   component: BlankLayout,
+  //   meta: { layout: 'default' },
+  //   children: [
+  //     {
+  //       path: 'home',
+  //       name: 'Home',
+  //       component: () => import('@/views/HomeView.vue'),
+  //       meta: { title: '首页', requiresAuth: true },
+  //     },
+  //   ],
+  // },
   // 404兜底
   {
     path: '/:pathMatch(.*)*',

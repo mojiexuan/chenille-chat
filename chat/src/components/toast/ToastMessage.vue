@@ -62,6 +62,7 @@ const currentIcon = computed(() => iconMap[toastState.icon] ?? successIcon);
     font-weight: 500;
     line-height: 1.4;
     word-break: break-word;
+    user-select: none;
 }
 
 /* 动画 */

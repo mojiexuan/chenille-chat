@@ -247,6 +247,7 @@ async function phoneLogin() {
     height: 24px;
     font-size: 12px;
     color: var(--ch-tip-error-color);
+    user-select: none;
 }
 
 .auth-modal-content-form-item input {
