@@ -44,7 +44,7 @@ const currentIcon = computed(() => iconMap[toastState.icon] ?? successIcon);
     box-sizing: border-box;
     width: max-content;
     max-width: min(360px, 85vw);
-    border-radius: 50px;
+    border-radius: 5px;
     background: #ffffff;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     color: #333;
