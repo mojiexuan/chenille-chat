@@ -1,4 +1,13 @@
 /**
+ * 调用 AI 聊天接口参数
+ */
+export interface AiChatParams {
+    message: string;
+    sessionId?: string;
+    model?: string;
+}
+
+/**
  * 聊天 SSE 消息（对应后端 MessageCallback）
  */
 export interface ChatSseMessage {

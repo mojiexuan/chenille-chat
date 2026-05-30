@@ -283,7 +283,7 @@ export function patch<T = unknown, P = unknown>(
 /**
  * SSE 流式请求方法
  */
-export function sse<P = unknown>(url: string, options: SseOptions<P> = {}): AbortController {
+export function sse<T = unknown, P = unknown>(url: string, options: SseOptions<T, P> = {}): AbortController {
     const {
         params,
         onMessage,
@@ -330,9 +330,9 @@ export function sse<P = unknown>(url: string, options: SseOptions<P> = {}): Abor
             return;
         }
         try {
-            onMessage?.({ event, data: JSON.parse(data) } as SseEvent<unknown>);
+            onMessage?.({ event, data: JSON.parse(data) } as SseEvent<T>);
         } catch {
-            onMessage?.({ event, data: data as unknown } as SseEvent<unknown>);
+            onMessage?.({ event, data: data as T } as SseEvent<T>);
         }
     }
 

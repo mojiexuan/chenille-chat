@@ -31,11 +31,11 @@ export interface FetchOptions<P = unknown> extends RequestInit {
 /**
  * SSE 请求配置
  */
-export interface SseOptions<P = unknown> extends Omit<FetchOptions, "signal"> {
+export interface SseOptions<T = unknown, P = unknown> extends Omit<FetchOptions, "signal"> {
     params?: P;
     showErrorToast?: boolean;
     /** 收到消息回调 */
-    onMessage?: <T = unknown>(event: SseEvent<T>) => void;
+    onMessage?: (event: SseEvent<T>) => void;
     /** 发生错误回调 */
     onError?: (error: Error) => void;
     /** 流结束回调 */
