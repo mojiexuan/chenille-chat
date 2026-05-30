@@ -15,7 +15,12 @@
     "format": "oxfmt src/"
   },
   "dependencies": {
+    "katex": "^0.17.0",
+    "markstream-vue": "1.0.1-beta.1",
+    "mermaid": "^11.15.0",
     "pinia": "^3.0.4",
+    "stream-markdown": "^0.0.15",
+    "stream-monaco": "^0.0.41",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
   },
