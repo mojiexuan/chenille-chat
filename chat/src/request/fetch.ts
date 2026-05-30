@@ -5,7 +5,7 @@
  * - 统一错误处理
  * - 支持 Toast 提示
  */
-import type { ApiResponse, FetchOptions } from '@/types';
+import type { ApiResponse, FetchOptions, SseOptions, SseEvent } from '@/types';
 import { API_BASE_URL, TOKEN_KEY, SUCCESS_CODE } from '@/config';
 import { useToast } from '@/composables';
 import { useUserStore } from '@/stores';
@@ -54,6 +54,27 @@ function buildHeaders(customHeaders?: HeadersInit): Headers {
 }
 
 /**
+ * 检查 HTTP 响应状态码
+ */
+function checkResponseStatus(response: Response, showErrorToast: boolean) {
+    if (response.ok) {
+        return;
+    }
+    const toast = useToast();
+    const errorMessage = `请求失败: ${response.status} ${response.statusText}`;
+    if (response.status === 401) {
+        const userStore = useUserStore()
+        // 401 错误，可能需要重新登录
+        toast.error("登录过期，请重新登录");
+        userStore.logout()
+    }
+    if (showErrorToast) {
+        toast.error("服务器错误");
+    }
+    throw new Error(errorMessage);
+}
+
+/**
  * 处理响应
  */
 async function handleResponse<T>(
@@ -63,19 +84,7 @@ async function handleResponse<T>(
 ): Promise<T> {
     const toast = useToast();
     // 检查 HTTP 状态码
-    if (!response.ok) {
-        const errorMessage = `请求失败: ${response.status} ${response.statusText}`;
-        if (response.status === 401) {
-            const userStore = useUserStore()
-            // 401 错误，可能需要重新登录
-            toast.error("登录过期，请重新登录");
-            userStore.logout()
-        }
-        if (showErrorToast) {
-            toast.error("服务器错误");
-        }
-        throw new Error(errorMessage);
-    }
+    checkResponseStatus(response, showErrorToast);
 
     // 解析 JSON 响应
     let apiResponse: ApiResponse<T>;
@@ -271,6 +280,132 @@ export function patch<T = unknown, P = unknown>(
     return request<T, P>(url, { ...options, params, method: 'PATCH' });
 }
 
+/**
+ * SSE 流式请求方法
+ */
+export function sse<P = unknown>(url: string, options: SseOptions<P> = {}): AbortController {
+    const {
+        params,
+        onMessage,
+        onError,
+        onComplete,
+        showErrorToast = true,
+        headers,
+        body,
+        ...restOptions
+    } = options;
+
+    const controller = new AbortController();
+    const fullUrl = buildUrl(url);
+    const requestHeaders = buildHeaders(headers);
+    requestHeaders.set('Accept', 'text/event-stream');
+    requestHeaders.delete('Content-Type');
+
+    const requestInit: RequestInit = {
+        ...restOptions,
+        method: restOptions.method || 'POST',
+        headers: requestHeaders,
+        signal: controller.signal,
+    };
+
+    if (body) {
+        requestInit.body = body;
+        if (body instanceof FormData) {
+            requestHeaders.delete('Content-Type');
+        }
+    } else if (params) {
+        requestHeaders.set('Content-Type', 'application/json');
+        requestInit.body = JSON.stringify(params);
+    }
+
+    const toast = useToast();
+
+    /**
+     * 分发 SSE 消息
+     * @param event 事件类型
+     * @param data 事件数据
+     */
+    const dispatchMessage = (event: string, data: string) => {
+        if (!data) {
+            return;
+        }
+        try {
+            onMessage?.({ event, data: JSON.parse(data) } as SseEvent<unknown>);
+        } catch {
+            onMessage?.({ event, data: data as unknown } as SseEvent<unknown>);
+        }
+    }
+
+    (async () => {
+        try {
+            const response = await fetch(fullUrl, requestInit);
+
+            checkResponseStatus(response, showErrorToast);
+
+            const reader = response.body?.getReader();
+            if (!reader) {
+                throw new Error('响应流不可读');
+            }
+
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let currentEvent = 'message';
+            let currentData = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    break;
+                };
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (line.startsWith('event:')) {
+                        currentEvent = line.slice(6).trim();
+                    } else if (line.startsWith('data:')) {
+                        currentData += line.slice(5).trim();
+                    } else if (line === '') {
+                        dispatchMessage(currentEvent, currentData);
+                        currentEvent = 'message';
+                        currentData = '';
+                    }
+                }
+            }
+
+            if (buffer.trim()) {
+                const remaining = buffer.trim();
+                if (remaining.startsWith('data:')) {
+                    dispatchMessage('message', remaining.slice(5).trim());
+                }
+            }
+
+            onComplete?.();
+        } catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError') {
+                onComplete?.();
+                return;
+            }
+            if (error instanceof Error) {
+                if (showErrorToast) {
+                    toast.error('SSE 请求失败');
+                }
+                onError?.(error);
+            } else {
+                const unknownError = new Error('发生未知错误');
+                if (showErrorToast) {
+                    toast.error('发生未知错误');
+                }
+                onError?.(unknownError);
+            }
+        }
+    })();
+
+    return controller;
+}
+
 // 默认导出
 export default {
     request,
@@ -279,4 +414,5 @@ export default {
     put,
     delete: del,
     patch,
+    sse,
 };

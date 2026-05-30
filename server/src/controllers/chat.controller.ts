@@ -1,8 +1,9 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { chatSseDto } from "@/dto";
 import { BizException } from "@/exception";
-import { BizCode } from "@/enumeration";
+import { BizCode, SseEventName } from "@/enumeration";
 import { AiService } from "@/services";
+import type { SseEventChunk } from "@/types";
 
 /**
  * 聊天控制器
@@ -37,10 +38,22 @@ export async function chatSseHandler(request: FastifyRequest, reply: FastifyRepl
                 if (aborted) {
                     return;
                 }
-                reply.raw.write(`data: ${JSON.stringify(message)}\n\n`);
+                sseSend(reply, {
+                    event: SseEventName.AI_CHAT_MESSAGE,
+                    data: message,
+                });
             }
         }
     });
 
     reply.raw.end();
+}
+
+/**
+ * 发送 SSE 事件
+ * @param reply 响应
+ * @param data 事件数据
+ */
+function sseSend(reply: FastifyReply, data: SseEventChunk) {
+    reply.raw.write(`event: ${data.event}\ndata: ${JSON.stringify(data.data)}\n\n`);
 }
