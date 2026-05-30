@@ -169,7 +169,7 @@ function switchSidebarClick() {
     justify-content: center;
     width: 28px;
     height: 28px;
-    cursor: pointer;
+    cursor: w-resize;
 }
 
 .default-layout-nav-content {
@@ -296,7 +296,7 @@ function switchSidebarClick() {
     justify-content: center;
     width: 28px;
     height: 28px;
-    cursor: pointer;
+    cursor: w-resize;
 }
 
 .default-layout-content-header-button.active {
