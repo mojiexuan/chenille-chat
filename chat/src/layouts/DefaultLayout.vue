@@ -1,7 +1,31 @@
 <template>
     <div class="default-layout">
-        <div class="default-layout-nav">
-            <section class="default-layout-nav-header"></section>
+        <div class="default-layout-nav" :class="{ 'active': sidebarActive }">
+            <section class="default-layout-nav-header">
+                <!-- 开关侧边栏 -->
+                <div class="default-layout-nav-header-button" @click="switchSidebarClick">
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="6" y="6" width="36" height="36" rx="3" fill="none" stroke="#1b1b1f" stroke-width="3"
+                            stroke-linejoin="round" />
+                        <path d="M16 6V42" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M13 42H19" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M13 6H19" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <!-- 新会话 -->
+                <div class="default-layout-nav-header-button">
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6H44V36H29L24 41L19 36H4V6Z" fill="none" stroke="#1b1b1f" stroke-width="3"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M23 21H25.0025" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" />
+                        <path d="M33.001 21H34.9999" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" />
+                        <path d="M13.001 21H14.9999" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                </div>
+            </section>
             <section class="default-layout-nav-content"></section>
             <section class="default-layout-nav-footer">
                 <div class="default-layout-nav-footer-me" :class="{ 'active': footerMeActive }" @click="footerMeClick">
@@ -24,7 +48,7 @@
                         <div class="default-layout-nav-footer-me-content-item">
                             <img class="default-layout-nav-footer-me-content-item-icon" :src="userAvatar" alt="用户头像" />
                             <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{ userNameNickname
-                                }}</span>
+                            }}</span>
                         </div>
                     </menu>
                     <!-- 用户信息 -->
@@ -34,7 +58,27 @@
             </section>
         </div>
         <div class="default-layout-content">
-            <router-view></router-view>
+            <div class="default-layout-content-header">
+                <!-- 开关侧边栏 -->
+                <div class="default-layout-content-header-button" :class="{ 'active': !sidebarActive }"
+                    @click="switchSidebarClick">
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="6" y="6" width="36" height="36" rx="3" fill="none" stroke="#1b1b1f" stroke-width="3"
+                            stroke-linejoin="round" />
+                        <path d="M16 6V42" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M13 42H19" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M13 6H19" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+            <main class="default-layout-content-main">
+                <div class="default-layout-content-main-container">
+                    <router-view></router-view>
+                </div>
+            </main>
         </div>
     </div>
 </template>
@@ -52,6 +96,8 @@ const userNameNickname = computed(() => userStore.user.nickname);
 
 // 悬浮卡片是否显示
 const footerMeActive = ref(false);
+// 侧边栏是否显示
+const sidebarActive = ref(true);
 
 /**
  * 点击用户信息
@@ -63,6 +109,13 @@ function footerMeClick() {
         footerMeActive.value = false;
         userStore.logout();
     }
+}
+
+/**
+ * 点击开关侧边栏
+ */
+function switchSidebarClick() {
+    sidebarActive.value = !sidebarActive.value;
 }
 </script>
 
@@ -86,7 +139,7 @@ function footerMeClick() {
     align-items: flex-start;
     width: 254px;
     height: calc(100vh - 12px);
-    padding: 6px;
+    padding: 0 6px;
     overflow: hidden;
     position: fixed;
     transform: translateX(-100%);
@@ -94,10 +147,29 @@ function footerMeClick() {
 }
 
 @media screen and (min-width: 768px) {
-    .default-layout-nav {
+    .default-layout-nav.active {
         position: unset;
         transform: translateX(0);
     }
+}
+
+.default-layout-nav-header {
+    width: 242px;
+    height: var(--ch-height-header);
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.default-layout-nav-header-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
 }
 
 .default-layout-nav-content {
@@ -207,5 +279,42 @@ function footerMeClick() {
     border-radius: 8px;
     overflow: hidden;
     transition: all .3s ease;
+}
+
+.default-layout-content-header {
+    width: 100%;
+    height: var(--ch-height-header);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.default-layout-content-header-button {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}
+
+.default-layout-content-header-button.active {
+    display: flex;
+}
+
+.default-layout-content-main {
+    width: 100%;
+    height: calc(100vh - var(--ch-height-header));
+    overflow: hidden;
+}
+
+.default-layout-content-main-container {
+    width: 100%;
+    max-width: 960px;
+    height: calc(100vh - var(--ch-height-header));
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 0 auto;
 }
 </style>
