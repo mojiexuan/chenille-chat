@@ -1,6 +1,6 @@
-import { TICK_TAG } from "@/constants";
+import { SLEEP_TOOL_NAME, TICK_TAG } from "@/constants";
 
-export const SLEEP_TOOL_NAME = "Sleep";
+export { SLEEP_TOOL_NAME };
 
 export const SLEEP_TOOL_PROMPT = `等待指定的时长。用户可随时中断休眠状态。
 

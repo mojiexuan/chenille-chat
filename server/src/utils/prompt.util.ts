@@ -1,8 +1,6 @@
 import { config } from "@/config";
-import { RISK_INSTRUCTION, SYSTEM_REMINDER_TAG, TICK_TAG } from "@/constants";
-import { APP_FEEDBACK_TOOL_NAME, ASK_USER_QUESTION_TOOL_NAME } from "@/tools";
+import { RISK_INSTRUCTION, SYSTEM_REMINDER_TAG, TICK_TAG, APP_FEEDBACK_TOOL_NAME, ASK_USER_QUESTION_TOOL_NAME, SLEEP_TOOL_NAME } from "@/constants";
 import type { Tools, SystemPrompt } from "@/types";
-import { SLEEP_TOOL_NAME } from "@/tools";
 
 /**
  * 转换为系统提示词

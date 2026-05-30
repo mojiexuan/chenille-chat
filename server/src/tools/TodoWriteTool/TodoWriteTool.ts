@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 import { buildTool } from "../tools";
-import { TODO_WRITE_TOOL_NAME } from "./prompt";
+import { TODO_WRITE_TOOL_NAME } from "@/constants";
 import { lazySchema } from "@/utils";
 
 const todoItemSchema = lazySchema(() =>

@@ -1,6 +1,5 @@
-import Dypnsapi20170525, { SendSmsVerifyCodeRequest } from '@alicloud/dypnsapi20170525';
+import Dypnsapi20170525, * as Dypnsapi from '@alicloud/dypnsapi20170525';
 import { Config } from '@alicloud/openapi-client';
-import Credential from '@alicloud/credentials';
 import { config } from "@/config";
 import { logger } from "@/utils";
 
@@ -10,7 +9,6 @@ class SmsService {
     constructor() {
         this.dysmsapiClient = new Dypnsapi20170525(new Config(
             {
-                credential: new Credential(),
                 regionId: 'cn-chengdu',
                 protocol: 'http',
                 endpoint: 'dypnsapi.aliyuncs.com',
@@ -27,7 +25,7 @@ class SmsService {
      */
     async sendSmsCode(phone: string, code: string) {
         try {
-            const request = new SendSmsVerifyCodeRequest({
+            const request = new Dypnsapi.SendSmsVerifyCodeRequest({
                 signName: '速通互联验证码',
                 phoneNumber: phone,
                 templateCode: '100001',

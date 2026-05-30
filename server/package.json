@@ -2,10 +2,9 @@
   "name": "chenille-agent",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "concurrently \"tsc --watch --preserveWatchOutput\" \"tsc-alias --watch\" \"node --watch dist/index.js\"",
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
     "db:generate": "drizzle-kit generate --config=src/config/drizzle.config.ts",
@@ -25,9 +24,9 @@
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.0.0",
     "@types/pg": "^8.20.0",
+    "concurrently": "^10.0.0",
     "pino-pretty": "^13.1.3",
     "tsc-alias": "^1.8.17",
-    "tsx": "^4.22.3",
     "typescript": "^5.7.0"
   },
   "dependencies": {

@@ -11,6 +11,7 @@ async function errorHandlerPluginFn(fastify: FastifyInstance) {
                 message: error.message,
             });
         }
+        fastify.log.error(error);
         reply.status(BizCode.FAIL.httpStatus).send({
             code: BizCode.FAIL.code,
             message: "服务器内部错误",
