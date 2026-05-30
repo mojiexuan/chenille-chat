@@ -52,12 +52,10 @@ export const useUserStore = defineStore('user', () => {
             useToast().error('登录结果异常')
             return
         }
-        // 刷新用户信息
-        refreshUserInfo();
         // 隐藏AuthModal
         useAuth().hide()
-        // 跳转首页
-        router.replace('/')
+        // 刷新当前路由
+        router.go(0)
     }
 
     /**
