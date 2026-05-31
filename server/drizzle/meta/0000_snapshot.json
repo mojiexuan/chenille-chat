@@ -1,5 +1,5 @@
 {
-  "id": "e5d0f339-2c4c-4dc2-8d83-6984524a35c4",
+  "id": "eaf8f516-aa20-4934-984d-ad619eaab88b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -409,134 +409,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.c_messages": {
-      "name": "c_messages",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "session_id": {
-          "name": "session_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "parent_id": {
-          "name": "parent_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "role": {
-          "name": "role",
-          "type": "role",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "content": {
-          "name": "content",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "meta": {
-          "name": "meta",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_date": {
-          "name": "created_date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_DATE"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "idx_messages_session_id": {
-          "name": "idx_messages_session_id",
-          "columns": [
-            {
-              "expression": "session_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_messages_created_date": {
-          "name": "idx_messages_created_date",
-          "columns": [
-            {
-              "expression": "created_date",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "c_messages_session_id_c_sessions_id_fk": {
-          "name": "c_messages_session_id_c_sessions_id_fk",
-          "tableFrom": "c_messages",
-          "tableTo": "c_sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "c_messages_parent_id_c_messages_id_fk": {
-          "name": "c_messages_parent_id_c_messages_id_fk",
-          "tableFrom": "c_messages",
-          "tableTo": "c_messages",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.c_sessions": {
       "name": "c_sessions",
       "schema": "",
@@ -643,6 +515,134 @@
           "name": "c_sessions_parent_id_c_sessions_id_fk",
           "tableFrom": "c_sessions",
           "tableTo": "c_sessions",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.c_messages": {
+      "name": "c_messages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_date": {
+          "name": "created_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_DATE"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_messages_session_id": {
+          "name": "idx_messages_session_id",
+          "columns": [
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_messages_created_date": {
+          "name": "idx_messages_created_date",
+          "columns": [
+            {
+              "expression": "created_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "c_messages_session_id_c_sessions_id_fk": {
+          "name": "c_messages_session_id_c_sessions_id_fk",
+          "tableFrom": "c_messages",
+          "tableTo": "c_sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "c_messages_parent_id_c_messages_id_fk": {
+          "name": "c_messages_parent_id_c_messages_id_fk",
+          "tableFrom": "c_messages",
+          "tableTo": "c_messages",
           "columnsFrom": [
             "parent_id"
           ],

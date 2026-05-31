@@ -2,7 +2,7 @@ CREATE TYPE "gender" AS ENUM ('male', 'female', 'other');
 CREATE TYPE "login_type" AS ENUM ('password', 'sms', 'wechat');
 CREATE TYPE "login_status" AS ENUM ('success', 'fail');
 CREATE TYPE "role" AS ENUM ('user', 'assistant', 'system');
-CREATE TYPE "model_provider" AS ENUM ('openai', 'google', 'anthropic');
+CREATE TYPE "model_provider" AS ENUM ('openai', 'google', 'anthropic', 'deepseek');
 
 CREATE TABLE "c_users" (
 	"id" serial PRIMARY KEY NOT NULL,
@@ -60,17 +60,6 @@ CREATE TABLE "c_model_providers" (
 	CONSTRAINT "c_model_providers_model_provider_unique" UNIQUE("model_provider")
 );
 --> statement-breakpoint
-CREATE TABLE "c_messages" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"session_id" integer NOT NULL,
-	"parent_id" integer,
-	"role" "role" NOT NULL,
-	"content" jsonb NOT NULL,
-	"meta" jsonb,
-	"created_date" date DEFAULT CURRENT_DATE NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "c_sessions" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
@@ -81,15 +70,26 @@ CREATE TABLE "c_sessions" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "c_messages" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"session_id" integer NOT NULL,
+	"parent_id" integer,
+	"role" "role" NOT NULL,
+	"content" text NOT NULL,
+	"meta" jsonb,
+	"created_date" date DEFAULT CURRENT_DATE NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "c_login_logs" ADD CONSTRAINT "c_login_logs_user_id_c_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."c_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "c_models" ADD CONSTRAINT "c_models_provider_id_c_model_providers_id_fk" FOREIGN KEY ("provider_id") REFERENCES "public"."c_model_providers"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "c_messages" ADD CONSTRAINT "c_messages_session_id_c_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."c_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "c_messages" ADD CONSTRAINT "c_messages_parent_id_c_messages_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."c_messages"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "c_sessions" ADD CONSTRAINT "c_sessions_user_id_c_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."c_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "c_sessions" ADD CONSTRAINT "c_sessions_parent_id_c_sessions_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."c_sessions"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "c_messages" ADD CONSTRAINT "c_messages_session_id_c_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."c_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "c_messages" ADD CONSTRAINT "c_messages_parent_id_c_messages_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."c_messages"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_login_logs_user_id" ON "c_login_logs" USING btree ("user_id","created_at" DESC NULLS LAST);--> statement-breakpoint
 CREATE INDEX "idx_login_logs_created_date" ON "c_login_logs" USING btree ("created_date");--> statement-breakpoint
-CREATE INDEX "idx_messages_session_id" ON "c_messages" USING btree ("session_id","created_at");--> statement-breakpoint
-CREATE INDEX "idx_messages_created_date" ON "c_messages" USING btree ("created_date");--> statement-breakpoint
 CREATE INDEX "idx_sessions_user_id" ON "c_sessions" USING btree ("user_id","updated_at" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "idx_sessions_created_date" ON "c_sessions" USING btree ("created_date");
+CREATE INDEX "idx_sessions_created_date" ON "c_sessions" USING btree ("created_date");--> statement-breakpoint
+CREATE INDEX "idx_messages_session_id" ON "c_messages" USING btree ("session_id","created_at");--> statement-breakpoint
+CREATE INDEX "idx_messages_created_date" ON "c_messages" USING btree ("created_date");
