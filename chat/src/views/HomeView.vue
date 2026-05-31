@@ -41,12 +41,11 @@
 import { ref, shallowRef } from 'vue';
 import { aiChatSse } from '@/request';
 import type { Message } from '@/types';
-import MarkdownRender from 'markstream-vue'
+import MarkdownRender from 'markstream-vue';
+import { useSessionStore } from '@/stores';
 
-// 会话ID
-let sessionId: number | undefined;
-// 会话标题
-const sessionTitle = ref('新会话');
+// 会话store
+const sessionStore = useSessionStore();
 // 编辑器消息
 const editorMessage = ref('');
 // 发送按钮是否激活
@@ -99,7 +98,7 @@ function sendClick() {
     isReplying.value = true;
 
     abortController.value = aiChatSse(
-        sessionId,
+        sessionStore.currentSession.id,
         message,
         (msg) => {
             if (msg.error) {
@@ -122,8 +121,8 @@ function sendClick() {
             }
         },
         (param) => {
-            sessionId = param.sessionId;
-            sessionTitle.value = param.title || '新会话';
+            sessionStore.updateCurrentSessionId(param.sessionId);
+            sessionStore.updateCurrentSessionTitle(param.title || '新会话');
         })
 }
 </script>

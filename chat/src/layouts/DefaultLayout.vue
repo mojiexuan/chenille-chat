@@ -16,7 +16,7 @@
                     </svg>
                 </div>
                 <!-- 新会话 -->
-                <div class="default-layout-nav-header-button">
+                <div class="default-layout-nav-header-button default-layout-nav-header-button-new-session">
                     <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 6H44V36H29L24 41L19 36H4V6Z" fill="none" stroke="#1b1b1f" stroke-width="3"
                             stroke-linecap="round" stroke-linejoin="round" />
@@ -48,7 +48,7 @@
                         <div class="default-layout-nav-footer-me-content-item">
                             <img class="default-layout-nav-footer-me-content-item-icon" :src="userAvatar" alt="用户头像" />
                             <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{ userNameNickname
-                                }}</span>
+                            }}</span>
                         </div>
                     </menu>
                     <!-- 用户信息 -->
@@ -59,19 +59,23 @@
         </div>
         <div class="default-layout-content">
             <div class="default-layout-content-header">
-                <!-- 开关侧边栏 -->
-                <div class="default-layout-content-header-button" :class="{ 'active': !sidebarActive }"
-                    @click="switchSidebarClick">
-                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="6" y="6" width="36" height="36" rx="3" fill="none" stroke="#1b1b1f" stroke-width="3"
-                            stroke-linejoin="round" />
-                        <path d="M16 6V42" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                        <path d="M13 42H19" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                        <path d="M13 6H19" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
+                <div class="default-layout-content-header-left">
+                    <!-- 开关侧边栏 -->
+                    <div class="default-layout-content-header-left-button" :class="{ 'active': !sidebarActive }"
+                        @click="switchSidebarClick">
+                        <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="6" y="6" width="36" height="36" rx="3" fill="none" stroke="#1b1b1f"
+                                stroke-width="3" stroke-linejoin="round" />
+                            <path d="M16 6V42" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M13 42H19" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M13 6H19" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <!-- 标题 -->
+                    <span class="default-layout-content-header-left-title ellipsis">{{ pageTitle }}</span>
                 </div>
             </div>
             <main class="default-layout-content-main">
@@ -86,10 +90,15 @@
 <script setup lang="ts" name="home">
 import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/user';
+import { useSessionStore } from '@/stores';
 
 // 用户store
 const userStore = useUserStore();
+// 会话store
+const sessionStore = useSessionStore();
 
+// 页面标题
+const pageTitle = computed(() => sessionStore.currentSession.title);
 // 用户头像
 const userAvatar = computed(() => userStore.user.avatar);
 const userNameNickname = computed(() => userStore.user.nickname);
@@ -170,6 +179,10 @@ function switchSidebarClick() {
     width: 28px;
     height: 28px;
     cursor: w-resize;
+}
+
+.default-layout-nav-header-button-new-session {
+    cursor: pointer;
 }
 
 .default-layout-nav-content {
@@ -288,9 +301,16 @@ function switchSidebarClick() {
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
+    gap: 10px;
 }
 
-.default-layout-content-header-button {
+.default-layout-content-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.default-layout-content-header-left-button {
     display: none;
     align-items: center;
     justify-content: center;
@@ -299,8 +319,13 @@ function switchSidebarClick() {
     cursor: w-resize;
 }
 
-.default-layout-content-header-button.active {
+.default-layout-content-header-left-button.active {
     display: flex;
+}
+
+.default-layout-content-header-left-title {
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .default-layout-content-main {
