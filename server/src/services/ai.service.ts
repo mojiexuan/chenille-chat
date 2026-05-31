@@ -5,6 +5,7 @@ import { BizCode, Role } from "@/enumeration";
 import { ChatSseDto } from "@/dto";
 import { getSystemPrompt, asSystemPrompt } from "@/utils";
 import { SessionService } from "./session.service";
+import { generateSessionTitle } from "@/session";
 
 export class AiService {
 
@@ -44,6 +45,22 @@ export class AiService {
             model: "deepseek-v4-pro",
             baseURL: "https://api.deepseek.com",
         });
+
+        // 生成会话标题
+        if (!session.title || session.title.length === 0) {
+            generateSessionTitle({
+                provider: AIProvider.OpenAI,
+                apiKey: process.env.OPENAI_API_KEY || "",
+                model: "deepseek-v4-flash",
+                baseURL: "https://api.deepseek.com",
+            }, [userMsg]).then((title) => {
+                if (title) {
+                    session.title = title;
+                    this.sessionService.updateSessionTitle(session.id, title);
+                }
+            })
+        }
+
         try {
             await aiModel.generate({
                 stream: true,
