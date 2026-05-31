@@ -56,7 +56,7 @@ export class SessionService {
      * @param content 消息内容
      * @param meta 消息元数据
      */
-    async addMessage(sessionId: number, role: Role, content: unknown, meta?: unknown) {
+    async addMessage(sessionId: number, role: Role, content: string, meta?: unknown) {
         const [message] = await db.insert(messages).values({
             sessionId,
             role,

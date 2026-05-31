@@ -90,6 +90,7 @@ function sendClick() {
     // 如果正在回复，直接取消请求
     if (sessionStore.isReplying) {
         abortController.value?.abort();
+        sessionStore.isReplying = false;
         return;
     }
     const message = editorMessage.value.trim();

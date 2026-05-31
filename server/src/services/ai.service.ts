@@ -6,6 +6,7 @@ import { ChatSseDto } from "@/dto";
 import { getSystemPrompt, asSystemPrompt } from "@/utils";
 import { SessionService } from "./session.service";
 import { generateSessionTitle } from "@/session";
+import { logger } from "@/utils";
 
 export class AiService {
 
@@ -30,7 +31,7 @@ export class AiService {
         const userMsg = this.buildUserMessage(params.data.message);
 
         // 添加用户消息到会话
-        await this.sessionService.addMessage(session.id, Role.User, userMsg.message);
+        await this.sessionService.addMessage(session.id, Role.User, params.data.message);
 
         // 获取会话历史消息
         const history = await this.sessionService.getMessages(session.id);
@@ -83,6 +84,7 @@ export class AiService {
                 }
             })
         } catch (err) {
+            logger.error(err);
             // throw new BizException(BizCode.AI_CHAT_ERROR);
             if (params.callback && params.callback.onMessage) {
                 params.callback.onMessage({
@@ -105,7 +107,9 @@ export class AiService {
                     this.sessionService.updateSessionTitle(session.id, title);
                     params.callback?.onTitle?.(session.id, title);
                 }
-            } catch { }
+            } catch (err) {
+                logger.error(err);
+            }
         }
     }
 
@@ -122,7 +126,7 @@ export class AiService {
     /**
      * 构建上下文消息
      */
-    private buildContextMessages(dbMessages: { role: string; content: unknown }[]): Message[] {
+    private buildContextMessages(dbMessages: { role: string; content: string }[]): Message[] {
         return dbMessages.filter((msg) => msg.role === Role.User || msg.role === Role.Assistant)
             .map((msg) => {
                 if (msg.role === Role.User) {
