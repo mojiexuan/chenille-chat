@@ -4,6 +4,7 @@ import { AiAbort } from "./ai.type";
  * 消息回调
  */
 export type MessageCallback = {
+    sessionId?: number;
     reasoning?: string;
     content?: string;
     finished: boolean;

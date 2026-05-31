@@ -30,7 +30,7 @@ export async function chatSseHandler(request: FastifyRequest, reply: FastifyRepl
     });
 
     await aiService.chat({
-        data: parsed.data, callback: {
+        data: parsed.data, userId: request.userId!, callback: {
             onAbort: (abort) => {
                 request.raw.on("close", abort)
             },

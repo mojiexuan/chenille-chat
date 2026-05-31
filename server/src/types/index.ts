@@ -13,3 +13,4 @@ export type * from "./agent.type";
 export type * from "./jwt.type";
 export type * from "./chat.type";
 export type * from "./sse.type";
+export type * from "./pagination.type";

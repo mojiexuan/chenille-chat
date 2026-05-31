@@ -1,3 +1,6 @@
+@import "markstream-vue/index.css" layer(components);
+@import "katex/dist/katex.min.css";
+
 html[data-theme="light"] {
   --ch-main-color: #f15a29;
   --ch-main-hover-color: #e23914;

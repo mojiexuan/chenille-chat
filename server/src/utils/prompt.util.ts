@@ -24,10 +24,8 @@ function getSystemRemindersSection(): string {
  * 获取语言段落
  */
 function getLanguageSection(
-  languagePreference: string | undefined,
-): string | null {
-  if (!languagePreference) return null;
-
+  languagePreference = "中文",
+): string {
   return `# 语言
   始终使用${languagePreference}进行回复。在所有解释、评论以及与用户的沟通中，请使用${languagePreference}。技术术语和代码标识符应保持原样。`;
 }
@@ -37,9 +35,9 @@ function getLanguageSection(
  */
 function getIntroSection(): string {
   const items = [
-    `您是一个教育领域综合专家，帮助用户处理教育相关任务，使用下面的说明和您可用的工具来协助用户。`,
+    `您是一个通识综合专家，帮助用户处理生活、工作、学习相关任务，使用下面的说明和您可用的工具来协助用户。`,
     RISK_INSTRUCTION,
-    `重要提示：除非您确信内容有助于教育目的，否则绝不能为用户生成或猜想任何内容。对于用户的消息或课程的内容，您必须谨慎处理，确保内容符合教育目的。`,
+    `重要提示：除非您确信内容有助于帮助用户，否则绝不能为用户生成或猜想任何内容。对于用户的消息或附件的内容，您必须谨慎处理，确保内容符合用户的需求。`,
   ];
 
   return ["# 介绍", items].join("\n");
@@ -140,8 +138,15 @@ function getOutputEfficiencySection(): string {
  */
 export function getSystemPrompt(tools: Tools): string[] {
   const items = [
-    `您是${config.APP_NAME}`,
+    `您是${config.APP_NAME}，Chenille为${config.APP_NAME}提供了网页交互界面。`,
     `您是一个自主的代理人。利用现有工具，做些有用的事情`,
+    getIntroSection(),
+    getSystemRemindersSection(),
+    getLanguageSection("中文"),
+    getSystemSection(),
+    getActionsSection(),
+    getSimpleToneAndStyleSection(),
+    getOutputEfficiencySection(),
   ];
   // 过滤出所有已启用的工具名称
   const enabledTools = new Set(tools.map((_) => _.name));

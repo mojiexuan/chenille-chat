@@ -11,6 +11,8 @@ export interface AiChatParams {
  * 聊天 SSE 消息（对应后端 MessageCallback）
  */
 export interface ChatSseMessage {
+    /** 会话 ID */
+    sessionId?: number;
     /** 思考过程 */
     reasoning?: string;
     /** 回复内容 */
