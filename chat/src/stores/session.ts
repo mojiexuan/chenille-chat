@@ -16,6 +16,8 @@ export const useSessionStore = defineStore("session", () => {
         title: "新会话",
         messages: [],
     });
+    // 是否正在回复
+    const isReplying = ref(false);
 
     /**
      * 设置当前会话
@@ -55,16 +57,27 @@ export const useSessionStore = defineStore("session", () => {
      * @author 陈佳宝
      * @date 2026-05-31
      */
-    function addCurrentSessionMessage(message: Message) {
-        currentSession.value.messages.push(message);
+    function addCurrentSessionMessage(...message: Message[]) {
+        currentSession.value.messages.push(...message);
+    }
+
+    /**
+     * 获取当前会话消息
+     * @author 陈佳宝
+     * @date 2026-05-31
+     */
+    function getMessageInCurrentSession(index: number): Message | undefined {
+        return currentSession.value.messages[index];
     }
 
     return {
         sessions,
         currentSession,
+        isReplying,
         updateCurrentSessionId,
         updateCurrentSessionTitle,
         resetCurrentSession,
         addCurrentSessionMessage,
+        getMessageInCurrentSession,
     };
 });

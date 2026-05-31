@@ -1,7 +1,8 @@
 <template>
     <div class="home">
         <div class="home-container">
-            <div v-for="item in messageList" :key="item.id" :class="`home-container-${item.role}-message`">
+            <div v-for="item in sessionStore.currentSession.messages" :key="item.id"
+                :class="`home-container-${item.role}-message`">
                 <MarkdownRender :custom-id="item.role + '-chat'" :content="item.content" :typewriter="item.isStreaming"
                     :smooth-streaming="item.isStreaming ? 'auto' : false" :final="item.isStreaming"
                     :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming">
@@ -19,9 +20,16 @@
                 <div class="home-input-area-box-editor-end">
                     <div class="home-input-area-box-editor-end-left"></div>
                     <div class="home-input-area-box-editor-end-right">
+                        <!-- 发送暂停按钮 -->
                         <a class="home-input-area-box-editor-end-right-send-button"
                             :class="{ 'active': isSendButtonActive }" @click="sendClick">
-                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                            <svg v-if="sessionStore.isReplying" width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M34 12H14C12.8954 12 12 12.8954 12 14V34C12 35.1046 12.8954 36 14 36H34C35.1046 36 36 35.1046 36 34V14C36 12.8954 35.1046 12 34 12Z"
+                                    fill="#ffffff" stroke="#ffffff" stroke-width="4" />
+                            </svg>
+                            <svg v-else width="20" height="20" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path d="M24.0083 12.1006V36.0001" stroke="#ffffff" stroke-width="4"
                                     stroke-linecap="round" stroke-linejoin="round" />
@@ -40,7 +48,6 @@
 <script setup lang="ts" name="home">
 import { ref, shallowRef } from 'vue';
 import { aiChatSse } from '@/request';
-import type { Message } from '@/types';
 import MarkdownRender from 'markstream-vue';
 import { useSessionStore } from '@/stores';
 
@@ -50,12 +57,8 @@ const sessionStore = useSessionStore();
 const editorMessage = ref('');
 // 发送按钮是否激活
 const isSendButtonActive = ref(false);
-// 消息列表
-const messageList = ref<Message[]>([]);
 // 当前请求控制器
 const abortController = shallowRef<AbortController | null>(null);
-// 是否正在回复
-const isReplying = ref(false);
 
 /**
  * 编辑器键盘事件处理
@@ -84,18 +87,23 @@ function sendClick() {
     if (!isSendButtonActive.value) {
         return;
     }
+    // 如果正在回复，直接取消请求
+    if (sessionStore.isReplying) {
+        abortController.value?.abort();
+        return;
+    }
     const message = editorMessage.value.trim();
     editorMessage.value = '';
 
-    messageList.value.push(
+    sessionStore.addCurrentSessionMessage(
         { id: Date.now(), role: 'user', content: message, isStreaming: false },
         { id: Date.now() + 1, role: 'assistant', content: '', isStreaming: true },
     );
 
-    const assistantIndex = messageList.value.length - 1;
-    const assistant = messageList.value[assistantIndex];
+    const assistantIndex = sessionStore.currentSession.messages.length - 1;
+    const assistant = sessionStore.getMessageInCurrentSession(assistantIndex);
 
-    isReplying.value = true;
+    sessionStore.isReplying = true;
 
     abortController.value = aiChatSse(
         sessionStore.currentSession.id,
@@ -113,7 +121,7 @@ function sendClick() {
             }
 
             if (msg.finished) {
-                isReplying.value = false;
+                sessionStore.isReplying = false;
                 if (!assistant) {
                     return;
                 }
