@@ -42,7 +42,7 @@ export class AiService {
         // 调用AI模型
         // !TODO 后续配置从数据库获取
         const aiModel = createAiModel({
-            provider: AIProvider.OpenAI,
+            provider: AIProvider.DeepSeek,
             apiKey: process.env.OPENAI_API_KEY || "",
             model: "deepseek-v4-pro",
             baseURL: "https://api.deepseek.com",
@@ -53,7 +53,7 @@ export class AiService {
         if (!session.title || session.title.length === 0) {
             // !TODO 后续配置从数据库获取
             titlePromise = generateSessionTitle({
-                provider: AIProvider.OpenAI,
+                provider: AIProvider.DeepSeek,
                 apiKey: process.env.OPENAI_API_KEY || "",
                 model: "deepseek-v4-flash",
                 baseURL: "https://api.deepseek.com",
@@ -67,7 +67,7 @@ export class AiService {
         }
 
         try {
-            await aiModel.generate({
+            const result = await aiModel.generate({
                 stream: true,
                 systemPrompt: asSystemPrompt(getSystemPrompt([])),
                 messages: contextMessages,
@@ -82,7 +82,10 @@ export class AiService {
                         });
                     }
                 }
-            })
+            });
+
+            // 添加AI消息到会话
+            this.sessionService.addMessage(session.id, Role.Assistant, result.message.content);
         } catch (err) {
             logger.error(err);
             // throw new BizException(BizCode.AI_CHAT_ERROR);

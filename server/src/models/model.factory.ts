@@ -12,6 +12,7 @@ import { AiModel } from "./base.model";
  */
 export function createAiModel(model: ChatModel): AiModel {
     switch (model.provider) {
+        case AIProvider.DeepSeek:
         case AIProvider.OpenAI:
             return new OpenAiModel(model);
         case AIProvider.Google:

@@ -1,6 +1,7 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
 export enum AIProvider {
+    DeepSeek = "deepseek",
     OpenAI = "openai",
     Google = "google",
     Anthropic = "anthropic",
