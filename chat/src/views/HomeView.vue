@@ -1,12 +1,16 @@
 <template>
     <div class="home">
-        <div class="home-container">
+        <div class="home-container"
+            :class="{ 'home-container-empty': sessionStore.currentSession.messages.length === 0 }">
             <div v-for="item in sessionStore.currentSession.messages" :key="item.id"
                 :class="`home-container-${item.role}-message`">
                 <MarkdownRender :custom-id="item.role + '-chat'" :content="item.content" :typewriter="item.isStreaming"
                     :smooth-streaming="item.isStreaming ? 'auto' : false" :final="item.isStreaming"
                     :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming">
                 </MarkdownRender>
+            </div>
+            <div class="home-container-hi">
+                <span class="home-container-hi-say">你好，{{ userStore.user.nickname || '你在忙什么？' }}</span>
             </div>
         </div>
         <div class="home-input-area">
@@ -49,10 +53,12 @@
 import { ref, shallowRef } from 'vue';
 import { aiChatSse } from '@/request';
 import MarkdownRender from 'markstream-vue';
-import { useSessionStore } from '@/stores';
+import { useSessionStore, useUserStore } from '@/stores';
 
 // 会话store
 const sessionStore = useSessionStore();
+// 用户store
+const userStore = useUserStore();
 // 编辑器消息
 const editorMessage = ref('');
 // 发送按钮是否激活
@@ -152,6 +158,24 @@ function sendClick() {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.home-container-empty {
+    align-items: center;
+    justify-content: center;
+}
+
+.home-container-hi {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-container-hi-say {
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.3;
 }
 
 .home-container-user-message {
