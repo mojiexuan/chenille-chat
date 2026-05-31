@@ -29,6 +29,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/HomeView.vue'),
         meta: { title: '首页', requiresAuth: true },
       },
+      {
+        path: 'setting',
+        name: 'Setting',
+        component: () => import('@/views/SettingView.vue'),
+        meta: { title: '设置', requiresAuth: true },
+      },
     ],
   },
   // 使用空白布局的路由（如登录页）

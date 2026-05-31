@@ -31,7 +31,7 @@
                     <div class="default-layout-nav-content-session-item" v-for="item in sessionStore.sessions"
                         :key="item.id">
                         <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
-                            }}</span>
+                        }}</span>
                         <div class="default-layout-nav-content-session-item-more">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -47,7 +47,8 @@
                 <div class="default-layout-nav-footer-me" :class="{ 'active': footerMeActive }" @click="footerMeClick">
                     <!-- 悬浮卡片 -->
                     <menu class="default-layout-nav-footer-me-content">
-                        <div class="default-layout-nav-footer-me-content-item">
+                        <!-- 设置 -->
+                        <div class="default-layout-nav-footer-me-content-item" @click="navigateToSetting">
                             <div class="default-layout-nav-footer-me-content-item-icon">
                                 <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -61,10 +62,11 @@
                             <span class="default-layout-nav-footer-me-content-item-name ellipsis">设置</span>
                         </div>
                         <span class="default-layout-nav-footer-me-content-line"></span>
+                        <!-- 用户信息 -->
                         <div class="default-layout-nav-footer-me-content-item">
                             <img class="default-layout-nav-footer-me-content-item-icon" :src="userAvatar" alt="用户头像" />
                             <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{ userNameNickname
-                            }}</span>
+                                }}</span>
                         </div>
                     </menu>
                     <!-- 用户信息 -->
@@ -106,6 +108,12 @@
 <script setup lang="ts" name="home">
 import { computed, ref, onMounted } from 'vue'
 import { useSessionStore, useUserStore } from '@/stores';
+import { useRouter, useRoute } from 'vue-router';
+
+// 路由
+const router = useRouter();
+// 路由参数
+const route = useRoute();
 
 // 用户store
 const userStore = useUserStore();
@@ -113,7 +121,12 @@ const userStore = useUserStore();
 const sessionStore = useSessionStore();
 
 // 页面标题
-const pageTitle = computed(() => sessionStore.currentSession.title);
+const pageTitle = computed(() => {
+    if (route.name === "Home") {
+        return sessionStore.currentSession.title;
+    }
+    return route.meta.title || "";
+});
 // 用户头像
 const userAvatar = computed(() => userStore.user.avatar);
 const userNameNickname = computed(() => userStore.user.nickname);
@@ -140,6 +153,13 @@ function footerMeClick() {
  */
 function switchSidebarClick() {
     sidebarActive.value = !sidebarActive.value;
+}
+
+/**
+ * 点击设置
+ */
+function navigateToSetting() {
+    router.push({ name: 'Setting' });
 }
 
 onMounted(() => {
@@ -237,6 +257,7 @@ onMounted(() => {
     flex: 1;
     font-size: 14px;
     line-height: 24px;
+    user-select: none;
 }
 
 .default-layout-nav-content-session-item-more {
