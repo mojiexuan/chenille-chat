@@ -5,7 +5,7 @@
                 <div class="confirm-dialog-container-top">
                     <img class="confirm-dialog-container-top-icon" :src="currentIcon" :alt="confirmState.title" />
                     <span class="confirm-dialog-container-top-title ellipsis">{{ confirmState.title }}</span>
-                    <div class="confirm-dialog-container-top-close">
+                    <div class="confirm-dialog-container-top-close" @click="cancelClick">
                         <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M14 14L34 34" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
                                 stroke-linejoin="round" />
