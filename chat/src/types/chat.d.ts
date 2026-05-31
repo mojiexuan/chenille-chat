@@ -3,7 +3,7 @@
  */
 export interface AiChatParams {
     message: string;
-    sessionId?: string;
+    sessionId?: number;
     model?: string;
 }
 
@@ -21,4 +21,14 @@ export interface ChatSseMessage {
     finished: boolean;
     /** 错误信息 */
     error?: string;
+}
+
+/**
+ * 聊天 SSE 标题事件数据
+ */
+export interface ChatSseTitle {
+    /** 会话 ID */
+    sessionId: number;
+    /** 会话标题 */
+    title: string;
 }

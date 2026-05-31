@@ -43,6 +43,10 @@ import { aiChatSse } from '@/request';
 import type { Message } from '@/types';
 import MarkdownRender from 'markstream-vue'
 
+// 会话ID
+let sessionId: number | undefined;
+// 会话标题
+const sessionTitle = ref('新会话');
 // 编辑器消息
 const editorMessage = ref('');
 // 发送按钮是否激活
@@ -94,26 +98,33 @@ function sendClick() {
 
     isReplying.value = true;
 
-    abortController.value = aiChatSse(message, (msg) => {
-        if (msg.error) {
-            return;
-        }
-
-        if (msg.content) {
-            if (!assistant) {
+    abortController.value = aiChatSse(
+        sessionId,
+        message,
+        (msg) => {
+            if (msg.error) {
                 return;
             }
-            assistant.content += msg.content;
-        }
 
-        if (msg.finished) {
-            isReplying.value = false;
-            if (!assistant) {
-                return;
+            if (msg.content) {
+                if (!assistant) {
+                    return;
+                }
+                assistant.content += msg.content;
             }
-            assistant.isStreaming = false;
-        }
-    })
+
+            if (msg.finished) {
+                isReplying.value = false;
+                if (!assistant) {
+                    return;
+                }
+                assistant.isStreaming = false;
+            }
+        },
+        (param) => {
+            sessionId = param.sessionId;
+            sessionTitle.value = param.title || '新会话';
+        })
 }
 </script>
 

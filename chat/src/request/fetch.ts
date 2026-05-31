@@ -9,6 +9,7 @@ import type { ApiResponse, FetchOptions, SseOptions, SseEvent } from '@/types';
 import { API_BASE_URL, TOKEN_KEY, SUCCESS_CODE } from '@/config';
 import { useToast } from '@/composables';
 import { useUserStore } from '@/stores';
+import { SseEventName } from '@/enumeration';
 
 /**
  * 从本地存储获取 token
@@ -329,6 +330,12 @@ export function sse<T = unknown, P = unknown>(url: string, options: SseOptions<T
         if (!data) {
             return;
         }
+
+        // 检查事件类型是否有效
+        if (!Object.values(SseEventName).includes(event as SseEventName)) {
+            return;
+        }
+
         try {
             onMessage?.({ event, data: JSON.parse(data) } as SseEvent<T>);
         } catch {

@@ -22,7 +22,7 @@ export class AiService {
     async chat(params: { userId: number, data: ChatSseDto, callback?: ChatCallback }) {
         // 获取或创建会话
         const session = await this.sessionService.getOrCreateSession(
-            params.data.sessionId ? Number(params.data.sessionId) : undefined,
+            params.data.sessionId,
             params.userId,
         );
 
@@ -39,6 +39,7 @@ export class AiService {
         const contextMessages = this.buildContextMessages(history);
 
         // 调用AI模型
+        // !TODO 后续配置从数据库获取
         const aiModel = createAiModel({
             provider: AIProvider.OpenAI,
             apiKey: process.env.OPENAI_API_KEY || "",
@@ -47,18 +48,21 @@ export class AiService {
         });
 
         // 生成会话标题
+        let titlePromise: Promise<string | null> | null = null;
         if (!session.title || session.title.length === 0) {
-            generateSessionTitle({
+            // !TODO 后续配置从数据库获取
+            titlePromise = generateSessionTitle({
                 provider: AIProvider.OpenAI,
                 apiKey: process.env.OPENAI_API_KEY || "",
                 model: "deepseek-v4-flash",
                 baseURL: "https://api.deepseek.com",
-            }, [userMsg]).then((title) => {
-                if (title) {
-                    session.title = title;
-                    this.sessionService.updateSessionTitle(session.id, title);
-                }
-            })
+            }, [userMsg]);
+            // .then((title) => {
+            //     if (title) {
+            //         session.title = title;
+            //         this.sessionService.updateSessionTitle(session.id, title);
+            //     }
+            // })
         }
 
         try {
@@ -88,6 +92,20 @@ export class AiService {
                     content: "",
                 });
             }
+        }
+
+        if (titlePromise) {
+            try {
+                const title = await Promise.race([
+                    titlePromise,
+                    new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
+                ]);
+                if (title) {
+                    session.title = title;
+                    this.sessionService.updateSessionTitle(session.id, title);
+                    params.callback?.onTitle?.(session.id, title);
+                }
+            } catch { }
         }
     }
 

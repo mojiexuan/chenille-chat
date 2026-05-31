@@ -42,6 +42,18 @@ export async function chatSseHandler(request: FastifyRequest, reply: FastifyRepl
                     event: SseEventName.AI_CHAT_MESSAGE,
                     data: message,
                 });
+            },
+            onTitle: (sessionId, title) => {
+                if (aborted) {
+                    return;
+                }
+                sseSend(reply, {
+                    event: SseEventName.AI_CHAT_SESSION_TITLE,
+                    data: {
+                        sessionId,
+                        title,
+                    },
+                });
             }
         }
     });
