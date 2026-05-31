@@ -9,7 +9,7 @@
                     :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming">
                 </MarkdownRender>
             </div>
-            <div class="home-container-hi">
+            <div class="home-container-hi" v-if="sessionStore.currentSession.messages.length === 0">
                 <span class="home-container-hi-say">你好，{{ userStore.user.nickname || '你在忙什么？' }}</span>
             </div>
         </div>
@@ -18,7 +18,7 @@
                 <div class="home-input-area-box-editor-wrapper" :data-message="editorMessage">
                     <textarea class="home-input-area-box-editor" v-model="editorMessage"
                         placeholder="聊点什么？shift+enter换行" spellcheck="false" autocomplete="off" autocapitalize="off"
-                        enterkeyhint="send" @keydown="handleEditorKeydown" @input="handleEditorInput"></textarea>
+                        enterkeyhint="send" @keydown="handleEditorKeydown"></textarea>
                 </div>
                 <!-- 功能区域 -->
                 <div class="home-input-area-box-editor-end">
@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { ref, shallowRef } from 'vue';
+import { ref, computed, shallowRef } from 'vue';
 import { aiChatSse } from '@/request';
 import MarkdownRender from 'markstream-vue';
 import { useSessionStore, useUserStore } from '@/stores';
@@ -62,7 +62,7 @@ const userStore = useUserStore();
 // 编辑器消息
 const editorMessage = ref('');
 // 发送按钮是否激活
-const isSendButtonActive = ref(false);
+const isSendButtonActive = computed(() => editorMessage.value.trim().length > 0);
 // 当前请求控制器
 const abortController = shallowRef<AbortController | null>(null);
 
@@ -77,13 +77,6 @@ function handleEditorKeydown(e: KeyboardEvent) {
         e.preventDefault();
         sendClick();
     }
-}
-
-/**
- * 编辑器内容事件处理
- */
-function handleEditorInput() {
-    isSendButtonActive.value = editorMessage.value.trim().length > 0;
 }
 
 /**
