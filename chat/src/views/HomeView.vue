@@ -1,6 +1,13 @@
 <template>
     <div class="home">
-        <div class="home-container"></div>
+        <div class="home-container">
+            <div v-for="item in messageList" :key="item.id" :class="`home-container-${item.role}-message`">
+                <MarkdownRender :custom-id="item.role + '-chat'" :content="item.content" :typewriter="item.isStreaming"
+                    :smooth-streaming="item.isStreaming ? 'auto' : false" :final="item.isStreaming"
+                    :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming">
+                </MarkdownRender>
+            </div>
+        </div>
         <div class="home-input-area">
             <div class="home-input-area-box">
                 <div class="home-input-area-box-editor-wrapper" :data-message="editorMessage">
@@ -31,13 +38,21 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 import { aiChatSse } from '@/request';
+import type { Message } from '@/types';
+import MarkdownRender from 'markstream-vue'
 
 // 编辑器消息
 const editorMessage = ref('');
 // 发送按钮是否激活
 const isSendButtonActive = ref(false);
+// 消息列表
+const messageList = ref<Message[]>([]);
+// 当前请求控制器
+const abortController = shallowRef<AbortController | null>(null);
+// 是否正在回复
+const isReplying = ref(false);
 
 /**
  * 编辑器键盘事件处理
@@ -66,8 +81,38 @@ function sendClick() {
     if (!isSendButtonActive.value) {
         return;
     }
-    aiChatSse(editorMessage.value, (msg) => {
-        console.log(msg);
+    const message = editorMessage.value.trim();
+    editorMessage.value = '';
+
+    messageList.value.push(
+        { id: Date.now(), role: 'user', content: message, isStreaming: false },
+        { id: Date.now() + 1, role: 'assistant', content: '', isStreaming: true },
+    );
+
+    const assistantIndex = messageList.value.length - 1;
+    const assistant = messageList.value[assistantIndex];
+
+    isReplying.value = true;
+
+    abortController.value = aiChatSse(message, (msg) => {
+        if (msg.error) {
+            return;
+        }
+
+        if (msg.content) {
+            if (!assistant) {
+                return;
+            }
+            assistant.content += msg.content;
+        }
+
+        if (msg.finished) {
+            isReplying.value = false;
+            if (!assistant) {
+                return;
+            }
+            assistant.isStreaming = false;
+        }
     })
 }
 </script>
@@ -85,6 +130,33 @@ function sendClick() {
 .home-container {
     flex: 1;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.home-container-user-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
+}
+
+[data-custom-id="user-chat"] {
+    max-width: 85%;
+    background-color: var(--ch-feature-card-bg);
+    border-radius: 12px 2px 12px 12px;
+    font-size: 16px;
+    padding: 8px 12px;
+}
+
+.home-container-assistant-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 6px;
 }
 
 .home-input-area {
