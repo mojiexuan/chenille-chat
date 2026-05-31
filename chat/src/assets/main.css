@@ -16,9 +16,13 @@ html[data-theme="light"] {
   --ch-white-bg-black: #ffffff;
   --ch-line-color: rgba(60, 60, 60, 0.12);
   --ch-tip-success-color: #52c41a;
+  --ch-tip-success-hover-color: #3d9f11;
   --ch-tip-prompt-color: #05cfa4;
+  --ch-tip-prompt-hover-color: #00a081;
   --ch-tip-error-color: #fd6b6d;
+  --ch-tip-error-hover-color: #f53e41;
   --ch-tip-warning-color: #faad14;
+  --ch-tip-warning-hover-color: #dd7f02;
   --ch-border-card-color: rgba(60, 60, 60, 0.12);
   --ch-border-divider-color: #e2e2e3;
   --ch-box-shadow-1: 0 12px 32px #0000001a, 0 2px 6px #00000014;

@@ -16,7 +16,8 @@
                     </svg>
                 </div>
                 <!-- 新会话 -->
-                <div class="default-layout-nav-header-button default-layout-nav-header-button-new-session">
+                <div class="default-layout-nav-header-button default-layout-nav-header-button-new-session"
+                    @click="newSessionClick">
                     <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 6H44V36H29L24 41L19 36H4V6Z" fill="none" stroke="#1b1b1f" stroke-width="3"
                             stroke-linecap="round" stroke-linejoin="round" />
@@ -156,10 +157,22 @@ function switchSidebarClick() {
 }
 
 /**
+ * 点击新会话
+ */
+function newSessionClick() {
+    sessionStore.resetCurrentSession();
+    if (route.name !== "Home") {
+        router.replace({ name: 'Home' });
+    }
+}
+
+/**
  * 点击设置
  */
 function navigateToSetting() {
-    router.push({ name: 'Setting' });
+    if (route.name !== "Setting") {
+        router.replace({ name: 'Setting' });
+    }
 }
 
 onMounted(() => {
