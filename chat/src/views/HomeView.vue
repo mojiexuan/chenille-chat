@@ -151,6 +151,9 @@ function sendClick() {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding: 16px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .home-container-empty {

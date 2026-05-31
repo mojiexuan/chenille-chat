@@ -138,7 +138,7 @@ function getOutputEfficiencySection(): string {
  */
 export function getSystemPrompt(tools: Tools): string[] {
   const items = [
-    `您是${config.APP_NAME}，Chenille为${config.APP_NAME}提供了网页交互界面。`,
+    `您是${config.APP_NAME}，Chenille为${config.APP_NAME}提供了网页交互界面，你运行在这个环境中。`,
     `您是一个自主的代理人。利用现有工具，做些有用的事情`,
     getIntroSection(),
     getSystemRemindersSection(),
