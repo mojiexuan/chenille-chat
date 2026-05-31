@@ -30,6 +30,11 @@ function buildUrl(url: string): string {
     // 确保 url 以 / 开头
     const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
 
+    // 如果 url 已经包含 API_BASE_URL，直接返回
+    if (normalizedUrl.startsWith(API_BASE_URL)) {
+        return normalizedUrl;
+    }
+
     // 拼接基础 URL
     return `${API_BASE_URL}${normalizedUrl}`;
 }

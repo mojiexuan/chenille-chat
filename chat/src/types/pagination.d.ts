@@ -9,7 +9,7 @@ export interface PaginationRequest {
 /**
  * 分页类型
  */
-export interface Pagination<T> {
+export interface PaginationResponse<T> {
     list: T[];
     total: number;
     page: number;

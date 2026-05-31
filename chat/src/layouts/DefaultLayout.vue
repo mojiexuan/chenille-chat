@@ -26,7 +26,23 @@
                     </svg>
                 </div>
             </section>
-            <section class="default-layout-nav-content"></section>
+            <section class="default-layout-nav-content">
+                <section class="default-layout-nav-content-session">
+                    <div class="default-layout-nav-content-session-item" v-for="item in sessionStore.sessions"
+                        :key="item.id">
+                        <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
+                            }}</span>
+                        <div class="default-layout-nav-content-session-item-more">
+                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="24" cy="12" r="3" fill="#3c3c43" />
+                                <circle cx="24" cy="24" r="3" fill="#3c3c43" />
+                                <circle cx="24" cy="35" r="3" fill="#3c3c43" />
+                            </svg>
+                        </div>
+                    </div>
+                </section>
+            </section>
             <section class="default-layout-nav-footer">
                 <div class="default-layout-nav-footer-me" :class="{ 'active': footerMeActive }" @click="footerMeClick">
                     <!-- 悬浮卡片 -->
@@ -88,9 +104,8 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { computed, ref } from 'vue'
-import { useUserStore } from '@/stores/user';
-import { useSessionStore } from '@/stores';
+import { computed, ref, onMounted } from 'vue'
+import { useSessionStore, useUserStore } from '@/stores';
 
 // 用户store
 const userStore = useUserStore();
@@ -126,6 +141,12 @@ function footerMeClick() {
 function switchSidebarClick() {
     sidebarActive.value = !sidebarActive.value;
 }
+
+onMounted(() => {
+    if (userStore.isLogin) {
+        sessionStore.getSessions();
+    }
+})
 </script>
 
 <style scoped>
@@ -187,6 +208,48 @@ function switchSidebarClick() {
 
 .default-layout-nav-content {
     flex: 1;
+    width: 100%;
+}
+
+.default-layout-nav-content-session {
+    width: 100%;
+}
+
+.default-layout-nav-content-session-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.default-layout-nav-content-session-item:hover {
+    background: var(--ch-feature-card-hover-bg);
+}
+
+.default-layout-nav-content-session-item:hover .default-layout-nav-content-session-item-more {
+    display: flex;
+}
+
+.default-layout-nav-content-session-item-title {
+    flex: 1;
+    font-size: 14px;
+    line-height: 24px;
+}
+
+.default-layout-nav-content-session-item-more {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.default-layout-nav-content-session-item-more:hover {
+    background-color: var(--ch-button-hover-bg);
 }
 
 .default-layout-nav-footer-me {

@@ -1,9 +1,16 @@
 /**
+ * 会话项类型
+ */
+export interface SessionItem {
+    id: number;
+    title: string;
+}
+
+/**
  * 会话类型
  */
-export interface Session {
+export interface Session extends SessionItem {
     id?: number;
-    title: string;
     messages: Message[];
 }
 
