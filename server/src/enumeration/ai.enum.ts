@@ -7,12 +7,3 @@ export enum AIProvider {
   Google = "google",
   Anthropic = "anthropic",
 }
-
-/**
- * 模型分类枚举
- */
-export enum ModelClassification {
-  Low = "low",
-  Medium = "medium",
-  High = "high",
-}

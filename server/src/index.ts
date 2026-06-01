@@ -3,13 +3,20 @@ import { config } from "@/config";
 import { responsePlugin, errorHandlerPlugin, redisClientPlugin, dbClientPlugin } from "@/plugins";
 import { logger } from "@/utils";
 import { v1Router } from "@/router/v1";
-import { runMigrate } from "@/db";
+import { runMigrate, runSeed } from "@/db";
 
 /**
  * 主函数
  */
 async function main() {
-  await runMigrate();
+
+  try {
+    await runMigrate();
+    await runSeed();
+  } catch (err) {
+    logger.error(err, "数据库迁移或种子数据运行失败，程序退出。");
+    process.exit(1);
+  }
 
   const app = Fastify({});
   app.log = logger;

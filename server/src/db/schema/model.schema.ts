@@ -8,7 +8,6 @@ import {
   boolean,
 } from "drizzle-orm/pg-core";
 import { modelProviders } from "./model.provider.schema";
-import { ModelClassification } from "@/enumeration";
 
 /**
  * 模型表
@@ -20,9 +19,6 @@ export const models = pgTable("c_models", {
     .references(() => modelProviders.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 50 }).notNull(), // 显示名："GPT-5.5"
   modelName: varchar("model_name", { length: 100 }).notNull(), // API 名："gpt-5.5"
-  classification: varchar("classification", { length: 20 }).$type<ModelClassification>()
-    .default(ModelClassification.Medium)
-    .notNull(), // 模型分类："low" | "medium" | "high"
   description: text("description"), // 模型简介
   isActive: boolean("is_active").default(true).notNull(),
   isDefault: boolean("is_default").default(false).notNull(),
