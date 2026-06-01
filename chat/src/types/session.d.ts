@@ -11,7 +11,7 @@ export interface SessionItem {
  */
 export interface Session extends SessionItem {
     id?: number;
-    messages: Message[];
+    messages: MessageStreaming[];
 }
 
 /**
@@ -21,5 +21,18 @@ export interface Message {
     id: number;
     role: 'user' | 'assistant';
     content: string;
+}
+
+/**
+ * 流式消息类型
+ */
+export interface MessageStreaming extends Message {
     isStreaming: boolean;
+}
+
+/**
+ * 会话详情类型
+ */
+export interface SessionDetail extends Session {
+    messages: Message[];
 }

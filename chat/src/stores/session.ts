@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import type { Message, SessionItem, Session } from "@/types";
-import { getSessionList } from "@/request";
+import type { MessageStreaming, SessionItem, Session } from "@/types";
+import { getSessionList, getSessionRequest } from "@/request";
 
 /**
  * 会话store
@@ -77,7 +77,7 @@ export const useSessionStore = defineStore("session", () => {
      * @author 陈佳宝
      * @date 2026-05-31
      */
-    function addCurrentSessionMessage(...message: Message[]) {
+    function addCurrentSessionMessage(...message: MessageStreaming[]) {
         currentSession.value.messages.push(...message);
     }
 
@@ -86,8 +86,28 @@ export const useSessionStore = defineStore("session", () => {
      * @author 陈佳宝
      * @date 2026-05-31
      */
-    function getMessageInCurrentSession(index: number): Message | undefined {
+    function getMessageInCurrentSession(index: number): MessageStreaming | undefined {
         return currentSession.value.messages[index];
+    }
+
+    /**
+     * 切换当前会话
+     * @param sessionId 会话ID
+     * @author 陈佳宝
+     * @date 2026-05-31
+     */
+    function switchCurrentSession(sessionId: number) {
+        getSessionRequest(sessionId)
+            .then((res) => {
+                currentSession.value = {
+                    id: res.id,
+                    title: res.title,
+                    messages: res.messages.map((item) => ({
+                        ...item,
+                        isStreaming: false,
+                    })),
+                }
+            })
     }
 
     return {
@@ -100,5 +120,6 @@ export const useSessionStore = defineStore("session", () => {
         resetCurrentSession,
         addCurrentSessionMessage,
         getMessageInCurrentSession,
+        switchCurrentSession,
     };
 });

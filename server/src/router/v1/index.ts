@@ -6,6 +6,7 @@ import {
     chatSseHandler,
     getSessionListHandler,
     getSessionTitleHandler,
+    getSessionHandler,
 } from "@/controllers";
 import { verifyJwt } from "@/plugins/auth.plugin";
 
@@ -19,5 +20,6 @@ export async function v1Router(fastify: FastifyInstance) {
         protectedScope.post("/chat/sse", chatSseHandler);
         protectedScope.get("/chat/session/list", getSessionListHandler);
         protectedScope.get("/chat/session/:sessionId/title", getSessionTitleHandler);
+        protectedScope.get("/chat/session/:sessionId", getSessionHandler);
     });
 }

@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
-import { paginationRequestDto, sessionTitleRequestDto } from "@/dto";
+import { paginationRequestDto, sessionTitleRequestDto, sessionRequestDto } from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { SessionService } from "@/services";
@@ -56,4 +56,33 @@ export async function getSessionTitleHandler(
   const sessionService = new SessionService();
   const title = await sessionService.generateUserSessionTitle(userId, parsed.data.sessionId);
   reply.success(title, "获取会话标题成功");
+}
+
+/**
+ * 获取会话
+ */
+export async function getSessionHandler(request: FastifyRequest, reply: FastifyReply,) {
+  const parsed = sessionRequestDto.safeParse(request.params);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  // 从请求中获取用户 ID
+  const userId = request.userId;
+  if (typeof userId !== "number") {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  const sessionService = new SessionService();
+  const session = await sessionService.getSession(parsed.data.sessionId, userId);
+  if (!session) {
+    throw new BizException(BizCode.SESSION_NOT_FOUND);
+  }
+  const messages = await sessionService.getMessages(parsed.data.sessionId);
+
+  reply.success({
+    session,
+    messages,
+  }, "获取会话成功");
 }

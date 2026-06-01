@@ -30,7 +30,8 @@
             <section class="default-layout-nav-content">
                 <section class="default-layout-nav-content-session">
                     <div class="default-layout-nav-content-session-item" v-for="item in sessionStore.sessions"
-                        :key="item.id">
+                        :key="item.id" @click="sessionStore.switchCurrentSession(item.id)"
+                        :class="{ 'active': item.id === sessionStore.currentSession.id }">
                         <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
                         }}</span>
                         <div class="default-layout-nav-content-session-item-more">
@@ -256,6 +257,10 @@ onMounted(() => {
     padding: 8px;
     cursor: pointer;
     border-radius: 10px;
+}
+
+.default-layout-nav-content-session-item.active {
+    background: var(--ch-feature-card-hover-bg);
 }
 
 .default-layout-nav-content-session-item:hover {
