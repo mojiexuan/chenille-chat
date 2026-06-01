@@ -9,6 +9,8 @@
                     :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming">
                 </MarkdownRender>
             </div>
+            <img v-if="sessionStore.isReplying" class="home-container-replying" src="../assets/images/replying.svg"
+                alt="思考中" />
             <div class="home-container-hi" v-if="sessionStore.currentSession.messages.length === 0">
                 <span class="home-container-hi-say">你好，{{ userStore.user.nickname || '你在忙什么？' }}</span>
             </div>
@@ -164,6 +166,11 @@ function sendClick() {
     padding: 16px 0;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.home-container-replying {
+    width: 20px;
+    height: 20px;
 }
 
 .home-container-empty {
