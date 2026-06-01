@@ -51,7 +51,7 @@
 
 <script setup lang="ts" name="home">
 import { ref, computed, shallowRef } from 'vue';
-import { aiChatSse } from '@/request';
+import { aiChatSse, getSessionTitleRequest } from '@/request';
 import MarkdownRender from 'markstream-vue';
 import { useSessionStore, useUserStore } from '@/stores';
 
@@ -113,6 +113,10 @@ function sendClick() {
                 return;
             }
 
+            if (sessionStore.currentSession.id !== msg.sessionId && msg.sessionId) {
+                sessionStore.updateCurrentSessionId(msg.sessionId);
+            }
+
             if (msg.content) {
                 if (!assistant) {
                     return;
@@ -122,6 +126,12 @@ function sendClick() {
 
             if (msg.finished) {
                 sessionStore.isReplying = false;
+                if (sessionStore.currentSession.title === '新会话' && sessionStore.currentSession.id) {
+                    getSessionTitleRequest(sessionStore.currentSession.id)
+                        .then((title) => {
+                            sessionStore.updateCurrentSessionTitle(title || '新会话');
+                        })
+                }
                 if (!assistant) {
                     return;
                 }

@@ -46,7 +46,7 @@ export class AiService {
 
         // 生成会话标题
         let titlePromise: Promise<string | null> | null = null;
-        if (!session.title || session.title.length === 0) {
+        if (!session.title || session.title.length === 0 || session.title === "新会话") {
             titlePromise = this.sessionService.generateUserSessionTitle(params.userId, session.id);
         }
 

@@ -123,7 +123,7 @@ export class SessionService {
     const allMessages = await this.getMessages(sessionId);
     let title = await generateSessionTitle(this.buildContextMessages(allMessages));
     if (!title) {
-      title = "不可知的会话";
+      title = "新会话";
     }
     this.updateSessionTitle(sessionId, title);
     return title;
