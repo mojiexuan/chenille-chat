@@ -1,6 +1,8 @@
 import { db, users } from "@/db";
 import { eq } from "drizzle-orm";
 import { userSafeInfo } from "@/vo";
+import { BizException } from "@/exception";
+import { BizCode } from "@/enumeration";
 
 /**
  * 用户服务
@@ -12,7 +14,10 @@ export class UserService {
      */
     async getUserInfoById(userId: number) {
         const [user] = await db.select(userSafeInfo).from(users).where(eq(users.id, userId)).limit(1);
-        return user || null;
+        if (!user) {
+            throw new BizException(BizCode.USER_NOT_FOUND);
+        }
+        return user;
     }
 
     /**

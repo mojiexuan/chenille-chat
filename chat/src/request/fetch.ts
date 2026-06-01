@@ -62,12 +62,18 @@ function buildHeaders(customHeaders?: HeadersInit): Headers {
 /**
  * 检查 HTTP 响应状态码
  */
-function checkResponseStatus(response: Response, showErrorToast: boolean) {
+async function checkResponseStatus(response: Response, showErrorToast: boolean) {
     if (response.ok) {
         return;
     }
     const toast = useToast();
-    const errorMessage = `请求失败: ${response.status} ${response.statusText}`;
+
+    let errorMessage = "服务器错误";
+    try {
+        const result = await response.json() as ApiResponse<void>;
+        errorMessage = result.message || "服务器错误";
+    } catch { }
+
     if (response.status === 401) {
         const userStore = useUserStore()
         // 401 错误，可能需要重新登录
@@ -75,7 +81,7 @@ function checkResponseStatus(response: Response, showErrorToast: boolean) {
         userStore.logout()
     }
     if (showErrorToast) {
-        toast.error("服务器错误");
+        toast.error(errorMessage);
     }
     throw new Error(errorMessage);
 }

@@ -1,4 +1,4 @@
-import { UserMessage, ChatCallback } from "@/types";
+import { ChatCallback } from "@/types";
 import { AIProvider } from "@/enumeration";
 import { createAiModel } from "@/models";
 import { BizCode, Role } from "@/enumeration";
