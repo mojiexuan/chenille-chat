@@ -1,9 +1,14 @@
-CREATE TYPE "gender" AS ENUM ('male', 'female', 'other');
-CREATE TYPE "login_type" AS ENUM ('password', 'sms', 'wechat');
-CREATE TYPE "login_status" AS ENUM ('success', 'fail');
-CREATE TYPE "role" AS ENUM ('user', 'assistant', 'system');
-CREATE TYPE "model_provider" AS ENUM ('openai', 'google', 'anthropic', 'deepseek');
-
+CREATE TABLE "c_agents" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(50) NOT NULL,
+	"key" varchar(100) NOT NULL,
+	"description" text,
+	"model_id" integer,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "c_agents_key_unique" UNIQUE("key")
+);
+--> statement-breakpoint
 CREATE TABLE "c_users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"username" varchar(50) NOT NULL,
@@ -11,7 +16,7 @@ CREATE TABLE "c_users" (
 	"email" varchar(255),
 	"phone" varchar(20) NOT NULL,
 	"password" varchar(255),
-	"gender" "gender" DEFAULT 'other',
+	"gender" varchar(10) DEFAULT 'other',
 	"wx_openid" varchar(255),
 	"avatar" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -25,11 +30,11 @@ CREATE TABLE "c_users" (
 CREATE TABLE "c_login_logs" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
-	"login_type" "login_type" NOT NULL,
+	"login_type" varchar(20) NOT NULL,
 	"ip_address" varchar(45),
 	"user_agent" text,
 	"token" varchar(255),
-	"status" "login_status" NOT NULL,
+	"status" varchar(20) NOT NULL,
 	"fail_reason" varchar(255),
 	"created_date" date DEFAULT CURRENT_DATE NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
@@ -50,10 +55,10 @@ CREATE TABLE "c_models" (
 --> statement-breakpoint
 CREATE TABLE "c_model_providers" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"model_provider" "model_provider" NOT NULL,
+	"model_provider" varchar(20) DEFAULT 'openai' NOT NULL,
 	"name" varchar(50) NOT NULL,
 	"api_key" varchar(512) NOT NULL,
-	"base_url" varchar(512),
+	"base_url" varchar(512) NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
@@ -74,13 +79,14 @@ CREATE TABLE "c_messages" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"session_id" integer NOT NULL,
 	"parent_id" integer,
-	"role" "role" NOT NULL,
+	"role" varchar(20) NOT NULL,
 	"content" text NOT NULL,
 	"meta" jsonb,
 	"created_date" date DEFAULT CURRENT_DATE NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "c_agents" ADD CONSTRAINT "c_agents_model_id_c_models_id_fk" FOREIGN KEY ("model_id") REFERENCES "public"."c_models"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "c_login_logs" ADD CONSTRAINT "c_login_logs_user_id_c_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."c_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "c_models" ADD CONSTRAINT "c_models_provider_id_c_model_providers_id_fk" FOREIGN KEY ("provider_id") REFERENCES "public"."c_model_providers"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "c_sessions" ADD CONSTRAINT "c_sessions_user_id_c_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."c_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

@@ -26,9 +26,6 @@ export class AiService {
             params.userId,
         );
 
-        // 构建用户消息
-        const userMsg = this.buildUserMessage(params.data.message);
-
         // 添加用户消息到会话
         await this.sessionService.addMessage(session.id, Role.User, params.data.message);
 
@@ -100,16 +97,6 @@ export class AiService {
                 logger.error(err);
             }
         }
-    }
-
-    /**
-     * 构建用户消息
-     */
-    private buildUserMessage(message: string): UserMessage {
-        return {
-            type: "user",
-            message: { role: "user", content: message },
-        };
     }
 
 }
