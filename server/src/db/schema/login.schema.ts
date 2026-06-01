@@ -1,18 +1,18 @@
 import { pgTable, serial, integer, varchar, text, timestamp, date, index } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { users } from "./user.schema";
-import { loginTypeEnum, loginStatusEnum } from "@/enumeration";
+import { LoginType, LoginStatus } from "@/enumeration";
 
 export const loginLogs = pgTable("c_login_logs", {
     id: serial("id").primaryKey(),
     userId: integer("user_id")
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
-    loginType: loginTypeEnum("login_type").notNull(),
+    loginType: varchar("login_type", { length: 20 }).$type<LoginType>().notNull(),
     ipAddress: varchar("ip_address", { length: 45 }),
     userAgent: text("user_agent"),
     token: varchar("token", { length: 255 }),
-    status: loginStatusEnum("status").notNull(),
+    status: varchar("status", { length: 20 }).$type<LoginStatus>().notNull(),
     failReason: varchar("fail_reason", { length: 255 }),
     createdDate: date("created_date").default(sql`CURRENT_DATE`).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

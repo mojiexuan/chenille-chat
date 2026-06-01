@@ -5,14 +5,14 @@ import {
   timestamp,
   boolean,
 } from "drizzle-orm/pg-core";
-import { modelProviderEnum, AIProvider } from "@/enumeration";
+import { AIProvider } from "@/enumeration";
 
 /**
  * 模型供应商表（存 API Key、中转地址等凭证信息）
  */
 export const modelProviders = pgTable("c_model_providers", {
   id: serial("id").primaryKey(),
-  provider: modelProviderEnum("model_provider")
+  provider: varchar("model_provider", { length: 20 }).$type<AIProvider>()
     .default(AIProvider.OpenAI)
     .notNull()
     .unique(),

@@ -1,5 +1,5 @@
 import { pgTable, serial, varchar, timestamp, text } from "drizzle-orm/pg-core";
-import { genderEnum, Gender } from "@/enumeration";
+import { Gender } from "@/enumeration";
 
 /**
  * 用户表
@@ -11,7 +11,7 @@ export const users = pgTable("c_users", {
     email: varchar("email", { length: 255 }).unique(),
     phone: varchar("phone", { length: 20 }).notNull().unique(),
     password: varchar("password", { length: 255 }),
-    gender: genderEnum("gender").default(Gender.Other),
+    gender: varchar("gender", { length: 10 }).$type<Gender>().default(Gender.Other),
     wxOpenId: varchar("wx_openid", { length: 255 }).unique(),
     avatar: text("avatar"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
