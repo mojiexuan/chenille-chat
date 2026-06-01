@@ -18,7 +18,7 @@ export const modelProviders = pgTable("c_model_providers", {
     .unique(),
   name: varchar("name", { length: 50 }).notNull(),
   apiKey: varchar("api_key", { length: 512 }).notNull(),
-  baseUrl: varchar("base_url", { length: 512 }),
+  baseUrl: varchar("base_url", { length: 512 }).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")

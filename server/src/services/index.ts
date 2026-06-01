@@ -4,3 +4,4 @@ export * from "./auth.service";
 export * from "./user.service";
 export * from "./ai.service";
 export * from "./session.service";
+export * from "./agent.service";

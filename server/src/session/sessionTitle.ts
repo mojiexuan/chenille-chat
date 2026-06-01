@@ -2,6 +2,7 @@ import { ClientService } from "@/services";
 import { ChatModel, Message } from "@/types";
 import { lazySchema, parseWithSchema } from "@/utils";
 import z from "zod/v4";
+import { agentService } from "@/services";
 
 const MAX_CONVERSATION_TEXT = 1000;
 
@@ -55,10 +56,18 @@ const SESSION_TITLE_PROMPT = `生成一个简洁的、句子首字母大写(英�
  * 生成会话标题
  */
 export async function generateSessionTitle(
-  model: ChatModel,
   messages: Message[],
 ): Promise<string | null> {
-  const result = await clientService.chat(model, {
+  const agent = await agentService.getGenerateSessionTitleAgent();
+  if (!agent) {
+    return null;
+  }
+  const result = await clientService.chat({
+    provider: agent.provider.provider,
+    apiKey: agent.provider.apiKey,
+    baseURL: agent.provider.baseUrl,
+    model: agent.model.modelName
+  }, {
     messages: [
       {
         type: "system",

@@ -37,11 +37,11 @@ export async function getSessionListHandler(
 /**
  * 获取会话标题
  */
-export async function getSessionTitle(
+export async function getSessionTitleHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const parsed = sessionTitleRequestDto.safeParse(request.query);
+  const parsed = sessionTitleRequestDto.safeParse(request.params);
   if (!parsed.success) {
     throw new BizException(
       BizCode.PARAM_INVALID,
@@ -54,4 +54,6 @@ export async function getSessionTitle(
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const sessionService = new SessionService();
+  const title = await sessionService.generateUserSessionTitle(userId, parsed.data.sessionId);
+  reply.success(title, "获取会话标题成功");
 }

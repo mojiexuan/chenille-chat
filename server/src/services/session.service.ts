@@ -1,7 +1,7 @@
 import { db, sessions, messages } from "@/db";
 import { eq, asc, desc, count, and } from "drizzle-orm";
 import { Role } from "@/enumeration";
-import { Pagination } from "@/types/pagination.type";
+import { Pagination, Message, AssistantMessage, UserMessage } from "@/types";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { generateSessionTitle } from "@/session";
@@ -95,11 +95,11 @@ export class SessionService {
   }
 
   /**
-   * 获取用户会话标题
-   */
+ * 获取用户会话标题
+ */
   async getUserSessionTitle(userId: number, sessionId: number) {
     const [session] = await db
-      .select({ title: sessions.title })
+      .select()
       .from(sessions)
       .where(and(eq(sessions.id, sessionId), eq(sessions.userId, userId)))
       .limit(1);
@@ -109,7 +109,24 @@ export class SessionService {
     if (session.title) {
       return session.title;
     }
-    // const title = await generateSessionTitle();
+    return null;
+  }
+
+  /**
+   * 生成用户会话标题
+   */
+  async generateUserSessionTitle(userId: number, sessionId: number) {
+    const sessionTitle = await this.getUserSessionTitle(userId, sessionId);
+    if (sessionTitle) {
+      return sessionTitle;
+    }
+    const allMessages = await this.getMessages(sessionId);
+    let title = await generateSessionTitle(this.buildContextMessages(allMessages));
+    if (!title) {
+      title = "不可知的会话";
+    }
+    this.updateSessionTitle(sessionId, title);
+    return title;
   }
 
   /**
@@ -143,5 +160,24 @@ export class SessionService {
       .limit(pageSize)
       .offset(offset);
     return { list, total: totalRow.total, page, pageSize };
+  }
+
+  /**
+   * 构建上下文消息
+   */
+  buildContextMessages(dbMessages: { role: string; content: string }[]): Message[] {
+    return dbMessages.filter((msg) => msg.role === Role.User || msg.role === Role.Assistant)
+      .map((msg) => {
+        if (msg.role === Role.User) {
+          return {
+            type: "user",
+            message: { role: "user", content: msg.content },
+          } as UserMessage
+        }
+        return {
+          type: "assistant",
+          message: { role: "assistant", content: msg.content }
+        } as AssistantMessage
+      });
   }
 }

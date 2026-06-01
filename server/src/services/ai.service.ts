@@ -1,11 +1,10 @@
-import { UserMessage, ChatCallback, Message, AssistantMessage } from "@/types";
+import { UserMessage, ChatCallback } from "@/types";
 import { AIProvider } from "@/enumeration";
 import { createAiModel } from "@/models";
 import { BizCode, Role } from "@/enumeration";
 import { ChatSseDto } from "@/dto";
 import { getSystemPrompt, asSystemPrompt } from "@/utils";
 import { SessionService } from "./session.service";
-import { generateSessionTitle } from "@/session";
 import { logger } from "@/utils";
 
 export class AiService {
@@ -37,7 +36,7 @@ export class AiService {
         const history = await this.sessionService.getMessages(session.id);
 
         // 构建上下文消息
-        const contextMessages = this.buildContextMessages(history);
+        const contextMessages = this.sessionService.buildContextMessages(history);
 
         // 调用AI模型
         // !TODO 后续配置从数据库获取
@@ -51,19 +50,7 @@ export class AiService {
         // 生成会话标题
         let titlePromise: Promise<string | null> | null = null;
         if (!session.title || session.title.length === 0) {
-            // !TODO 后续配置从数据库获取
-            titlePromise = generateSessionTitle({
-                provider: AIProvider.DeepSeek,
-                apiKey: process.env.OPENAI_API_KEY || "",
-                model: "deepseek-v4-flash",
-                baseURL: "https://api.deepseek.com",
-            }, [userMsg]);
-            // .then((title) => {
-            //     if (title) {
-            //         session.title = title;
-            //         this.sessionService.updateSessionTitle(session.id, title);
-            //     }
-            // })
+            titlePromise = this.sessionService.generateUserSessionTitle(params.userId, session.id);
         }
 
         try {
@@ -107,7 +94,6 @@ export class AiService {
                 ]);
                 if (title) {
                     session.title = title;
-                    this.sessionService.updateSessionTitle(session.id, title);
                     params.callback?.onTitle?.(session.id, title);
                 }
             } catch (err) {
@@ -124,25 +110,6 @@ export class AiService {
             type: "user",
             message: { role: "user", content: message },
         };
-    }
-
-    /**
-     * 构建上下文消息
-     */
-    private buildContextMessages(dbMessages: { role: string; content: string }[]): Message[] {
-        return dbMessages.filter((msg) => msg.role === Role.User || msg.role === Role.Assistant)
-            .map((msg) => {
-                if (msg.role === Role.User) {
-                    return {
-                        type: "user",
-                        message: { role: "user", content: msg.content },
-                    } as UserMessage
-                }
-                return {
-                    type: "assistant",
-                    message: { role: "assistant", content: msg.content }
-                } as AssistantMessage
-            });
     }
 
 }
