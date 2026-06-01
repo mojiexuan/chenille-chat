@@ -1,4 +1,4 @@
-import memoize from "lodash-es/memoize";
+import memoize from "lodash/memoize";
 
 /**
  * 获取系统上下文

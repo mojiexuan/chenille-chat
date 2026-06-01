@@ -1,6 +1,8 @@
 import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import pg from "pg";
 import { config } from "@/config";
+import path from "path";
 
 const pool = new pg.Pool({
     host: config.DB_HOST,
@@ -11,5 +13,11 @@ const pool = new pg.Pool({
 });
 
 export const db = drizzle(pool);
+
+export async function runMigrate() {
+    const migrationsFolder = path.join(__dirname, "../../drizzle");
+    await migrate(db, { migrationsFolder });
+}
+
 export { pool };
 export * from "./schema";
