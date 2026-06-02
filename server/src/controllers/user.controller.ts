@@ -2,6 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { UserService } from "@/services";
+import { meUpdateUserInfoDto } from "@/dto";
 
 /**
  * 获取用户信息
@@ -44,4 +45,29 @@ export async function meUpdateAvatarHandler(
   const userService = new UserService();
   const avatar = await userService.updateAvatar(userId, file);
   return reply.success(avatar, "用户头像更新成功");
+}
+
+/**
+ * 更新用户信息
+ * @param request 请求
+ * @param reply 响应
+ */
+export async function meUpdateUserInfoHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const parsed = meUpdateUserInfoDto.safeParse(request.body);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  const userId = request.userId;
+  if (typeof userId !== "number") {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  const userService = new UserService();
+  const set = await userService.updateProfile(userId, parsed.data);
+  return reply.success(set, "用户信息更新成功");
 }

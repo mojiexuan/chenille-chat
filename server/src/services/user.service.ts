@@ -6,6 +6,7 @@ import { BizCode } from "@/enumeration";
 import { OssService } from "./oss.service";
 import { logger } from "@/utils";
 import type { MultipartFile } from "@fastify/multipart";
+import { MeUpdateUserInfoDto } from "@/dto";
 
 /**
  * 用户服务
@@ -35,7 +36,20 @@ export class UserService {
   /**
    * 更新用户信息
    */
-  async updateProfile(userId: number) {}
+  async updateProfile(userId: number, data: MeUpdateUserInfoDto) {
+    const set: Record<string, unknown> = {};
+    if (data.nickname !== undefined) {
+      set.nickname = data.nickname;
+    }
+    if (data.gender !== undefined) {
+      set.gender = data.gender;
+    }
+    if (Object.keys(set).length === 0) {
+      return;
+    }
+    await db.update(users).set(set).where(eq(users.id, userId));
+    return set;
+  }
 
   /**
    * 更新用户头像
