@@ -9,6 +9,8 @@ declare module 'vue-router' {
     layout?: 'default' | 'blank';
     requiresAuth?: boolean;
     title?: string;
+    needBack?: boolean;
+    redirectName?: string;
   }
 }
 
@@ -34,6 +36,12 @@ const routes: RouteRecordRaw[] = [
         name: 'Setting',
         component: () => import('@/views/SettingView.vue'),
         meta: { title: '设置', requiresAuth: true },
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/ProfileView.vue'),
+        meta: { title: '个人中心', requiresAuth: true, needBack: true, redirectName: 'Setting' },
       },
     ],
   },

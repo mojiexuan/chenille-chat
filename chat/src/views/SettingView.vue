@@ -1,6 +1,7 @@
 <template>
     <div class="setting">
-        <div class="setting-card setting-card-user">
+        <!-- 用户资料 -->
+        <div class="setting-card setting-card-user" @click="handleProfileClick">
             <div class="setting-card-item setting-card-item-user">
                 <img class="setting-card-item-user-avatar" :src="userStore.user.avatar"
                     :alt="userStore.user.nickname" />
@@ -13,6 +14,7 @@
                 </svg>
             </div>
         </div>
+        <!-- 退出登录 -->
         <a class="setting-button-item setting-button-item-logout" @click="logoutClick">退出登录</a>
     </div>
 </template>
@@ -20,11 +22,21 @@
 <script setup lang="ts" name="setting">
 import { useConfirm } from '@/composables';
 import { useUserStore } from '@/stores';
+import { useRouter } from 'vue-router';
 
 // 确认弹窗
 const confirm = useConfirm();
 // 用户store
 const userStore = useUserStore();
+// 路由
+const router = useRouter();
+
+/**
+ * 用户资料点击事件
+ */
+function handleProfileClick() {
+    router.push({ name: 'Profile' });
+}
 
 /**
  * 退出登录点击事件

@@ -33,7 +33,7 @@
                         :key="item.id" @click="sessionItemClick(item.id)"
                         :class="{ 'active': item.id === sessionStore.currentSession.id }">
                         <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
-                            }}</span>
+                        }}</span>
                         <div class="default-layout-nav-content-session-item-more"
                             @click.stop="sessionMoreClick(item.id)">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
@@ -69,7 +69,7 @@
                         <div class="default-layout-nav-footer-me-content-item">
                             <img class="default-layout-nav-footer-me-content-item-icon" :src="userAvatar" alt="用户头像" />
                             <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{ userNameNickname
-                            }}</span>
+                                }}</span>
                         </div>
                     </menu>
                     <!-- 用户信息 -->
@@ -81,6 +81,13 @@
         <div class="default-layout-content">
             <div class="default-layout-content-header">
                 <div class="default-layout-content-header-left">
+                    <!-- 返回按钮 -->
+                    <div v-if="needBack" class="default-layout-content-header-back-button active" @click="navigateBack">
+                        <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M31 36L19 24L31 12" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
                     <!-- 开关侧边栏 -->
                     <div class="default-layout-content-header-left-button" :class="{ 'active': !sidebarActive }"
                         @click="switchSidebarClick">
@@ -130,6 +137,8 @@ const pageTitle = computed(() => {
     }
     return route.meta.title || "";
 });
+// 是否需要返回按钮
+const needBack = computed(() => route.meta.needBack || false);
 // 用户头像
 const userAvatar = computed(() => userStore.user.avatar);
 const userNameNickname = computed(() => userStore.user.nickname);
@@ -138,6 +147,13 @@ const userNameNickname = computed(() => userStore.user.nickname);
 const footerMeActive = ref(false);
 // 侧边栏是否显示
 const sidebarActive = ref(true);
+
+/**
+ * 点击返回按钮
+ */
+function navigateBack() {
+    router.replace({ name: route.meta.redirectName || 'Home' });
+}
 
 /**
  * 点击用户信息
@@ -181,7 +197,10 @@ function navigateToSetting() {
  * 点击会话
  */
 function sessionItemClick(sessionId: number) {
-    sessionStore.switchCurrentSession(sessionId)
+    sessionStore.switchCurrentSession(sessionId);
+    if (route.name !== "Home") {
+        router.replace({ name: 'Home' });
+    }
 }
 
 /**
@@ -426,6 +445,15 @@ onMounted(() => {
     gap: 10px;
 }
 
+.default-layout-content-header-back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}
+
 .default-layout-content-header-left-button {
     display: none;
     align-items: center;
@@ -442,6 +470,7 @@ onMounted(() => {
 .default-layout-content-header-left-title {
     font-size: 14px;
     font-weight: 600;
+    user-select: none;
 }
 
 .default-layout-content-main {
