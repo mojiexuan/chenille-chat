@@ -4,3 +4,5 @@ export * from "../utils/context.util";
 export * from "./message";
 export * from "./redis";
 export * from "./toolNames";
+export * from "./oss";
+export * from "./path";

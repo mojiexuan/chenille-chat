@@ -1,17 +1,22 @@
 import Fastify from "fastify";
 import { config } from "@/config";
-import { responsePlugin, errorHandlerPlugin, redisClientPlugin, dbClientPlugin, multipartPlugin } from "@/plugins";
+import {
+  responsePlugin,
+  errorHandlerPlugin,
+  redisClientPlugin,
+  dbClientPlugin,
+  multipartPlugin,
+} from "@/plugins";
 import { logger } from "@/utils";
 import { v1Router } from "@/router/v1";
 import { runMigrate, runSeed } from "@/db";
 import FastifyStatic from "@fastify/static";
-import path from "path";
+import { UPLOADS_PATH, ensurePaths } from "@/constants/path";
 
 /**
  * 主函数
  */
 async function main() {
-
   try {
     await runMigrate();
     await runSeed();
@@ -22,7 +27,8 @@ async function main() {
 
   const app = Fastify({});
   app.log = logger;
-
+  // 确保必要路径存在
+  ensurePaths();
   // 注册multipart插件
   app.register(multipartPlugin);
   // 注册错误处理插件
@@ -35,7 +41,7 @@ async function main() {
   app.register(dbClientPlugin);
   // 注册静态文件服务
   app.register(FastifyStatic, {
-    root: path.join(__dirname, "../uploads"),
+    root: UPLOADS_PATH,
     prefix: "/uploads/",
   });
   // 注册V1控制器插件

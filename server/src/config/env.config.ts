@@ -22,8 +22,15 @@ export const schema = {
   DB_NAME: void 0,
   JWT_SECRET: void 0,
   JWT_EXPIRES_IN: "604800",
+  // 阿里云短信配置
   ALIBABA_CLOUD_SMS_ACCESS_KEY_ID: void 0,
   ALIBABA_CLOUD_SMS_ACCESS_KEY_SECRET: void 0,
+  // OSS存储配置
+  ALIBABA_CLOUD_OSS_REGION: void 0,
+  ALIBABA_CLOUD_OSS_ACCESS_KEY_ID: void 0,
+  ALIBABA_CLOUD_OSS_ACCESS_KEY_SECRET: void 0,
+  ALIBABA_CLOUD_OSS_BUCKET_NAME: void 0,
+  ALIBABA_CLOUD_OSS_ENDPOINT: void 0,
 } satisfies EnvSchema;
 
 const cache = new Map<string, string>();
