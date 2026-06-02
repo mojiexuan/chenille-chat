@@ -5,114 +5,152 @@ import { ChatSseDto } from "@/dto";
 import { getSystemPrompt, asSystemPrompt } from "@/utils";
 import { SessionService } from "./session.service";
 import { AgentService } from "./agent.service";
-import { logger } from "@/utils";
+import { logger, formatTime } from "@/utils";
+import { SystemEnvironment } from "@/types";
+import { UserService } from "./user.service";
 
 export class AiService {
+  private sessionService: SessionService;
+  private agentService: AgentService;
 
-    private sessionService: SessionService;
-    private agentService: AgentService;
+  constructor() {
+    this.sessionService = new SessionService();
+    this.agentService = new AgentService();
+  }
 
-    constructor() {
-        this.sessionService = new SessionService();
-        this.agentService = new AgentService();
-    }
+  /**
+   * 聊天服务
+   * @param params 聊天参数
+   */
+  async chat(params: {
+    userId: number;
+    data: ChatSseDto;
+    callback?: ChatCallback;
+  }) {
+    // 获取或创建会话
+    const session = await this.sessionService.getOrCreateSession(
+      params.data.sessionId,
+      params.userId,
+    );
 
-    /**
-     * 聊天服务
-     * @param params 聊天参数
-     */
-    async chat(params: { userId: number, data: ChatSseDto, callback?: ChatCallback }) {
-        // 获取或创建会话
-        const session = await this.sessionService.getOrCreateSession(
-            params.data.sessionId,
-            params.userId,
-        );
+    // 添加用户消息到会话
+    await this.sessionService.addMessage(
+      session.id,
+      Role.User,
+      params.data.message,
+    );
 
-        // 添加用户消息到会话
-        await this.sessionService.addMessage(session.id, Role.User, params.data.message);
+    // 获取会话历史消息
+    const history = await this.sessionService.getMessages(session.id);
 
-        // 获取会话历史消息
-        const history = await this.sessionService.getMessages(session.id);
+    // 构建上下文消息
+    const contextMessages = this.sessionService.buildContextMessages(history);
 
-        // 构建上下文消息
-        const contextMessages = this.sessionService.buildContextMessages(history);
-
-        // 查询agent
-        const agent = await this.agentService.getAiChatDefaultModelAgent(params.data.modelId);
-        if (!agent) {
-            logger.error("未配置AI Chat Agent");
-            if (params.callback && params.callback.onMessage) {
-                params.callback.onMessage({
-                    sessionId: session.id,
-                    error: BizCode.AI_CHAT_ERROR.message,
-                    finished: true,
-                    content: "",
-                });
-            }
-            return;
-        }
-
-        // 调用AI模型
-        const aiModel = createAiModel({
-            provider: agent.provider.provider,
-            apiKey: agent.provider.apiKey,
-            model: agent.model.modelName,
-            baseURL: agent.provider.baseUrl,
+    // 查询agent
+    const agent = await this.agentService.getAiChatDefaultModelAgent(
+      params.data.modelId,
+    );
+    if (!agent) {
+      logger.error("未配置AI Chat Agent");
+      if (params.callback && params.callback.onMessage) {
+        params.callback.onMessage({
+          sessionId: session.id,
+          error: BizCode.AI_CHAT_ERROR.message,
+          finished: true,
+          content: "",
         });
-
-        // 生成会话标题
-        let titlePromise: Promise<string | null> | null = null;
-        if (!session.title || session.title.length === 0 || session.title === "新会话") {
-            titlePromise = this.sessionService.generateUserSessionTitle(params.userId, session.id);
-        }
-
-        try {
-            const result = await aiModel.generate({
-                stream: true,
-                systemPrompt: asSystemPrompt(getSystemPrompt([])),
-                messages: contextMessages,
-                onAbort: params.callback?.onAbort,
-                onChunk: (chunk) => {
-                    if (params.callback && params.callback.onMessage) {
-                        params.callback.onMessage({
-                            sessionId: session.id,
-                            reasoning: chunk.reasoning,
-                            content: chunk.message.content,
-                            finished: chunk.finished,
-                        });
-                    }
-                }
-            });
-
-            // 添加AI消息到会话
-            this.sessionService.addMessage(session.id, Role.Assistant, result.message.content);
-        } catch (err) {
-            logger.error(err);
-            // throw new BizException(BizCode.AI_CHAT_ERROR);
-            if (params.callback && params.callback.onMessage) {
-                params.callback.onMessage({
-                    sessionId: session.id,
-                    error: BizCode.AI_CHAT_ERROR.message,
-                    finished: true,
-                    content: "",
-                });
-            }
-        }
-
-        if (titlePromise) {
-            try {
-                const title = await Promise.race([
-                    titlePromise,
-                    new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
-                ]);
-                if (title) {
-                    session.title = title;
-                    params.callback?.onTitle?.(session.id, title);
-                }
-            } catch (err) {
-                logger.error(err);
-            }
-        }
+      }
+      return;
     }
 
+    // 调用AI模型
+    const aiModel = createAiModel({
+      provider: agent.provider.provider,
+      apiKey: agent.provider.apiKey,
+      model: agent.model.modelName,
+      baseURL: agent.provider.baseUrl,
+    });
+
+    // 生成会话标题
+    let titlePromise: Promise<string | null> | null = null;
+    if (
+      !session.title ||
+      session.title.length === 0 ||
+      session.title === "新会话"
+    ) {
+      titlePromise = this.sessionService.generateUserSessionTitle(
+        params.userId,
+        session.id,
+      );
+    }
+
+    try {
+      const result = await aiModel.generate({
+        stream: true,
+        systemPrompt: asSystemPrompt(getSystemPrompt([], [])),
+        messages: contextMessages,
+        onAbort: params.callback?.onAbort,
+        onChunk: (chunk) => {
+          if (params.callback && params.callback.onMessage) {
+            params.callback.onMessage({
+              sessionId: session.id,
+              reasoning: chunk.reasoning,
+              content: chunk.message.content,
+              finished: chunk.finished,
+            });
+          }
+        },
+      });
+
+      // 添加AI消息到会话
+      this.sessionService.addMessage(
+        session.id,
+        Role.Assistant,
+        result.message.content,
+      );
+    } catch (err) {
+      logger.error(err);
+      // throw new BizException(BizCode.AI_CHAT_ERROR);
+      if (params.callback && params.callback.onMessage) {
+        params.callback.onMessage({
+          sessionId: session.id,
+          error: BizCode.AI_CHAT_ERROR.message,
+          finished: true,
+          content: "",
+        });
+      }
+    }
+
+    if (titlePromise) {
+      try {
+        const title = await Promise.race([
+          titlePromise,
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
+        ]);
+        if (title) {
+          session.title = title;
+          params.callback?.onTitle?.(session.id, title);
+        }
+      } catch (err) {
+        logger.error(err);
+      }
+    }
+  }
+
+  /**
+   * 构建系统环境变量提示词
+   */
+  async buildEnvironmentPrompt(userId: number) {
+    const userService = new UserService();
+    const user = await userService.getUserInfoById(userId);
+    const env: SystemEnvironment = [];
+    env.push({
+      key: "当前用户昵称",
+      value: user.username,
+    });
+    env.push({
+      key: "当前时间",
+      value: formatTime(),
+    });
+  }
 }
