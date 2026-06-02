@@ -1,9 +1,11 @@
 import Fastify from "fastify";
 import { config } from "@/config";
-import { responsePlugin, errorHandlerPlugin, redisClientPlugin, dbClientPlugin } from "@/plugins";
+import { responsePlugin, errorHandlerPlugin, redisClientPlugin, dbClientPlugin, multipartPlugin } from "@/plugins";
 import { logger } from "@/utils";
 import { v1Router } from "@/router/v1";
 import { runMigrate, runSeed } from "@/db";
+import FastifyStatic from "@fastify/static";
+import path from "path";
 
 /**
  * 主函数
@@ -21,6 +23,8 @@ async function main() {
   const app = Fastify({});
   app.log = logger;
 
+  // 注册multipart插件
+  app.register(multipartPlugin);
   // 注册错误处理插件
   app.register(errorHandlerPlugin);
   // 注册响应插件
@@ -29,6 +33,11 @@ async function main() {
   app.register(redisClientPlugin);
   // 注册数据库插件
   app.register(dbClientPlugin);
+  // 注册静态文件服务
+  app.register(FastifyStatic, {
+    root: path.join(__dirname, "../uploads"),
+    prefix: "/uploads/",
+  });
   // 注册V1控制器插件
   app.register(v1Router, { prefix: "/api/v1" });
 

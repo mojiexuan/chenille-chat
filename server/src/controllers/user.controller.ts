@@ -20,3 +20,17 @@ export async function meInfoHandler(request: FastifyRequest, reply: FastifyReply
     }
     return reply.success(user, "用户信息");
 }
+
+/**
+ * 更新用户头像
+ * @param request 请求
+ * @param reply 响应
+ */
+export async function meUpdateAvatarHandler(request: FastifyRequest, reply: FastifyReply) {
+    const userId = request.userId;
+    if (typeof userId !== "number") {
+        throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+    }
+    const userService = new UserService();
+    return reply.success(null, "用户头像更新成功");
+}
