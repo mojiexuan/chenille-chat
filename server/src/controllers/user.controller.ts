@@ -8,17 +8,20 @@ import { UserService } from "@/services";
  * @param request 请求
  * @param reply 响应
  */
-export async function meInfoHandler(request: FastifyRequest, reply: FastifyReply) {
-    const userId = request.userId;
-    if (typeof userId !== "number") {
-        throw new BizException(BizCode.AUTH_UNAUTHORIZED);
-    }
-    const userService = new UserService();
-    const user = await userService.getUserInfoById(userId);
-    if (!user) {
-        throw new BizException(BizCode.AUTH_NOT_FOUND);
-    }
-    return reply.success(user, "用户信息");
+export async function meGetInfoHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const userId = request.userId;
+  if (typeof userId !== "number") {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  const userService = new UserService();
+  const user = await userService.getUserInfoById(userId);
+  if (!user) {
+    throw new BizException(BizCode.AUTH_NOT_FOUND);
+  }
+  return reply.success(user, "用户信息");
 }
 
 /**
@@ -26,11 +29,19 @@ export async function meInfoHandler(request: FastifyRequest, reply: FastifyReply
  * @param request 请求
  * @param reply 响应
  */
-export async function meUpdateAvatarHandler(request: FastifyRequest, reply: FastifyReply) {
-    const userId = request.userId;
-    if (typeof userId !== "number") {
-        throw new BizException(BizCode.AUTH_UNAUTHORIZED);
-    }
-    const userService = new UserService();
-    return reply.success(null, "用户头像更新成功");
+export async function meUpdateAvatarHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const userId = request.userId;
+  if (typeof userId !== "number") {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  const file = await request.file();
+  if (!file) {
+    throw new BizException(BizCode.PARAM_INVALID, "请上传文件");
+  }
+  const userService = new UserService();
+  const avatar = await userService.updateAvatar(userId, file);
+  return reply.success(avatar, "用户头像更新成功");
 }

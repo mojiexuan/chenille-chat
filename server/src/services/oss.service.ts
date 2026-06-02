@@ -7,6 +7,7 @@ import { logger } from "@/utils";
 import { BizException } from "@/exception";
 import { TEMP_PATH } from "@/constants";
 import path from "path";
+import type { MultipartFile } from "@fastify/multipart";
 
 /**
  * OSS服务
@@ -29,7 +30,7 @@ export class OssService {
   /**
    * 上传文件到OSS
    */
-  async uploadFileToOss(file: File) {
+  async uploadFileToOss(file: MultipartFile) {
     // 自定义请求头
     const headers = {
       // 指定Object的存储类型
@@ -42,9 +43,11 @@ export class OssService {
       "x-oss-forbid-overwrite": "false",
     };
     const { datePath, compact } = getTimeComponents();
-    const objectName = `${OSS_KEY_PREFIX}/${datePath}/${compact}_${randomStr(6, CharType.Upper)}_${file.name}`;
+    const ext = path.extname(file.filename) || ".png";
+    const objectName = `${OSS_KEY_PREFIX}/${datePath}/${compact}_${randomStr(6, CharType.Upper)}${ext}`;
     try {
-      const result = await this.ossClient.put(objectName, file, { headers });
+      const buffer = await file.toBuffer();
+      const result = await this.ossClient.put(objectName, buffer, { headers });
       return result.url;
     } catch (err) {
       logger.error(err, "上传文件到OSS失败");

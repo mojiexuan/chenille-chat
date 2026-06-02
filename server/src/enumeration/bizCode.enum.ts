@@ -22,4 +22,5 @@ export class BizCode {
     static readonly FILE_UPLOAD_FAIL = new BizCode(40031, 500, "文件上传失败");
     static readonly FILE_DELETE_FAIL = new BizCode(40032, 500, "文件删除失败");
     static readonly FILE_DOWNLOAD_FAIL = new BizCode(40033, 500, "文件下载失败");
+    static readonly USER_UPDATE_FAIL = new BizCode(40041, 500, "用户更新失败");
 }
