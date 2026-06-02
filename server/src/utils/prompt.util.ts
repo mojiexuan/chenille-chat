@@ -1,6 +1,13 @@
 import { config } from "@/config";
-import { RISK_INSTRUCTION, SYSTEM_REMINDER_TAG, TICK_TAG, APP_FEEDBACK_TOOL_NAME, ASK_USER_QUESTION_TOOL_NAME, SLEEP_TOOL_NAME } from "@/constants";
-import type { Tools, SystemPrompt } from "@/types";
+import {
+  RISK_INSTRUCTION,
+  SYSTEM_REMINDER_TAG,
+  TICK_TAG,
+  APP_FEEDBACK_TOOL_NAME,
+  ASK_USER_QUESTION_TOOL_NAME,
+  SLEEP_TOOL_NAME,
+} from "@/constants";
+import type { Tools, SystemPrompt, SystemEnvironment } from "@/types";
 
 /**
  * 转换为系统提示词
@@ -23,9 +30,7 @@ function getSystemRemindersSection(): string {
 /**
  * 获取语言段落
  */
-function getLanguageSection(
-  languagePreference = "中文",
-): string {
+function getLanguageSection(languagePreference = "中文"): string {
   return `# 语言
   始终使用${languagePreference}进行回复。在所有解释、评论以及与用户的沟通中，请使用${languagePreference}。技术术语和代码标识符应保持原样。`;
 }
@@ -134,14 +139,45 @@ function getOutputEfficiencySection(): string {
 }
 
 /**
+ * 获取MCP指令
+ */
+function getMcpInstructions(): string {
+  return `# MCP服务器说明
+
+  以下MCP服务器已提供了如何使用其工具和资源的说明：`;
+}
+
+/**
+ * 获取系统环境变量段落
+ */
+function getSystemEnvironmentSection(env: SystemEnvironment): string {
+  if (env.length === 0) {
+    return "";
+  }
+  const items = env.map((e) => {
+    return `<${e.key}}>${e.value}</${e.key}>`;
+  });
+  return [
+    "# 系统环境",
+    `<${SYSTEM_REMINDER_TAG}}>`,
+    ...prependBullets(items),
+    `</${SYSTEM_REMINDER_TAG}}>`,
+  ].join("\n");
+}
+
+/**
  * 获取系统提示词
  */
-export function getSystemPrompt(tools: Tools): string[] {
+export function getSystemPrompt(
+  tools: Tools,
+  env: SystemEnvironment,
+): string[] {
   const items = [
     `您是${config.APP_NAME}，Chenille为${config.APP_NAME}提供了网页交互界面，你运行在这个环境中。`,
     `您是一个自主的代理人。利用现有工具，做些有用的事情`,
     getIntroSection(),
     getSystemRemindersSection(),
+    getSystemEnvironmentSection(env),
     getLanguageSection("中文"),
     getSystemSection(),
     getActionsSection(),
@@ -151,15 +187,6 @@ export function getSystemPrompt(tools: Tools): string[] {
   // 过滤出所有已启用的工具名称
   const enabledTools = new Set(tools.map((_) => _.name));
   return items.filter((s) => s != null);
-}
-
-/**
- * 获取MCP指令
- */
-function getMcpInstructions(): string {
-  return `# MCP服务器说明
-
-  以下MCP服务器已提供了如何使用其工具和资源的说明：`;
 }
 
 /**
