@@ -6,3 +6,4 @@ export * from "./ai.service";
 export * from "./session.service";
 export * from "./agent.service";
 export * from "./oss.service";
+export * from "./model.service";

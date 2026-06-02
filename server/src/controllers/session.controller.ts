@@ -1,5 +1,9 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
-import { paginationRequestDto, sessionTitleRequestDto, sessionRequestDto } from "@/dto";
+import {
+  paginationRequestDto,
+  sessionTitleRequestDto,
+  sessionRequestDto,
+} from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { SessionService } from "@/services";
@@ -31,7 +35,7 @@ export async function getSessionListHandler(
     parsed.data.page,
     parsed.data.pageSize,
   );
-  reply.success(sessionList, "获取会话列表成功");
+  return reply.success(sessionList, "获取会话列表成功");
 }
 
 /**
@@ -54,14 +58,20 @@ export async function getSessionTitleHandler(
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const sessionService = new SessionService();
-  const title = await sessionService.generateUserSessionTitle(userId, parsed.data.sessionId);
-  reply.success(title, "获取会话标题成功");
+  const title = await sessionService.generateUserSessionTitle(
+    userId,
+    parsed.data.sessionId,
+  );
+  return reply.success(title, "获取会话标题成功");
 }
 
 /**
  * 获取会话
  */
-export async function getSessionHandler(request: FastifyRequest, reply: FastifyReply,) {
+export async function getSessionHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
   const parsed = sessionRequestDto.safeParse(request.params);
   if (!parsed.success) {
     throw new BizException(
@@ -75,14 +85,20 @@ export async function getSessionHandler(request: FastifyRequest, reply: FastifyR
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const sessionService = new SessionService();
-  const session = await sessionService.getSession(parsed.data.sessionId, userId);
+  const session = await sessionService.getSession(
+    parsed.data.sessionId,
+    userId,
+  );
   if (!session) {
     throw new BizException(BizCode.SESSION_NOT_FOUND);
   }
   const messages = await sessionService.getMessages(parsed.data.sessionId);
 
-  reply.success({
-    session,
-    messages,
-  }, "获取会话成功");
+  return reply.success(
+    {
+      session,
+      messages,
+    },
+    "获取会话成功",
+  );
 }
