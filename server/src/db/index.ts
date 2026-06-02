@@ -36,7 +36,12 @@ async function seedAgents() {
             name: "生成会话标题",
             key: AgentKey.GenerateSessionTitle,
             description: "根据会话内容生成简要的会话标题",
-        }
+        },
+        {
+            name: "Ai 聊天默认模型",
+            key: AgentKey.AiChatDefaultModel,
+            description: "聊天时，若未传入模型Id，默认使用该模型Id",
+        },
     ];
 
     for (const item of seedData) {

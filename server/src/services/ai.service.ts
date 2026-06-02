@@ -1,18 +1,20 @@
 import { ChatCallback } from "@/types";
-import { AIProvider } from "@/enumeration";
 import { createAiModel } from "@/models";
 import { BizCode, Role } from "@/enumeration";
 import { ChatSseDto } from "@/dto";
 import { getSystemPrompt, asSystemPrompt } from "@/utils";
 import { SessionService } from "./session.service";
+import { AgentService } from "./agent.service";
 import { logger } from "@/utils";
 
 export class AiService {
 
     private sessionService: SessionService;
+    private agentService: AgentService;
 
     constructor() {
         this.sessionService = new SessionService();
+        this.agentService = new AgentService();
     }
 
     /**
@@ -35,13 +37,27 @@ export class AiService {
         // 构建上下文消息
         const contextMessages = this.sessionService.buildContextMessages(history);
 
+        // 查询agent
+        const agent = await this.agentService.getAiChatDefaultModelAgent(params.data.modelId);
+        if (!agent) {
+            logger.error("未配置AI Chat Agent");
+            if (params.callback && params.callback.onMessage) {
+                params.callback.onMessage({
+                    sessionId: session.id,
+                    error: BizCode.AI_CHAT_ERROR.message,
+                    finished: true,
+                    content: "",
+                });
+            }
+            return;
+        }
+
         // 调用AI模型
-        // !TODO 后续配置从数据库获取
         const aiModel = createAiModel({
-            provider: AIProvider.DeepSeek,
-            apiKey: process.env.OPENAI_API_KEY || "",
-            model: "deepseek-v4-pro",
-            baseURL: "https://api.deepseek.com",
+            provider: agent.provider.provider,
+            apiKey: agent.provider.apiKey,
+            model: agent.model.modelName,
+            baseURL: agent.provider.baseUrl,
         });
 
         // 生成会话标题
