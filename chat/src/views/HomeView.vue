@@ -131,7 +131,7 @@ function sendClick() {
                 if (sessionStore.currentSession.title === '新会话' && sessionStore.currentSession.id) {
                     getSessionTitleRequest(sessionStore.currentSession.id)
                         .then((title) => {
-                            sessionStore.updateCurrentSessionTitle(title || '新会话');
+                            sessionStore.updateCurrentSessionTitle(title);
                         })
                 }
                 if (!assistant) {
@@ -142,7 +142,7 @@ function sendClick() {
         },
         (param) => {
             sessionStore.updateCurrentSessionId(param.sessionId);
-            sessionStore.updateCurrentSessionTitle(param.title || '新会话');
+            sessionStore.updateCurrentSessionTitle(param.title);
         })
 }
 </script>

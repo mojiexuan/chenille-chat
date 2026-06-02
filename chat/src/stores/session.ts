@@ -15,7 +15,7 @@ export const useSessionStore = defineStore("session", () => {
     const hasMoreSessions = ref(true);
     // 当前会话
     const currentSession = ref<Session>({
-        id: undefined,
+        id: void 0,
         title: "新会话",
         messages: [],
     });
@@ -54,8 +54,15 @@ export const useSessionStore = defineStore("session", () => {
      * @date 2026-05-31
      */
     function updateCurrentSessionTitle(title: string): void {
-        if (currentSession.value.id !== undefined) {
+        if (currentSession.value.id !== void 0 && title && title !== "新会话") {
             currentSession.value.title = title;
+            if(sessions.value.find((item) => item.id === currentSession.value.id)){
+                return;
+            }
+            sessions.value.unshift({
+                id: currentSession.value.id,
+                title,
+            });
         }
     }
 
@@ -65,8 +72,12 @@ export const useSessionStore = defineStore("session", () => {
      * @date 2026-05-31
      */
     function resetCurrentSession(): void {
+        if (currentSession.value.id !== void 0) {
+            hasMoreSessions.value = true;
+            getSessions();
+        }
         currentSession.value = {
-            id: undefined,
+            id: void 0,
             title: "新会话",
             messages: [],
         };

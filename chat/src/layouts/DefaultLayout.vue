@@ -177,6 +177,9 @@ function navigateToSetting() {
     }
 }
 
+/**
+ * 点击会话
+ */
 function sessionItemClick(sessionId: number) {
     sessionStore.switchCurrentSession(sessionId)
 }
