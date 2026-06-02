@@ -1,5 +1,18 @@
 <template>
     <div class="setting">
+        <div class="setting-card setting-card-user">
+            <div class="setting-card-item setting-card-item-user">
+                <img class="setting-card-item-user-avatar" :src="userStore.user.avatar"
+                    :alt="userStore.user.nickname" />
+                <div class="setting-card-item-user-info">
+                    <div class="setting-card-item-user-info-nickname ellipsis">{{ userStore.user.nickname }}</div>
+                </div>
+                <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12L31 24L19 36" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+        </div>
         <a class="setting-button-item setting-button-item-logout" @click="logoutClick">退出登录</a>
     </div>
 </template>
@@ -35,6 +48,54 @@ function logoutClick() {
     display: flex;
     flex-direction: column;
     padding-top: 12px;
+    gap: 24px;
+}
+
+.setting-card {
+    width: 100%;
+    background-color: var(--ch-feature-card-bg);
+    min-height: 48px;
+    padding: 0 16px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-card-user {
+    cursor: pointer;
+}
+
+.setting-card-item {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.setting-card-item-user {
+    padding: 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.setting-card-item-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.setting-card-item-user-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.setting-card-item-user-info-nickname {
+    font-size: 16px;
+    font-weight: 400;
+    font-weight: 400;
+    line-height: 24px;
 }
 
 .setting-button-item {

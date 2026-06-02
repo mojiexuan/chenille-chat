@@ -30,11 +30,12 @@
             <section class="default-layout-nav-content">
                 <section class="default-layout-nav-content-session">
                     <div class="default-layout-nav-content-session-item" v-for="item in sessionStore.sessions"
-                        :key="item.id" @click="sessionStore.switchCurrentSession(item.id)"
+                        :key="item.id" @click="sessionItemClick(item.id)"
                         :class="{ 'active': item.id === sessionStore.currentSession.id }">
                         <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
-                        }}</span>
-                        <div class="default-layout-nav-content-session-item-more">
+                            }}</span>
+                        <div class="default-layout-nav-content-session-item-more"
+                            @click.stop="sessionMoreClick(item.id)">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="24" cy="12" r="3" fill="#3c3c43" />
@@ -68,7 +69,7 @@
                         <div class="default-layout-nav-footer-me-content-item">
                             <img class="default-layout-nav-footer-me-content-item-icon" :src="userAvatar" alt="用户头像" />
                             <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{ userNameNickname
-                                }}</span>
+                            }}</span>
                         </div>
                     </menu>
                     <!-- 用户信息 -->
@@ -174,6 +175,16 @@ function navigateToSetting() {
     if (route.name !== "Setting") {
         router.replace({ name: 'Setting' });
     }
+}
+
+function sessionItemClick(sessionId: number) {
+    sessionStore.switchCurrentSession(sessionId)
+}
+
+/**
+ * 点击会话更多
+ */
+function sessionMoreClick(sessionId: number) {
 }
 
 onMounted(() => {

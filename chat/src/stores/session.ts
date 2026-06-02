@@ -97,6 +97,9 @@ export const useSessionStore = defineStore("session", () => {
      * @date 2026-05-31
      */
     function switchCurrentSession(sessionId: number) {
+        if (currentSession.value.id === sessionId) {
+            return;
+        }
         getSessionRequest(sessionId)
             .then((res) => {
                 currentSession.value = {
