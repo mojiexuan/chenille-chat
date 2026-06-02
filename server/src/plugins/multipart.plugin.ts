@@ -8,7 +8,13 @@ import fastifyMultipart from "@fastify/multipart";
 export async function multipartPlugin(fastify: FastifyInstance) {
     await fastify.register(fastifyMultipart, {
         limits: {
-            fileSize: 2 * 1024 * 1024, // 2MB
+            fileSize: 50 * 1024 * 1024, // 50MB
+            files: 10, // 最多10个文件
+            fieldNameSize: 100, // 最大字段名长度为100个字符
+            fieldSize: 1024 * 1024, // 最大字段值为1MB
+            fields: 100, // 最多100个非文件字段
+            parts: 100, // 最多100个部分
+            headerPairs: 2000, // 最多2000个头对值
         },
     });
 }
