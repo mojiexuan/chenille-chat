@@ -87,9 +87,10 @@ export class AiService {
     }
 
     try {
+      const systemPrompt = await this.buildEnvironmentPrompt(params.userId);
       const result = await aiModel.generate({
         stream: true,
-        systemPrompt: asSystemPrompt(getSystemPrompt([], [])),
+        systemPrompt: asSystemPrompt(getSystemPrompt([], systemPrompt)),
         messages: contextMessages,
         onAbort: params.callback?.onAbort,
         onChunk: (chunk) => {
@@ -154,5 +155,6 @@ export class AiService {
       key: "当前时间",
       value: formatTime(),
     });
+    return env;
   }
 }
