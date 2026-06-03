@@ -95,8 +95,8 @@ export class SessionService {
   }
 
   /**
- * 获取用户会话标题
- */
+   * 获取用户会话标题
+   */
   async getUserSessionTitle(userId: number, sessionId: number) {
     const [session] = await db
       .select()
@@ -121,9 +121,11 @@ export class SessionService {
       return sessionTitle;
     }
     const allMessages = await this.getMessages(sessionId);
-    let title = await generateSessionTitle(this.buildContextMessages(allMessages));
+    let title = await generateSessionTitle(
+      this.buildContextMessages(allMessages),
+    );
     if (!title) {
-      title = "新会话";
+      throw new BizException(BizCode.SESSION_TITLE_GENERATE_FAIL);
     }
     this.updateSessionTitle(sessionId, title);
     return title;
@@ -165,19 +167,22 @@ export class SessionService {
   /**
    * 构建上下文消息
    */
-  buildContextMessages(dbMessages: { role: string; content: string }[]): Message[] {
-    return dbMessages.filter((msg) => msg.role === Role.User || msg.role === Role.Assistant)
+  buildContextMessages(
+    dbMessages: { role: string; content: string }[],
+  ): Message[] {
+    return dbMessages
+      .filter((msg) => msg.role === Role.User || msg.role === Role.Assistant)
       .map((msg) => {
         if (msg.role === Role.User) {
           return {
             type: "user",
             message: { role: "user", content: msg.content },
-          } as UserMessage
+          } as UserMessage;
         }
         return {
           type: "assistant",
-          message: { role: "assistant", content: msg.content }
-        } as AssistantMessage
+          message: { role: "assistant", content: msg.content },
+        } as AssistantMessage;
       });
   }
 }

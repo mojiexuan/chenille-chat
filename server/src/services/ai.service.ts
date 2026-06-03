@@ -78,10 +78,12 @@ export class AiService {
       session.title.length === 0 ||
       session.title === "新会话"
     ) {
-      titlePromise = this.sessionService.generateUserSessionTitle(
-        params.userId,
-        session.id,
-      );
+      try {
+        titlePromise = this.sessionService.generateUserSessionTitle(
+          params.userId,
+          session.id,
+        );
+      } catch {}
     }
 
     try {

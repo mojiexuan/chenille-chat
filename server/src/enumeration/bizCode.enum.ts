@@ -19,6 +19,7 @@ export class BizCode {
     static readonly AUTH_EXPIRED = new BizCode(40009, 401, "登录已过期，请重新登录");
     static readonly AI_CHAT_ERROR = new BizCode(40010, 500, "AI会话意外中断，请重试");
     static readonly SESSION_NOT_FOUND = new BizCode(40021, 404, "会话不存在");
+    static readonly SESSION_TITLE_GENERATE_FAIL = new BizCode(40022, 422, "会话标题生成失败");
     static readonly FILE_UPLOAD_FAIL = new BizCode(40031, 500, "文件上传失败");
     static readonly FILE_DELETE_FAIL = new BizCode(40032, 500, "文件删除失败");
     static readonly FILE_DOWNLOAD_FAIL = new BizCode(40033, 500, "文件下载失败");
