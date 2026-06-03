@@ -1,11 +1,12 @@
 import type { FastifyInstance } from "fastify";
+import fp from "fastify-plugin";
 import fastifyMultipart from "@fastify/multipart";
 
 /**
  * 处理multipart请求
  * @param fastify Fastify实例
  */
-export async function multipartPlugin(fastify: FastifyInstance) {
+async function multipartPluginFn(fastify: FastifyInstance) {
     await fastify.register(fastifyMultipart, {
         limits: {
             fileSize: 50 * 1024 * 1024, // 50MB
@@ -18,3 +19,5 @@ export async function multipartPlugin(fastify: FastifyInstance) {
         },
     });
 }
+
+export const multipartPlugin = fp(multipartPluginFn, { name: "multipart" });

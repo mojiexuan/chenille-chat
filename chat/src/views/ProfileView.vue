@@ -1,38 +1,44 @@
 <template>
   <div class="profile">
     <div class="profile-avatar">
-      <img
-        class="profile-avatar-image"
-        :src="userStore.user.avatar"
-        :alt="userStore.user.nickname"
-      />
-      <input class="profile-avatar-input" type="file" accept="image/*" @click="handleAvatarClick" />
+      <img class="profile-avatar-image" :src="userStore.user.avatar" :alt="userStore.user.nickname" />
+      <input class="profile-avatar-input" type="file" accept="image/*" @change="handleAvatarClick" />
     </div>
     <div class="profile-info">
       <div class="profile-info-item">
         <span class="profile-info-item-label">昵称</span>
-        <input
-          class="profile-info-item-input"
-          type="text"
-          v-model="editorUserNickname"
-          placeholder="请输入昵称"
-          maxlength="20"
-          minlength="1"
-        />
+        <input class="profile-info-item-input" type="text" v-model="editorUserNickname" placeholder="请输入昵称"
+          maxlength="20" minlength="1" />
       </div>
     </div>
+    <CropperComponent v-if="showCropper" :file="cropperFile!" @close="showCropper = false"
+      @confirm="handleCropConfirmClick">
+    </CropperComponent>
   </div>
 </template>
 
 <script setup lang="ts" name="profile">
 import { ref, onMounted } from "vue";
 import { useUserStore } from "@/stores";
+import { useToast, useConfirm } from "@/composables";
+import { updateUserAvatarRequest } from "@/request";
+import CropperComponent from "@/components/cropper/CropperComponent.vue";
 
 // 用户store
 const userStore = useUserStore();
 
 // 编辑器用户昵称
 const editorUserNickname = ref("");
+
+// 提示
+const toast = useToast();
+// 确认
+const confirm = useConfirm();
+
+// 显示裁剪组件
+const showCropper = ref(false);
+// 裁剪文件
+const cropperFile = ref<File>();
 
 /**
  * 点击头像触发上传
@@ -42,10 +48,60 @@ function handleAvatarClick(e: Event) {
   const target = e.target as HTMLInputElement;
   const file = target.files?.[0];
   if (!file) {
+    toast.prompt("请选择图片");
     return;
   }
-  if (!file.type.startsWith("image/")) {
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    confirm.error({
+      title: "图片格式错误",
+      message: "请上传JPEG、PNG、GIF、WEBP格式的图片",
+      confirmText: "知道了",
+    });
+    target.value = "";
+    return;
   }
+  // 限制文件大小为2MB
+  const maxSize = 2 * 1024 * 1024;
+  if (file.size > maxSize) {
+    toast.error("图片大小超过2MB");
+    target.value = "";
+    return;
+  }
+
+  const img = new Image();
+  img.onload = () => {
+    const maxResolution = 2048;
+    if (img.width > maxResolution || img.height > maxResolution) {
+      toast.error("图片分辨率超过2048");
+      target.value = "";
+      return;
+    }
+    // 校验通过，裁剪头像
+    cropperFile.value = file;
+    showCropper.value = true;
+  }
+  img.onerror = () => {
+    toast.error("图片加载失败");
+    target.value = "";
+    return;
+  }
+  img.src = URL.createObjectURL(file);
+}
+
+/**
+ * 裁剪确认点击
+ */
+function handleCropConfirmClick(blob: Blob) {
+  const file = new File([blob], "avatar.png", { type: blob.type });
+  updateUserAvatarRequest(file)
+    .then(() => {
+      toast.success("头像更新成功");
+      userStore.refreshUserInfo();
+    })
+    .catch(() => {
+      toast.error("头像更新失败");
+    });
 }
 
 onMounted(() => {
@@ -88,6 +144,7 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
+  opacity: 0;
   cursor: pointer;
 }
 
