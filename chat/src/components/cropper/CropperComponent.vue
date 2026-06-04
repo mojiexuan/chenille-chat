@@ -36,6 +36,7 @@
 <script setup lang="ts" name="Cropper">
 import 'vue-cropper/dist/index.css'
 import { VueCropper } from "vue-cropper";
+import type { VueCropperInstance } from "vue-cropper";
 import { ref, computed } from "vue";
 
 // 预览数据
@@ -79,7 +80,7 @@ const previewStyle = ref({
 });
 
 // 裁剪器实例
-const cropperRef = ref<VueCropper | null>(null);
+const cropperRef = ref<VueCropperInstance | null>(null);
 
 /**
  * 关闭裁剪器
@@ -92,9 +93,11 @@ function handleCloseClick() {
  * 确认裁剪
  */
 function handleConfirmClick() {
-    cropperRef.value?.getCropBlob((blob: Blob) => {
-        emit("confirm", blob);
-    })
+    if (cropperRef.value) {
+        cropperRef.value.getCropBlob((blob: Blob) => {
+            emit("confirm", blob);
+        })
+    }
 }
 
 /**

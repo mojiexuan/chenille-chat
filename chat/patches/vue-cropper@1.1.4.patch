@@ -1,0 +1,8 @@
+diff --git a/lib/vue-cropper.vue.d.ts b/lib/vue-cropper.vue.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..6709067fb9f4b7460c298c33c77e57eb2eb0b820
+--- /dev/null
++++ b/lib/vue-cropper.vue.d.ts
+@@ -0,0 +1,2 @@
++declare const component: any
++export default component
