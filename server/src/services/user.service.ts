@@ -30,6 +30,7 @@ export class UserService {
     if (!user) {
       throw new BizException(BizCode.USER_NOT_FOUND);
     }
+    user.avatar = this.ossService.getFullUrl(user.avatar);
     return user;
   }
 
@@ -55,16 +56,18 @@ export class UserService {
    * 更新用户头像
    */
   async updateAvatar(userId: number, avatar: MultipartFile) {
-    const avatarUrl = await this.ossService.uploadFileToOss(avatar);
+    const user = await this.getUserInfoById(userId);
+    this.ossService.deleteFileFromOss(user.avatar);
+    const { url, path } = await this.ossService.uploadFileToOss(avatar);
     try {
       await db
         .update(users)
-        .set({ avatar: avatarUrl })
+        .set({ avatar: path })
         .where(eq(users.id, userId));
-      return avatarUrl;
+      return url;
     } catch (err) {
       logger.error(err, "更新用户头像失败");
-      this.ossService.deleteFileFromOss(avatarUrl);
+      this.ossService.deleteFileFromOss(path);
       throw new BizException(BizCode.USER_UPDATE_FAIL);
     }
   }
@@ -72,5 +75,5 @@ export class UserService {
   /**
    * 绑定微信账号
    */
-  async bindWeChat() {}
+  async bindWeChat() { }
 }

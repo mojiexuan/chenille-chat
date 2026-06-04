@@ -7,4 +7,4 @@ export const userSafeInfo = {
     phone: users.phone,
     gender: users.gender,
     avatar: users.avatar,
-} as const;
+};

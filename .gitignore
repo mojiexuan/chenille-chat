@@ -11,3 +11,6 @@ dist
 *.test.ts
 
 volumes/
+scripts/
+uploads/
+logs/

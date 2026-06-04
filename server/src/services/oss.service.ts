@@ -28,6 +28,20 @@ export class OssService {
   }
 
   /**
+   * 获取文件的完整URL
+   * @param path 文件路径
+   * @returns 文件的完整URL
+   */
+  getFullUrl(path: string | null) {
+    if (!path || path.startsWith("http")) {
+      return path;
+    }
+    const endpoint = config.ALIBABA_CLOUD_OSS_ENDPOINT.replace(/\/+$/, "");
+    const normalizedPath = path.replace(/^\/+/, "");
+    return `${endpoint}/${normalizedPath}`;
+  }
+
+  /**
    * 上传文件到OSS
    */
   async uploadFileToOss(file: MultipartFile) {
@@ -35,8 +49,6 @@ export class OssService {
     const headers = {
       // 指定Object的存储类型
       "x-oss-storage-class": "Standard",
-      // 指定Object的访问权限
-      "x-oss-object-acl": "public-read",
       // 通过文件URL访问文件时，指定以附件形式下载文件
       "Content-Disposition": "inline",
       // 指定PutObject操作时是否覆盖同名目标Object。此处设置为true，表示禁止覆盖同名Object
@@ -48,7 +60,10 @@ export class OssService {
     try {
       const buffer = await file.toBuffer();
       const result = await this.ossClient.put(objectName, buffer, { headers });
-      return result.url;
+      return {
+        url: result.url,
+        path: objectName,
+      };
     } catch (err) {
       logger.error(err, "上传文件到OSS失败");
       throw new BizException(BizCode.FILE_UPLOAD_FAIL);
@@ -76,10 +91,14 @@ export class OssService {
   /**
    * 删除OSS上的文件
    */
-  async deleteFileFromOss(fileUrl: string) {
+  async deleteFileFromOss(fileUrl: string | null) {
+    if (!fileUrl) {
+      return;
+    }
     let objectName = fileUrl;
-    if (fileUrl.startsWith(OSS_KEY_PREFIX)) {
-      objectName = fileUrl.replace(OSS_KEY_PREFIX, "");
+    const prefix = config.ALIBABA_CLOUD_OSS_ENDPOINT + '/';
+    if (fileUrl.startsWith(prefix)) {
+      objectName = fileUrl.replace(prefix, "");
     }
     try {
       await this.ossClient.delete(objectName);
