@@ -93,7 +93,11 @@ function handleAvatarClick(e: Event) {
  * 裁剪确认点击
  */
 function handleCropConfirmClick(blob: Blob) {
+  // 转换为File对象
   const file = new File([blob], "avatar.png", { type: blob.type });
+  // 关闭裁剪组件
+  showCropper.value = false;
+  // 更新用户头像
   updateUserAvatarRequest(file)
     .then(() => {
       toast.success("头像更新成功");
