@@ -6,3 +6,5 @@ export * from "./role.enum";
 export * from "./char.enum";
 export * from "./sse.enum";
 export * from "./agent.enum";
+export * from "./message.enum";
+export * from "./task.enum";
