@@ -31,6 +31,11 @@ export const schema = {
   ALIBABA_CLOUD_OSS_ACCESS_KEY_SECRET: void 0,
   ALIBABA_CLOUD_OSS_BUCKET_NAME: void 0,
   ALIBABA_CLOUD_OSS_ENDPOINT: void 0,
+  // 邮件配置
+  SMTP_HOST: void 0,
+  SMTP_PORT: "465",
+  SMTP_USER: void 0,
+  SMTP_PASS: void 0,
 } satisfies EnvSchema;
 
 const cache = new Map<string, string>();
