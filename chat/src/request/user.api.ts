@@ -1,11 +1,18 @@
 import type { User } from '@/types';
-import { get, post } from './fetch';
+import { get, post, patch } from './fetch';
 
 /**
  * 获取用户信息
  */
 export const userInfoRequest = () => {
     return get<User>('/user/me');
+}
+
+/**
+ * 更新用户信息
+ */
+export const patchUserInfoRequest = (data: User) => {
+    return patch<User>("/user/me/info", data);
 }
 
 /**

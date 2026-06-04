@@ -11,6 +11,7 @@
           maxlength="20" minlength="1" />
       </div>
     </div>
+    <button class="profile-btn" @click="handleSaveClick">保存</button>
     <CropperComponent v-if="showCropper" :file="cropperFile!" @close="showCropper = false"
       @confirm="handleCropConfirmClick">
     </CropperComponent>
@@ -21,7 +22,7 @@
 import { ref, onMounted } from "vue";
 import { useUserStore } from "@/stores";
 import { useToast, useConfirm } from "@/composables";
-import { updateUserAvatarRequest } from "@/request";
+import { updateUserAvatarRequest, patchUserInfoRequest } from "@/request";
 import CropperComponent from "@/components/cropper/CropperComponent.vue";
 
 // 用户store
@@ -108,6 +109,28 @@ function handleCropConfirmClick(blob: Blob) {
     });
 }
 
+/**
+ * 保存点击
+ */
+function handleSaveClick() {
+  if (editorUserNickname.value === userStore.user.nickname) {
+    return;
+  }
+  if (editorUserNickname.value.length < 1 || editorUserNickname.value.length > 20) {
+    toast.error("昵称长度必须在1-20之间");
+    return;
+  }
+  // 更新用户信息
+  patchUserInfoRequest({ nickname: editorUserNickname.value })
+    .then(() => {
+      toast.success("昵称更新成功");
+      userStore.refreshUserInfo();
+    })
+    .catch(() => {
+      toast.error("昵称更新失败");
+    });
+}
+
 onMounted(() => {
   editorUserNickname.value = userStore.user.nickname || "";
 });
@@ -180,5 +203,23 @@ onMounted(() => {
 .profile-info-item-input {
   font-size: 16px;
   flex: 1 1;
+}
+
+.profile-btn {
+  max-width: 560px;
+  width: 100%;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ch-main-color);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ch-text-white-color);
+}
+
+.profile-btn:hover {
+  background-color: var(--ch-main-hover-color);
 }
 </style>
