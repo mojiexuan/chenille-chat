@@ -12,10 +12,12 @@ import { UserService } from "./user.service";
 export class AiService {
   private sessionService: SessionService;
   private agentService: AgentService;
+  private userService: UserService;
 
   constructor() {
     this.sessionService = new SessionService();
     this.agentService = new AgentService();
+    this.userService = new UserService();
   }
 
   /**
@@ -144,19 +146,25 @@ export class AiService {
    * 构建系统环境变量提示词
    */
   async buildEnvironmentPrompt(userId: number) {
-    const userService = new UserService();
-    const user = await userService.getUserInfoById(userId);
+    const user = await this.userService.getUserInfoById(userId);
     const env: SystemEnvironment = [];
+    const loginLog = await this.userService.getNewLoginLog(userId);
+    if (loginLog && loginLog.country && loginLog.city) {
+      env.push({
+        key: "当前用户大致位置",
+        value: loginLog.country + loginLog.city,
+      });
+    }
     env.push({
       key: "当前用户昵称",
       value: user.username,
     });
     env.push({
-      key: "当前时间",
+      key: "当前用户所在时区时间",
       value: formatTime(),
     });
     env.push({
-      key: "当前周",
+      key: "当前用户所在时区时间对应周",
       value: getWeekDay(),
     });
     return env;
