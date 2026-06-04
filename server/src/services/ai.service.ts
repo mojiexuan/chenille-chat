@@ -5,7 +5,7 @@ import { ChatSseDto } from "@/dto";
 import { getSystemPrompt, asSystemPrompt } from "@/utils";
 import { SessionService } from "./session.service";
 import { AgentService } from "./agent.service";
-import { logger, formatTime } from "@/utils";
+import { logger, formatTime, getWeekDay } from "@/utils";
 import { SystemEnvironment } from "@/types";
 import { UserService } from "./user.service";
 
@@ -154,6 +154,10 @@ export class AiService {
     env.push({
       key: "当前时间",
       value: formatTime(),
+    });
+    env.push({
+      key: "当前周",
+      value: getWeekDay(),
     });
     return env;
   }
