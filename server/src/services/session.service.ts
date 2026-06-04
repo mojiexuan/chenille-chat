@@ -1,7 +1,13 @@
 import { db, sessions, messages } from "@/db";
 import { eq, asc, desc, count, and } from "drizzle-orm";
 import { Role } from "@/enumeration";
-import { Pagination, Message, AssistantMessage, UserMessage } from "@/types";
+import {
+  Pagination,
+  Message,
+  AssistantMessage,
+  UserMessage,
+  ChatUsage,
+} from "@/types";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { generateSessionTitle } from "@/session";
@@ -68,6 +74,7 @@ export class SessionService {
     sessionId: number,
     role: Role,
     content: string,
+    usage?: ChatUsage,
     meta?: unknown,
   ) {
     const [message] = await db
@@ -76,6 +83,10 @@ export class SessionService {
         sessionId,
         role,
         content,
+        promptTokens: usage?.prompt_tokens || 0,
+        completionTokens: usage?.completion_tokens || 0,
+        totalTokens: usage?.total_tokens || 0,
+        cachedTokens: usage?.prompt_tokens_details?.cached_tokens || 0,
         meta,
       })
       .returning();

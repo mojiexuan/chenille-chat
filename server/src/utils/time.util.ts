@@ -52,3 +52,14 @@ export function formatTime(date = new Date(), template = "yyyy年M月d日 HH:mm"
     .replace("ss", pad(s))
     .replace("s", String(s));
 }
+
+/**
+ * 获取当前周几
+ *
+ * @param format 前缀，默认"周"
+ * @returns 例："周一"
+ */
+export function getWeekDay(date = new Date(), format = "周") {
+  const WEEK_DAYS = ["日", "一", "二", "三", "四", "五", "六"];
+  return format + WEEK_DAYS[date.getDay()];
+}

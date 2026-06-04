@@ -1,5 +1,5 @@
-import { db, users } from "@/db";
-import { eq } from "drizzle-orm";
+import { db, users, loginLogs } from "@/db";
+import { eq, desc } from "drizzle-orm";
 import { userSafeInfo } from "@/vo";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
@@ -60,10 +60,7 @@ export class UserService {
     this.ossService.deleteFileFromOss(user.avatar);
     const { url, path } = await this.ossService.uploadFileToOss(avatar);
     try {
-      await db
-        .update(users)
-        .set({ avatar: path })
-        .where(eq(users.id, userId));
+      await db.update(users).set({ avatar: path }).where(eq(users.id, userId));
       return url;
     } catch (err) {
       logger.error(err, "更新用户头像失败");
@@ -73,7 +70,20 @@ export class UserService {
   }
 
   /**
+   * 获取用户最新登录日志
+   */
+  async getNewLoginLog(userId: number) {
+    const [loginLog] = await db
+      .select()
+      .from(loginLogs)
+      .where(eq(loginLogs.userId, userId))
+      .orderBy(desc(loginLogs.createdAt))
+      .limit(1);
+    return loginLog;
+  }
+
+  /**
    * 绑定微信账号
    */
-  async bindWeChat() { }
+  async bindWeChat() {}
 }
