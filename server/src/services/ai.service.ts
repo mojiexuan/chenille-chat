@@ -1,12 +1,23 @@
-import { ChatCallback } from "@/types";
+import {
+  ChatCallback,
+  ChatUsage,
+  SystemEnvironment,
+  Message,
+  SystemPrompt,
+} from "@/types";
 import { createAiModel } from "@/models";
 import { BizCode, Role } from "@/enumeration";
 import { ChatSseDto } from "@/dto";
-import { getSystemPrompt, asSystemPrompt } from "@/utils";
+import {
+  getSystemPrompt,
+  asSystemPrompt,
+  estimateSystemPromptTokens,
+  estimateTokens,
+  estimateMessagesTokens,
+} from "@/utils";
 import { SessionService } from "./session.service";
 import { AgentService } from "./agent.service";
 import { logger, formatTime, getWeekDay } from "@/utils";
-import { SystemEnvironment } from "@/types";
 import { UserService } from "./user.service";
 
 export class AiService {
@@ -88,31 +99,42 @@ export class AiService {
       } catch {}
     }
 
+    // 缓存生成的内容
+    let reasoning = "";
+    let content = "";
+    let usage: ChatUsage | null = null;
+
+    // 构建系统提示词
+    let systemEnvironmentPrompt = await this.buildEnvironmentPrompt(
+      params.userId,
+    );
+    let systemPrompt = asSystemPrompt(
+      getSystemPrompt([], systemEnvironmentPrompt),
+    );
+
     try {
-      const systemPrompt = await this.buildEnvironmentPrompt(params.userId);
-      const result = await aiModel.generate({
+      await aiModel.generate({
         stream: true,
-        systemPrompt: asSystemPrompt(getSystemPrompt([], systemPrompt)),
+        systemPrompt: systemPrompt,
         messages: contextMessages,
         onAbort: params.callback?.onAbort,
         onChunk: (chunk) => {
+          // 缓存生成的内容
+          reasoning += chunk.reasoning || "";
+          content += chunk.message.content || "";
+          usage = chunk.usage || null;
+          // 发送消息回调
           if (params.callback && params.callback.onMessage) {
             params.callback.onMessage({
               sessionId: session.id,
               reasoning: chunk.reasoning,
               content: chunk.message.content,
+              usage: chunk.usage,
               finished: chunk.finished,
             });
           }
         },
       });
-
-      // 添加AI消息到会话
-      this.sessionService.addMessage(
-        session.id,
-        Role.Assistant,
-        result.message.content,
-      );
     } catch (err) {
       logger.error(err);
       // throw new BizException(BizCode.AI_CHAT_ERROR);
@@ -125,6 +147,16 @@ export class AiService {
         });
       }
     }
+
+    // 添加AI消息记录到会话
+    usage = this.calculateUsage(
+      usage,
+      systemPrompt,
+      contextMessages,
+      reasoning,
+      content,
+    );
+    this.sessionService.addMessage(session.id, Role.Assistant, content, usage);
 
     if (titlePromise) {
       try {
@@ -145,7 +177,7 @@ export class AiService {
   /**
    * 构建系统环境变量提示词
    */
-  async buildEnvironmentPrompt(userId: number) {
+  private async buildEnvironmentPrompt(userId: number) {
     const user = await this.userService.getUserInfoById(userId);
     const env: SystemEnvironment = [];
     const loginLog = await this.userService.getNewLoginLog(userId);
@@ -168,5 +200,40 @@ export class AiService {
       value: getWeekDay(),
     });
     return env;
+  }
+
+  /**
+   * 计算AI模型调用的Token用量
+   */
+  private calculateUsage(
+    usage: ChatUsage | null,
+    systemPrompt: SystemPrompt,
+    messages: Message[],
+    reasoning: string,
+    content: string,
+  ) {
+    if (!usage) {
+      usage = {
+        prompt_tokens: 0,
+        completion_tokens: 0,
+        total_tokens: 0,
+        prompt_tokens_details: {
+          cached_tokens: 0,
+        },
+      };
+    }
+    if (usage.prompt_tokens === 0) {
+      usage.prompt_tokens =
+        estimateSystemPromptTokens(systemPrompt) +
+        estimateTokens(reasoning + content) +
+        estimateMessagesTokens(messages);
+    }
+    if (usage.completion_tokens === 0) {
+      usage.completion_tokens = estimateTokens(content);
+    }
+    if (usage.total_tokens === 0) {
+      usage.total_tokens = usage.prompt_tokens + usage.completion_tokens;
+    }
+    return usage;
   }
 }
