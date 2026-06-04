@@ -6,7 +6,10 @@ import type { IpLocationResponse, IpLocation } from "@/types/ip.type";
  * @param ip IP地址
  * @returns 位置信息
  */
-export async function ipToLocation(ip: string) {
+export async function ipToLocation(ip?: string) {
+  if (!ip) {
+    return null;
+  }
   try {
     const res = await fetch(`http://ip-api.com/json/${ip}?lang=zh-CN`);
     const data = (await res.json()) as IpLocationResponse;
