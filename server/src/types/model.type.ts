@@ -3,13 +3,13 @@ import type { SystemPrompt } from "./prompt.type";
 import { AssistantMessage, Message } from "./message.type";
 import { Tools } from "./tool.type";
 import { AiAbort } from "./ai.type";
-import { AIProvider } from "@/enumeration";
+import { AiProvider } from "@/enumeration";
 
 /**
  * 聊天模型
  */
 export interface ChatModel {
-  provider: AIProvider;
+  provider: AiProvider;
   apiKey: string;
   baseURL?: string;
   model?: string;

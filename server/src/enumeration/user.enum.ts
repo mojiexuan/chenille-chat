@@ -1,7 +1,7 @@
 /**
  * 性别枚举
  */
-export enum Gender {
+export enum UserGender {
     Male = "male",
     Female = "female",
     Other = "other",

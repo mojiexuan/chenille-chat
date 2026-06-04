@@ -1,6 +1,6 @@
 import { db, sessions, messages } from "@/db";
 import { eq, asc, desc, count, and } from "drizzle-orm";
-import { Role } from "@/enumeration";
+import { AiRole } from "@/enumeration";
 import {
   Pagination,
   Message,
@@ -72,7 +72,7 @@ export class SessionService {
    */
   async addMessage(
     sessionId: number,
-    role: Role,
+    role: AiRole,
     content: string,
     usage?: ChatUsage,
     meta?: unknown,
@@ -182,9 +182,9 @@ export class SessionService {
     dbMessages: { role: string; content: string }[],
   ): Message[] {
     return dbMessages
-      .filter((msg) => msg.role === Role.User || msg.role === Role.Assistant)
+      .filter((msg) => msg.role === AiRole.User || msg.role === AiRole.Assistant)
       .map((msg) => {
-        if (msg.role === Role.User) {
+        if (msg.role === AiRole.User) {
           return {
             type: "user",
             message: { role: "user", content: msg.content },

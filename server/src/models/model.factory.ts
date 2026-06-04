@@ -2,7 +2,7 @@ import { ChatModel } from "@/types";
 import { OpenAiModel } from "./openai";
 import { GoogleModel } from "./google";
 import { AnthropicModel } from "./anthropic";
-import { AIProvider } from "@/enumeration";
+import { AiProvider } from "@/enumeration";
 import { AiModel } from "./base.model";
 
 /**
@@ -12,12 +12,12 @@ import { AiModel } from "./base.model";
  */
 export function createAiModel(model: ChatModel): AiModel {
     switch (model.provider) {
-        case AIProvider.DeepSeek:
-        case AIProvider.OpenAI:
+        case AiProvider.DeepSeek:
+        case AiProvider.OpenAI:
             return new OpenAiModel(model);
-        case AIProvider.Google:
+        case AiProvider.Google:
             return new GoogleModel(model);
-        case AIProvider.Anthropic:
+        case AiProvider.Anthropic:
             return new AnthropicModel(model);
         default:
             throw new Error(`未知的AI提供方: ${model.provider}`);

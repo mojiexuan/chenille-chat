@@ -6,7 +6,7 @@ import {
   SystemPrompt,
 } from "@/types";
 import { createAiModel } from "@/models";
-import { BizCode, Role } from "@/enumeration";
+import { BizCode, AiRole } from "@/enumeration";
 import { ChatSseDto } from "@/dto";
 import {
   getSystemPrompt,
@@ -49,7 +49,7 @@ export class AiService {
     // 添加用户消息到会话
     await this.sessionService.addMessage(
       session.id,
-      Role.User,
+      AiRole.User,
       params.data.message,
     );
 
@@ -156,7 +156,7 @@ export class AiService {
       reasoning,
       content,
     );
-    this.sessionService.addMessage(session.id, Role.Assistant, content, usage);
+    this.sessionService.addMessage(session.id, AiRole.Assistant, content, usage);
 
     if (titlePromise) {
       try {

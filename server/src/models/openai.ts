@@ -12,13 +12,13 @@ import { Stream } from "openai/core/streaming";
 import { ChatCompletionCreateParams, ReasoningEffort } from "openai/resources/index";
 import z from "zod/v4";
 import { AiModel } from "./base.model";
-import { AIProvider } from "@/enumeration";
+import { AiProvider } from "@/enumeration";
 
 /**
  * OpenAI 模型
  */
 class OpenAiModel extends AiModel {
-  private provider: AIProvider;
+  private provider: AiProvider;
   private client: OpenAI;
   private config: ChatModel & { model: string; baseURL: string };
 
@@ -65,7 +65,7 @@ class OpenAiModel extends AiModel {
           ...(options.jsonSchema
             ? {
               response_format: {
-                type: this.provider === AIProvider.OpenAI ? "json_schema" : "json_object",
+                type: this.provider === AiProvider.OpenAI ? "json_schema" : "json_object",
                 json_schema: {
                   name: "response",
                   schema: z.toJSONSchema(options.jsonSchema),
