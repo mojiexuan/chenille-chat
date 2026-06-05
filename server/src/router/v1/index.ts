@@ -11,24 +11,33 @@ import {
   meUpdateUserInfoHandler,
   getModelListHandler,
 } from "@/controllers";
-import { verifyJwt } from "@/plugins/auth.plugin";
+import { verifyJwt, requireRole } from "@/plugins";
+import { UserRole } from "@/enumeration";
 
 export async function v1Router(fastify: FastifyInstance) {
   fastify.post("/auth/phone/code", sendPhoneCodeHandler);
   fastify.post("/auth/phone/login", phoneCodeLoginHandler);
   // 需要登录才能访问的接口
-  fastify.register(async (protectedScope) => {
-    protectedScope.addHook("preHandler", verifyJwt);
-    protectedScope.get("/user/me", meGetInfoHandler);
-    protectedScope.post("/user/me/avatar", meUpdateAvatarHandler);
-    protectedScope.patch("/user/me/info", meUpdateUserInfoHandler);
-    protectedScope.post("/chat/sse", chatSseHandler);
-    protectedScope.get("/chat/session/list", getSessionListHandler);
-    protectedScope.get(
-      "/chat/session/:sessionId/title",
-      getSessionTitleHandler,
-    );
-    protectedScope.get("/chat/session/:sessionId", getSessionHandler);
-    protectedScope.get("/chat/model/list", getModelListHandler);
+  fastify.register(async (authScope) => {
+    authScope.addHook("preHandler", verifyJwt);
+    // 普通用户及以上
+    authScope.register(async (scope) => {
+      scope.addHook("preHandler", requireRole(UserRole.User, UserRole.Admin));
+      scope.get("/user/me", meGetInfoHandler);
+      scope.post("/user/me/avatar", meUpdateAvatarHandler);
+      scope.patch("/user/me/info", meUpdateUserInfoHandler);
+      scope.post("/chat/sse", chatSseHandler);
+      scope.get("/chat/session/list", getSessionListHandler);
+      scope.get(
+        "/chat/session/:sessionId/title",
+        getSessionTitleHandler,
+      );
+      scope.get("/chat/session/:sessionId", getSessionHandler);
+      scope.get("/chat/model/list", getModelListHandler);
+    });
+    // 管理员用户
+    authScope.register(async (adminScope) => {
+      adminScope.addHook("preHandler", requireRole(UserRole.Admin));
+    });
   });
 }

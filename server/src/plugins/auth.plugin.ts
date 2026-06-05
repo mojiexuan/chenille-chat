@@ -30,6 +30,7 @@ export async function verifyJwt(request: FastifyRequest) {
       throw new BizException(BizCode.USER_DISABLED);
     }
     request.userId = payload.userId;
+    request.userRole = user.role;
   } catch {
     throw new BizException(BizCode.AUTH_EXPIRED);
   }

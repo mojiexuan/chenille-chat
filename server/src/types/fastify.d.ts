@@ -1,5 +1,6 @@
 import type Redis from "ioredis";
 import type { db } from "@/db";
+import type { UserRole } from "@/enumeration";
 
 declare module "fastify" {
     interface FastifyInstance {
@@ -8,5 +9,6 @@ declare module "fastify" {
     }
     interface FastifyRequest {
         userId?: number;
+        userRole: UserRole | null;
     }
 }
