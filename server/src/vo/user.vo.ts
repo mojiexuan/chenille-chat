@@ -1,10 +1,11 @@
 import { users } from "@/db";
 
 export const userSafeInfo = {
-    username: users.username,
-    nickname: users.nickname,
-    email: users.email,
-    phone: users.phone,
-    gender: users.gender,
-    avatar: users.avatar,
+  username: users.username,
+  nickname: users.nickname,
+  email: users.email,
+  phone: users.phone,
+  gender: users.gender,
+  avatar: users.avatar,
+  status: users.status,
 };

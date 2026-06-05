@@ -87,3 +87,5 @@ export class UserService {
    */
   async bindWeChat() {}
 }
+
+export const userService = new UserService();

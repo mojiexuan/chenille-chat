@@ -20,7 +20,7 @@ export async function meGetInfoHandler(
   const userService = new UserService();
   const user = await userService.getUserInfoById(userId);
   if (!user) {
-    throw new BizException(BizCode.AUTH_NOT_FOUND);
+    throw new BizException(BizCode.USER_NOT_FOUND);
   }
   return reply.success(user, "用户信息");
 }
