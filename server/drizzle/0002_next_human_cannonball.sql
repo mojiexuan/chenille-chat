@@ -1,0 +1,1 @@
+ALTER TABLE "c_users" ADD COLUMN "role" varchar(20) DEFAULT 'user';

@@ -6,3 +6,11 @@ export enum UserGender {
     Female = "female",
     Other = "other",
 }
+
+/**
+ * 角色枚举
+ */
+export enum UserRole {
+    User = "user",
+    Admin = "admin",
+}
