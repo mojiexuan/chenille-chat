@@ -16,7 +16,7 @@ interface UserInfo extends BasicUserInfo {
    */
   token: string;
   email?: string;
-  phone?: string;
+  phone: string;
   gender?: string;
 }
 

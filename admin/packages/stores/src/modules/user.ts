@@ -22,6 +22,10 @@ interface BasicUserInfo {
    * 用户名
    */
   username: string;
+  /**
+   * 手机号
+   */
+  phone: string;
 }
 
 interface AccessState {
