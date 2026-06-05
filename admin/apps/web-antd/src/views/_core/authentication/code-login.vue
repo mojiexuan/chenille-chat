@@ -7,9 +7,12 @@ import { computed, ref } from 'vue';
 import { AuthenticationCodeLogin, z } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 
-import { phoneCodeRequest, phoneLoginRequest } from '#/api';
+import { phoneCodeRequest } from '#/api';
+import { useAuthStore } from '#/store';
 
 defineOptions({ name: 'CodeLogin' });
+
+const authStore = useAuthStore();
 
 // 认录登录组件实例
 const authCodeLoginRef = ref();
@@ -81,7 +84,7 @@ async function handleSendCode() {
 async function handleLogin(values: Recordable<any>) {
   loading.value = true;
   try {
-    await phoneLoginRequest({
+    await authStore.authLogin({
       phone: values.phoneNumber,
       code: values.code,
     });

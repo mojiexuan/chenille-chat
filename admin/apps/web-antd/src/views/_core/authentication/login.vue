@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { VbenFormSchema } from '@vben/common-ui';
-import type { BasicOption } from '@vben/types';
+import type { BasicOption, Recordable } from '@vben/types';
 
 import { computed, markRaw } from 'vue';
 
@@ -79,8 +79,12 @@ const formSchema = computed((): VbenFormSchema[] => {
     },
   ];
 });
+
+async function handleLogin(values: Recordable<any>) {
+
+}
 </script>
 
 <template>
-  <AuthenticationLogin :form-schema="formSchema" :loading="authStore.loginLoading" @submit="authStore.authLogin" />
+  <AuthenticationLogin :form-schema="formSchema" :loading="authStore.loginLoading" @submit="handleLogin" />
 </template>
