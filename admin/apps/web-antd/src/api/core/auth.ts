@@ -7,6 +7,15 @@ export namespace AuthApi {
     username?: string;
   }
 
+  export interface PhoneCodeParams {
+    phone: string;
+  }
+
+  export interface PhoneLoginParams {
+    phone: string;
+    code: string;
+  }
+
   /** 登录接口返回值 */
   export interface LoginResult {
     accessToken: string;
@@ -48,4 +57,18 @@ export async function logoutApi() {
  */
 export async function getAccessCodesApi() {
   return requestClient.get<string[]>('/auth/codes');
+}
+
+/**
+ * 获取手机号验证码
+ */
+export const phoneCodeRequest = (phone: AuthApi.PhoneCodeParams) => {
+  return requestClient.post<void>('/auth/phone/code', phone);
+}
+
+/**
+ * 手机号登录
+ */
+export const phoneLoginRequest = (data: AuthApi.PhoneLoginParams) => {
+  return requestClient.post<string>('/auth/phone/login', data);
 }

@@ -99,14 +99,9 @@ defineExpose({
       </template>
     </Title>
     <Form />
-    <VbenButton
-      :class="{
-        'cursor-wait': loading,
-      }"
-      :loading="loading"
-      class="w-full"
-      @click="handleSubmit"
-    >
+    <VbenButton :class="{
+      'cursor-wait': loading,
+    }" :loading="loading" class="w-full" @click="handleSubmit">
       <slot name="submitButtonText">
         {{ submitButtonText || $t('common.login') }}
       </slot>

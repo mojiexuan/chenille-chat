@@ -7,7 +7,12 @@ import { computed, ref } from 'vue';
 import { AuthenticationCodeLogin, z } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 
+import { phoneCodeRequest, phoneLoginRequest } from '#/api';
+
 defineOptions({ name: 'CodeLogin' });
+
+// 认录登录组件实例
+const authCodeLoginRef = ref();
 
 const loading = ref(false);
 const CODE_LENGTH = 6;
@@ -39,6 +44,7 @@ const formSchema = computed((): VbenFormSchema[] => {
               : $t('authentication.sendCode');
           return text;
         },
+        handleSendCode,
         placeholder: $t('authentication.code'),
       },
       fieldName: 'code',
@@ -49,21 +55,42 @@ const formSchema = computed((): VbenFormSchema[] => {
     },
   ];
 });
+
+/**
+ * 异步处理发送验证码操作
+ */
+async function handleSendCode() {
+  if (!authCodeLoginRef.value) {
+    console.error('authCodeLoginRef 是未初始化的');
+    throw new Error('应用异常');
+  };
+  const formApi = authCodeLoginRef.value.getFormApi();
+  const { valid } = await formApi.validateField('phoneNumber');
+  if (!valid) {
+    throw new Error('手机号格式错误');
+  }
+  const values = await formApi.getValues();
+  await phoneCodeRequest({ phone: values.phoneNumber });
+}
+
 /**
  * 异步处理登录操作
  * Asynchronously handle the login process
  * @param values 登录表单数据
  */
 async function handleLogin(values: Recordable<any>) {
-  // eslint-disable-next-line no-console
-  console.log(values);
+  loading.value = true;
+  try {
+    await phoneLoginRequest({
+      phone: values.phoneNumber,
+      code: values.code,
+    });
+  } finally {
+    loading.value = false;
+  }
 }
 </script>
 
 <template>
-  <AuthenticationCodeLogin
-    :form-schema="formSchema"
-    :loading="loading"
-    @submit="handleLogin"
-  />
+  <AuthenticationCodeLogin ref="authCodeLoginRef" :form-schema="formSchema" :loading="loading" @submit="handleLogin" />
 </template>
