@@ -4,4 +4,6 @@ export * from "./model.schema";
 export * from "./model.provider.schema";
 export * from "./session.schema";
 export * from "./message.schema";
+export * from "./message.attachment.schema";
 export * from "./agent.schema";
+export * from "./ai.token.usage.schema";
