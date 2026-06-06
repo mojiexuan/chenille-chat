@@ -15,20 +15,12 @@ import {
   estimateTokens,
   estimateMessagesTokens,
 } from "@/utils";
-import { SessionService } from "./session.service";
-import { AgentService } from "./agent.service";
+import { sessionService, agentService, userService } from "@/services";
 import { logger, formatTime, getWeekDay } from "@/utils";
-import { UserService } from "./user.service";
 
-export class AiService {
-  private sessionService: SessionService;
-  private agentService: AgentService;
-  private userService: UserService;
+class AiService {
 
   constructor() {
-    this.sessionService = new SessionService();
-    this.agentService = new AgentService();
-    this.userService = new UserService();
   }
 
   /**
@@ -41,26 +33,26 @@ export class AiService {
     callback?: ChatCallback;
   }) {
     // 获取或创建会话
-    const session = await this.sessionService.getOrCreateSession(
+    const session = await sessionService.getOrCreateSession(
       params.data.sessionId,
       params.userId,
     );
 
     // 添加用户消息到会话
-    await this.sessionService.addMessage(
+    await sessionService.addMessage(
       session.id,
       AiRole.User,
       params.data.message,
     );
 
     // 获取会话历史消息
-    const history = await this.sessionService.getMessages(session.id);
+    const history = await sessionService.getMessages(session.id);
 
     // 构建上下文消息
-    const contextMessages = this.sessionService.buildContextMessages(history);
+    const contextMessages = sessionService.buildContextMessages(history);
 
     // 查询agent
-    const agent = await this.agentService.getAiChatDefaultModelAgent(
+    const agent = await agentService.getAiChatDefaultModelAgent(
       params.data.modelId,
     );
     if (!agent) {
@@ -92,11 +84,11 @@ export class AiService {
       session.title === "新会话"
     ) {
       try {
-        titlePromise = this.sessionService.generateUserSessionTitle(
+        titlePromise = sessionService.generateUserSessionTitle(
           params.userId,
           session.id,
         );
-      } catch {}
+      } catch { }
     }
 
     // 缓存生成的内容
@@ -156,7 +148,7 @@ export class AiService {
       reasoning,
       content,
     );
-    this.sessionService.addMessage(session.id, AiRole.Assistant, content, usage);
+    sessionService.addMessage(session.id, AiRole.Assistant, content, usage);
 
     if (titlePromise) {
       try {
@@ -178,9 +170,9 @@ export class AiService {
    * 构建系统环境变量提示词
    */
   private async buildEnvironmentPrompt(userId: number) {
-    const user = await this.userService.getUserInfoById(userId);
+    const user = await userService.getUserInfoById(userId);
     const env: SystemEnvironment = [];
-    const loginLog = await this.userService.getNewLoginLog(userId);
+    const loginLog = await userService.getNewLoginLog(userId);
     if (loginLog && loginLog.country && loginLog.city) {
       env.push({
         key: "当前用户大致位置",
@@ -237,3 +229,5 @@ export class AiService {
     return usage;
   }
 }
+
+export const aiService = new AiService();

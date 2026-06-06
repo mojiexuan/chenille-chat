@@ -15,4 +15,4 @@ class ClientService {
 
 }
 
-export { ClientService };
+export const clientService = new ClientService();

@@ -1,7 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
-import { UserService } from "@/services";
+import { userService } from "@/services";
 import { meUpdateUserInfoDto } from "@/dto";
 
 /**
@@ -17,7 +17,6 @@ export async function meGetInfoHandler(
   if (typeof userId !== "number") {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
-  const userService = new UserService();
   const user = await userService.getUserInfoById(userId);
   if (!user) {
     throw new BizException(BizCode.USER_NOT_FOUND);
@@ -42,7 +41,6 @@ export async function meUpdateAvatarHandler(
   if (!file) {
     throw new BizException(BizCode.PARAM_INVALID, "请上传文件");
   }
-  const userService = new UserService();
   const avatar = await userService.updateAvatar(userId, file);
   return reply.success(avatar, "用户头像更新成功");
 }
@@ -67,7 +65,6 @@ export async function meUpdateUserInfoHandler(
   if (typeof userId !== "number") {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
-  const userService = new UserService();
   const set = await userService.updateProfile(userId, parsed.data);
   return reply.success(set, "用户信息更新成功");
 }

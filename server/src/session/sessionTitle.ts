@@ -1,12 +1,10 @@
-import { ClientService } from "@/services";
-import { ChatModel, Message } from "@/types";
+import { clientService } from "@/services";
+import { Message } from "@/types";
 import { lazySchema, parseWithSchema } from "@/utils";
 import z from "zod/v4";
 import { agentService } from "@/services";
 
 const MAX_CONVERSATION_TEXT = 1000;
-
-const clientService = new ClientService();
 
 /**
  * 将消息数组展平为一个文本字符串

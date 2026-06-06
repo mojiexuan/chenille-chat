@@ -5,7 +5,7 @@ import { logger } from "@/utils";
 /**
  * 邮件服务
  */
-export class EmailService {
+class EmailService {
   private transporter: nodemailer.Transporter;
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -41,3 +41,5 @@ export class EmailService {
     }
   }
 }
+
+export const emailService = new EmailService();

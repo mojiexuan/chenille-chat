@@ -3,7 +3,7 @@ import { eq, desc } from "drizzle-orm";
 import { userSafeInfo } from "@/vo";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
-import { OssService } from "./oss.service";
+import { ossService } from "@/services";
 import { logger } from "@/utils";
 import type { MultipartFile } from "@fastify/multipart";
 import { MeUpdateUserInfoDto } from "@/dto";
@@ -11,11 +11,9 @@ import { MeUpdateUserInfoDto } from "@/dto";
 /**
  * 用户服务
  */
-export class UserService {
-  private ossService: OssService;
+class UserService {
 
   constructor() {
-    this.ossService = new OssService();
   }
 
   /**
@@ -30,7 +28,7 @@ export class UserService {
     if (!user) {
       throw new BizException(BizCode.USER_NOT_FOUND);
     }
-    user.avatar = this.ossService.getFullUrl(user.avatar);
+    user.avatar = ossService.getFullUrl(user.avatar);
     return user;
   }
 
@@ -57,14 +55,14 @@ export class UserService {
    */
   async updateAvatar(userId: number, avatar: MultipartFile) {
     const user = await this.getUserInfoById(userId);
-    this.ossService.deleteFileFromOss(user.avatar);
-    const { url, path } = await this.ossService.uploadFileToOss(avatar);
+    ossService.deleteFileFromOss(user.avatar);
+    const { url, path } = await ossService.uploadFileToOss(avatar);
     try {
       await db.update(users).set({ avatar: path }).where(eq(users.id, userId));
       return url;
     } catch (err) {
       logger.error(err, "更新用户头像失败");
-      this.ossService.deleteFileFromOss(path);
+      ossService.deleteFileFromOss(path);
       throw new BizException(BizCode.USER_UPDATE_FAIL);
     }
   }
@@ -85,7 +83,7 @@ export class UserService {
   /**
    * 绑定微信账号
    */
-  async bindWeChat() {}
+  async bindWeChat() { }
 }
 
 export const userService = new UserService();

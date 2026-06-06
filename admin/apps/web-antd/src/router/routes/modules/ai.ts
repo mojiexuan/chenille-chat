@@ -20,6 +20,9 @@ const routes: RouteRecordRaw[] = [
             {
                 path: '/ai',
                 component: () => import('#/views/ai/index.vue'),
+                meta: {
+                    title: $t('page.ai.title'),
+                },
             }
         ],
     },

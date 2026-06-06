@@ -12,7 +12,7 @@ import type { MultipartFile } from "@fastify/multipart";
 /**
  * OSS服务
  */
-export class OssService {
+class OssService {
   private ossClient: OSS;
 
   constructor() {
@@ -108,3 +108,5 @@ export class OssService {
     }
   }
 }
+
+export const ossService = new OssService();

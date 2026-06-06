@@ -1,4 +1,4 @@
-import { SmsService } from "./sms.service";
+import { smsService } from "@/services";
 import type { Redis } from "ioredis";
 import { CharType } from "@/enumeration";
 import { randomStr, ipToLocation } from "@/utils";
@@ -12,7 +12,7 @@ import { BizCode, LoginType, LoginStatus } from "@/enumeration";
 import { db, loginLogs, users } from "@/db";
 import { eq, max } from "drizzle-orm";
 import { config } from "@/config";
-import type { JwtPayload } from "@/types/jwt.type";
+import type { JwtPayload } from "@/types";
 
 const SMS_CODE_TTL = 300;
 const SMS_RATE_TTL = 60;
@@ -20,11 +20,10 @@ const SMS_RATE_TTL = 60;
 /**
  * 认证服务
  */
-export class AuthService {
+class AuthService {
   constructor(
     private redis: Redis,
-    private smsService: SmsService,
-  ) {}
+  ) { }
 
   /**
    * 生成手机号验证码
@@ -51,7 +50,7 @@ export class AuthService {
       SMS_CODE_TTL,
     );
     await this.redis.set(rateKey, "1", "EX", SMS_RATE_TTL);
-    const success = await this.smsService.sendSmsCode(phone, code);
+    const success = await smsService.sendSmsCode(phone, code);
     if (!success) {
       throw new BizException(BizCode.SMS_SEND_FAIL);
     }
@@ -167,3 +166,5 @@ export class AuthService {
     });
   }
 }
+
+export const authService = (redis: Redis) => new AuthService(redis);

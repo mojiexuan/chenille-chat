@@ -10,6 +10,9 @@ import {
   meUpdateAvatarHandler,
   meUpdateUserInfoHandler,
   getModelListHandler,
+  getModelProviderListHandler,
+  getModelListByProviderIdHandler,
+  getAgentListHandler,
 } from "@/controllers";
 import { verifyJwt, requireRole } from "@/plugins";
 import { UserRole } from "@/enumeration";
@@ -38,6 +41,9 @@ export async function v1Router(fastify: FastifyInstance) {
     // 管理员用户
     authScope.register(async (adminScope) => {
       adminScope.addHook("preHandler", requireRole(UserRole.Admin));
+      adminScope.get("/admin/chat/model/provider/list", getModelProviderListHandler);
+      adminScope.get("/admin/chat/model/:providerId/list", getModelListByProviderIdHandler);
+      adminScope.get("/admin/agent/list", getAgentListHandler);
     });
   });
 }

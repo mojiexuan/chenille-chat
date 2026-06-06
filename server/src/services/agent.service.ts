@@ -1,11 +1,13 @@
 import { db, agents, models, modelProviders } from "@/db";
 import { eq } from "drizzle-orm";
 import { AgentKey } from "@/enumeration";
+import { agentSafeVo } from "@/vo";
+import { asc } from "drizzle-orm";
 
 /**
  * 智能体服务
  */
-export class AgentService {
+class AgentService {
     constructor() { }
 
     /**
@@ -56,6 +58,16 @@ export class AgentService {
             .where(eq(agents.key, AgentKey.AiChatDefaultModel))
             .limit(1);
         return result ?? null;
+    }
+
+    /**
+     * 获取智能体列表
+     */
+    async getAgentList() {
+        return db.select(agentSafeVo)
+            .from(agents)
+            .leftJoin(models, eq(agents.modelId, models.id))
+            .orderBy(asc(agents.id));
     }
 }
 

@@ -6,7 +6,7 @@ import {
 } from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
-import { SessionService } from "@/services";
+import { sessionService } from "@/services";
 
 /**
  * 获取会话列表
@@ -29,7 +29,6 @@ export async function getSessionListHandler(
   if (typeof userId !== "number") {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
-  const sessionService = new SessionService();
   const sessionList = await sessionService.getUserSessions(
     userId,
     parsed.data.page,
@@ -57,7 +56,6 @@ export async function getSessionTitleHandler(
   if (typeof userId !== "number") {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
-  const sessionService = new SessionService();
   const title = await sessionService.generateUserSessionTitle(
     userId,
     parsed.data.sessionId,
@@ -84,7 +82,6 @@ export async function getSessionHandler(
   if (typeof userId !== "number") {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
-  const sessionService = new SessionService();
   const session = await sessionService.getSession(
     parsed.data.sessionId,
     userId,

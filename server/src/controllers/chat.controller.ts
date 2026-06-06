@@ -2,7 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import { chatSseDto } from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode, SseEventName } from "@/enumeration";
-import { AiService } from "@/services";
+import { aiService } from "@/services";
 import type { SseEventChunk } from "@/types";
 
 /**
@@ -15,8 +15,6 @@ export async function chatSseHandler(request: FastifyRequest, reply: FastifyRepl
     if (!parsed.success) {
         throw new BizException(BizCode.PARAM_INVALID, parsed.error.issues[0]?.message);
     }
-
-    const aiService = new AiService();
 
     reply.raw.writeHead(200, {
         "Content-Type": "text/event-stream",

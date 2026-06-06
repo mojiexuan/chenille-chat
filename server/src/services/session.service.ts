@@ -15,7 +15,7 @@ import { generateSessionTitle } from "@/session";
 /**
  * 会话服务
  */
-export class SessionService {
+class SessionService {
   /**
    * 创建会话
    * @param userId 用户ID
@@ -197,3 +197,5 @@ export class SessionService {
       });
   }
 }
+
+export const sessionService = new SessionService();

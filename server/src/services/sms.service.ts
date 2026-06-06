@@ -45,4 +45,4 @@ class SmsService {
     }
 }
 
-export { SmsService };
+export const smsService = new SmsService();
