@@ -46,3 +46,23 @@ export interface ChatSseTitle {
   /** 会话标题 */
   title: string;
 }
+
+/**
+ * 模型
+ */
+export interface Model {
+  id: number;
+  providerId: number;
+  name: string;
+  description: string;
+  canThinking: boolean;
+  canInputImage: boolean;
+  canOutputImage: boolean;
+  canInputVideo: boolean;
+  canOutputVideo: boolean;
+  canInputAudio: boolean;
+  canOutputAudio: boolean;
+  isActive: boolean;
+  isDefault: boolean;
+  sortOrder: number;
+}

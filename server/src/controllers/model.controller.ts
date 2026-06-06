@@ -13,7 +13,7 @@ export async function getModelListHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const modelList = await modelService.getModelList();
+  const modelList = await modelService.getActiveModelList();
   return reply.success(modelList, "模型列表");
 }
 

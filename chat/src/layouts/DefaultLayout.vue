@@ -47,31 +47,36 @@
                 </section>
             </section>
             <section class="default-layout-nav-footer">
-                <div class="default-layout-nav-footer-me" :class="{ 'active': footerMeActive }" @click="footerMeClick">
-                    <!-- 悬浮卡片 -->
-                    <menu class="default-layout-nav-footer-me-content">
-                        <!-- 设置 -->
-                        <div class="default-layout-nav-footer-me-content-item" @click="navigateToSetting">
-                            <div class="default-layout-nav-footer-me-content-item-icon">
-                                <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M34.0003 41L44 24L34.0003 7H14.0002L4 24L14.0002 41H34.0003Z" fill="none"
-                                        stroke="#1b1b1f" stroke-width="3" stroke-linejoin="round" />
-                                    <path
-                                        d="M24 29C26.7614 29 29 26.7614 29 24C29 21.2386 26.7614 19 24 19C21.2386 19 19 21.2386 19 24C19 26.7614 21.2386 29 24 29Z"
-                                        fill="none" stroke="#1b1b1f" stroke-width="3" stroke-linejoin="round" />
-                                </svg>
+                <div class="default-layout-nav-footer-me" @click="footerMeClick">
+                    <Transition name="fade-card">
+                        <!-- 悬浮卡片 -->
+                        <menu v-if="footerMeActive" v-click-outside="footerMeClick"
+                            class="default-layout-nav-footer-me-content">
+                            <!-- 设置 -->
+                            <div class="default-layout-nav-footer-me-content-item" @click="navigateToSetting">
+                                <div class="default-layout-nav-footer-me-content-item-icon">
+                                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M34.0003 41L44 24L34.0003 7H14.0002L4 24L14.0002 41H34.0003Z"
+                                            fill="none" stroke="#1b1b1f" stroke-width="3" stroke-linejoin="round" />
+                                        <path
+                                            d="M24 29C26.7614 29 29 26.7614 29 24C29 21.2386 26.7614 19 24 19C21.2386 19 19 21.2386 19 24C19 26.7614 21.2386 29 24 29Z"
+                                            fill="none" stroke="#1b1b1f" stroke-width="3" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <span class="default-layout-nav-footer-me-content-item-name ellipsis">设置</span>
                             </div>
-                            <span class="default-layout-nav-footer-me-content-item-name ellipsis">设置</span>
-                        </div>
-                        <span class="default-layout-nav-footer-me-content-line"></span>
-                        <!-- 用户信息 -->
-                        <div class="default-layout-nav-footer-me-content-item">
-                            <img class="default-layout-nav-footer-me-content-item-icon" :src="userAvatar" alt="用户头像" />
-                            <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{ userNameNickname
+                            <span class="default-layout-nav-footer-me-content-line"></span>
+                            <!-- 用户信息 -->
+                            <div class="default-layout-nav-footer-me-content-item">
+                                <img class="default-layout-nav-footer-me-content-item-icon" :src="userAvatar"
+                                    alt="用户头像" />
+                                <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{
+                                    userNameNickname
                                 }}</span>
-                        </div>
-                    </menu>
+                            </div>
+                        </menu>
+                    </Transition>
                     <!-- 用户信息 -->
                     <img class="default-layout-nav-footer-me-avatar" :src="userAvatar" alt="用户头像" />
                     <span class="default-layout-nav-footer-me-name ellipsis">{{ userNameNickname }}</span>
@@ -119,6 +124,8 @@
 import { computed, ref, onMounted } from 'vue'
 import { useSessionStore, useUserStore } from '@/stores';
 import { useRouter, useRoute } from 'vue-router';
+import type { Model } from '@/types';
+import { getModelListRequest } from '@/request';
 
 // 路由
 const router = useRouter();
@@ -147,6 +154,9 @@ const userNameNickname = computed(() => userStore.user.nickname);
 const footerMeActive = ref(false);
 // 侧边栏是否显示
 const sidebarActive = ref(true);
+
+// 模型列表
+const modelList = ref<Model[]>([]);
 
 /**
  * 点击返回按钮
@@ -211,7 +221,10 @@ function sessionMoreClick(sessionId: number) {
 
 onMounted(() => {
     if (userStore.isLogin) {
-        sessionStore.getSessions();
+        Promise.all([sessionStore.getSessions(), getModelListRequest()])
+            .then((res) => {
+                modelList.value = res[1];
+            })
     }
 })
 </script>
@@ -341,9 +354,22 @@ onMounted(() => {
     background: var(--ch-feature-card-hover-bg);
 }
 
-.default-layout-nav-footer-me.active .default-layout-nav-footer-me-content {
-    display: block;
+/* 动画 开始 */
+.footer-card-enter-active {
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+.footer-card-leave-active {
+    transition: all 0.15s ease-in;
+}
+
+.footer-card-enter-from,
+.footer-card-leave-to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+}
+
+/* 动画 结束 */
 
 .default-layout-nav-footer-me-content {
     position: absolute;
@@ -353,7 +379,6 @@ onMounted(() => {
     background-color: var(--ch-bg-color-card);
     border-radius: 8px;
     padding: 6px;
-    display: none;
     box-shadow: var(--ch-box-shadow-1);
 }
 

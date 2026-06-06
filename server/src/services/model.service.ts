@@ -15,6 +15,13 @@ class ModelService {
   }
 
   /**
+   * 获取所有活跃模型列表
+   */
+  async getActiveModelList() {
+    return (await this.getModelList()).filter((item) => item.isActive === true);
+  }
+
+  /**
    * 根据提供提供方ID获取模型列表
    */
   async getModelListByProviderId(providerId: number) {

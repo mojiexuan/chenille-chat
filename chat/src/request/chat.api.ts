@@ -7,6 +7,7 @@ import type {
     PaginationRequest,
     PaginationResponse,
     SessionItem,
+    Model,
 } from "@/types";
 
 /**
@@ -37,3 +38,10 @@ export const aiChatSse = (
         },
     });
 };
+
+/**
+ * 获取 AI 模型列表
+ */
+export const getModelListRequest = () => {
+    return get<Model[]>("/chat/model/list");
+}
