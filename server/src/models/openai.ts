@@ -99,6 +99,7 @@ class OpenAiModel extends AiModel {
         if (!options.stream) {
           const text = (stream as OpenAI.Chat.Completions.ChatCompletion)
             .choices?.[0]?.message?.content;
+          result.reasoning = "";
           result.message.content = text || "";
           result.finished = true;
           const toolCalls = (stream as OpenAI.Chat.Completions.ChatCompletion)
@@ -118,6 +119,7 @@ class OpenAiModel extends AiModel {
           return result;
         }
 
+        let fullReasoning = "";
         let fullText = "";
 
         for await (const chunk of stream as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>) {
@@ -128,27 +130,34 @@ class OpenAiModel extends AiModel {
           // TODO 流式工具调用暂未处理 console.log("流式工具调用", chunk.choices?.[0]?.delta?.tool_calls);
 
           const content = chunk.choices?.[0]?.delta?.content || "";
-          const reasoningContent = (chunk.choices?.[0]?.delta as { reasoning_content?: string } | undefined)?.reasoning_content || undefined;
-          console.log(chunk.choices?.[0]);
-          if (content || chunk.choices?.[0]?.finish_reason === "stop") {
-            fullText += content;
-            if (chunk.usage) {
-              result.usage = {
-                prompt_tokens: chunk.usage.prompt_tokens,
-                completion_tokens: chunk.usage.completion_tokens,
-                total_tokens: chunk.usage.total_tokens,
-                prompt_tokens_details: {
-                  cached_tokens:
-                    chunk.usage.prompt_tokens_details?.cached_tokens ?? 0,
-                },
-              };
-            }
-            result.finished = chunk.choices?.[0]?.finish_reason === "stop";
-            result.reasoning = reasoningContent;
-            result.message.content = content;
-            options.onChunk?.(result);
+          const reasoningContent = (chunk.choices?.[0]?.delta as { reasoning_content?: string } | undefined)?.reasoning_content || "";
+          const finishReason = chunk.choices?.[0]?.finish_reason;
+
+          fullReasoning += reasoningContent;
+          fullText += content;
+
+          if (chunk.usage) {
+            result.usage = {
+              prompt_tokens: chunk.usage.prompt_tokens,
+              completion_tokens: chunk.usage.completion_tokens,
+              total_tokens: chunk.usage.total_tokens,
+              prompt_tokens_details: {
+                cached_tokens:
+                  chunk.usage.prompt_tokens_details?.cached_tokens ?? 0,
+              },
+            };
+          }
+
+          result.finished = finishReason === "stop";
+          result.reasoning = reasoningContent;
+          result.message.content = content;
+          options.onChunk?.(result);
+
+          if (finishReason === "stop") {
+            break;
           }
         }
+        result.reasoning = fullReasoning;
         result.message.content = fullText;
         result.finished = true;
         return result;

@@ -229,7 +229,7 @@ function sendClick() {
                 sessionStore.updateCurrentSessionId(msg.sessionId);
             }
 
-            if (msg.content) {
+            if (msg.content && msg.content.length > 0) {
                 if (assistant) {
                     assistant.content += msg.content;
                 }
