@@ -6,7 +6,12 @@
                 :class="`home-container-${item.role}-message`">
                 <MarkdownRender :custom-id="item.role + '-chat'" :content="item.content" :typewriter="item.isStreaming"
                     :smooth-streaming="item.isStreaming ? 'auto' : false" :final="item.isStreaming"
-                    :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming">
+                    :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming" mode="chat"
+                    :code-block-monaco-options="{
+                        themes: ['vitesse-light'],
+                        theme: 'vitesse-light',
+                        MAX_HEIGHT: 640,
+                    }">
                 </MarkdownRender>
                 <!-- 状态功能栏 -->
                 <div class="home-container-status-bar"

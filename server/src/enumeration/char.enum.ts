@@ -6,3 +6,15 @@ export enum CharType {
     Lower = 1 << 1,   // a-z
     Upper = 1 << 2,   // A-Z
 }
+
+/**
+ * AI 推理努力程度枚举
+ */
+export enum ReasoningEffort {
+    None = "none",
+    Minimal = "minimal",
+    Low = "low",
+    Medium = "medium",
+    High = "high",
+    Xhigh = "xhigh",
+}

@@ -6,7 +6,7 @@ import {
   SystemPrompt,
 } from "@/types";
 import { createAiModel } from "@/models";
-import { BizCode, AiRole } from "@/enumeration";
+import { BizCode, AiRole, ReasoningEffort } from "@/enumeration";
 import { ChatSseDto } from "@/dto";
 import {
   getSystemPrompt,
@@ -94,6 +94,9 @@ class AiService {
         stream: true,
         systemPrompt: systemPrompt,
         messages: contextMessages,
+        reasoning: {
+          effort: ReasoningEffort.High,
+        },
         onAbort: params.callback?.onAbort,
         onChunk: (chunk) => {
           // 缓存生成的内容
@@ -151,7 +154,7 @@ class AiService {
     }
     env.push({
       key: "当前用户昵称",
-      value: user.username,
+      value: user.nickname,
     });
     env.push({
       key: "当前用户所在时区时间",

@@ -6,7 +6,6 @@ import {
     text,
     jsonb,
     timestamp,
-    date,
     index,
 } from "drizzle-orm/pg-core";
 import { messages } from "./message.schema";

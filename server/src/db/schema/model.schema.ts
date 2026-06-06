@@ -8,6 +8,7 @@ import {
   boolean,
 } from "drizzle-orm/pg-core";
 import { modelProviders } from "./model.provider.schema";
+import { ReasoningEffort } from "@/enumeration";
 
 /**
  * 模型表
@@ -20,7 +21,10 @@ export const models = pgTable("c_models", {
   name: varchar("name", { length: 50 }).notNull(), // 显示名："GPT-5.5"
   modelName: varchar("model_name", { length: 100 }).notNull(), // API 名："gpt-5.5"
   description: text("description"), // 模型简介
-  canThinking: boolean("canThinking").default(false).notNull(), // 是否支持思考
+  reasoningEffort: varchar("reasoning_effort", { length: 24 })
+    .$type<ReasoningEffort>()
+    .notNull()
+    .default(ReasoningEffort.High), // 思考努力："high"
   canInputImage: boolean("canInputImage").default(false).notNull(), // 是否支持输入图片
   canOutputImage: boolean("canOutputImage").default(false).notNull(), // 是否支持输出图片
   canInputVideo: boolean("canInputVideo").default(false).notNull(), // 是否支持输入视频

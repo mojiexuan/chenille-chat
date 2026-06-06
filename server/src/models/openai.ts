@@ -9,10 +9,10 @@ import {
 } from "@/types";
 import OpenAI from "openai";
 import { Stream } from "openai/core/streaming";
-import { ChatCompletionCreateParams, ReasoningEffort } from "openai/resources/index";
+import { ChatCompletionCreateParams, ReasoningEffort as OpenAiReasoningEffort } from "openai/resources/index";
 import z from "zod/v4";
 import { AiModel } from "./base.model";
-import { AiProvider } from "@/enumeration";
+import { AiProvider, ReasoningEffort } from "@/enumeration";
 
 /**
  * OpenAI 模型
@@ -84,12 +84,12 @@ class OpenAiModel extends AiModel {
             }
             : {}),
           ...(options.reasoning ? {
-            reasoning_effort: options.reasoning.effort as ReasoningEffort,
+            reasoning_effort: options.reasoning.effort as OpenAiReasoningEffort,
             extra_body: {
               thinking: {
-                type: options.reasoning.effort === "none" ? "disabled" : "enabled",
+                type: options.reasoning.effort === ReasoningEffort.None ? "disabled" : "enabled",
               }, // deepseek 思考参数 // 火山引擎思考参数 // kimi 思考参数
-              enable_thinking: options.reasoning.effort !== "none", // 千问开启思考
+              enable_thinking: options.reasoning.effort !== ReasoningEffort.None, // 千问开启思考
             } // 兼容参数
           } : {}),
         } as ChatCompletionCreateParams,
@@ -128,6 +128,8 @@ class OpenAiModel extends AiModel {
           // TODO 流式工具调用暂未处理 console.log("流式工具调用", chunk.choices?.[0]?.delta?.tool_calls);
 
           const content = chunk.choices?.[0]?.delta?.content || "";
+          const reasoningContent = (chunk.choices?.[0]?.delta as { reasoning_content?: string } | undefined)?.reasoning_content || undefined;
+          console.log(chunk.choices?.[0]);
           if (content || chunk.choices?.[0]?.finish_reason === "stop") {
             fullText += content;
             if (chunk.usage) {
@@ -142,6 +144,7 @@ class OpenAiModel extends AiModel {
               };
             }
             result.finished = chunk.choices?.[0]?.finish_reason === "stop";
+            result.reasoning = reasoningContent;
             result.message.content = content;
             options.onChunk?.(result);
           }

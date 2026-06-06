@@ -8,7 +8,7 @@ export const modelSafeVo = {
   providerId: models.providerId,
   name: models.name,
   description: models.description,
-  canThinking: models.canThinking,
+  reasoningEffort: models.reasoningEffort,
   canInputImage: models.canInputImage,
   canOutputImage: models.canOutputImage,
   canInputVideo: models.canInputVideo,

@@ -3,7 +3,7 @@ import type { SystemPrompt } from "./prompt.type";
 import { AssistantMessage, Message } from "./message.type";
 import { Tools } from "./tool.type";
 import { AiAbort } from "./ai.type";
-import { AiProvider } from "@/enumeration";
+import { AiProvider, ReasoningEffort } from "@/enumeration";
 
 /**
  * 聊天模型
@@ -34,7 +34,7 @@ export type ChatChunk = (chunk: ChatResult) => void;
  * 思考请求参数
  */
 export type ChatReasoningRequest = {
-  effort: "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
+  effort: ReasoningEffort;
 }
 
 /**
