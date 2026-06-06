@@ -38,16 +38,6 @@ export interface ChatSseMessage {
 }
 
 /**
- * 聊天 SSE 标题事件数据
- */
-export interface ChatSseTitle {
-  /** 会话 ID */
-  sessionId: number;
-  /** 会话标题 */
-  title: string;
-}
-
-/**
  * 模型
  */
 export interface Model {

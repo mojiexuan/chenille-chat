@@ -107,6 +107,7 @@ const confirmClick = (e: MouseEvent) => {
     font-size: 18px;
     font-weight: 600;
     flex: 1;
+    user-select: none;
 }
 
 .confirm-dialog-container-top-close {
@@ -121,6 +122,7 @@ const confirmClick = (e: MouseEvent) => {
 .confirm-dialog-container-content {
     padding: 16px 0 32px 0;
     font-size: 14px;
+    user-select: none;
 }
 
 .confirm-dialog-container-bottom {
@@ -136,6 +138,7 @@ const confirmClick = (e: MouseEvent) => {
     font-weight: 600;
     border-radius: 8px;
     padding: 0 15px;
+    user-select: none;
 }
 
 .confirm-dialog-container-bottom-button-cancel {

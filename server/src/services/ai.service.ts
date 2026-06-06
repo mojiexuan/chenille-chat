@@ -76,21 +76,6 @@ class AiService {
       baseURL: agent.provider.baseUrl,
     });
 
-    // 生成会话标题
-    let titlePromise: Promise<string | null> | null = null;
-    if (
-      !session.title ||
-      session.title.length === 0 ||
-      session.title === "新会话"
-    ) {
-      try {
-        titlePromise = sessionService.generateUserSessionTitle(
-          params.userId,
-          session.id,
-        );
-      } catch { }
-    }
-
     // 缓存生成的内容
     let reasoning = "";
     let content = "";
@@ -149,21 +134,6 @@ class AiService {
       content,
     );
     sessionService.addMessage(session.id, AiRole.Assistant, content, usage);
-
-    if (titlePromise) {
-      try {
-        const title = await Promise.race([
-          titlePromise,
-          new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
-        ]);
-        if (title) {
-          session.title = title;
-          params.callback?.onTitle?.(session.id, title);
-        }
-      } catch (err) {
-        logger.error(err);
-      }
-    }
   }
 
   /**

@@ -143,7 +143,7 @@ class SessionService {
       return sessionTitle;
     }
     const allMessages = await this.getMessages(sessionId);
-    let title = await generateSessionTitle(
+    const title = await generateSessionTitle(
       this.buildContextMessages(allMessages),
     );
     if (!title) {

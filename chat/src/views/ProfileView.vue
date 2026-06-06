@@ -217,6 +217,7 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 600;
   color: var(--ch-text-white-color);
+  user-select: none;
 }
 
 .profile-btn:hover {

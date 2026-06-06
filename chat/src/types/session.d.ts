@@ -21,6 +21,10 @@ export interface Message {
     id: number;
     role: 'user' | 'assistant';
     content: string;
+    promptTokens?: number,
+    completionTokens?: number,
+    totalTokens?: number,
+    cachedTokens?: number,
 }
 
 /**

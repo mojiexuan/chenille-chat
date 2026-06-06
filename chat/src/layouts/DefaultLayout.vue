@@ -34,7 +34,7 @@
                         :key="item.id" @click="sessionItemClick(item.id)"
                         :class="{ 'active': item.id === sessionStore.currentSession.id }">
                         <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
-                        }}</span>
+                            }}</span>
                         <div class="default-layout-nav-content-session-item-more"
                             @click.stop="sessionMoreClick($event)">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
@@ -97,7 +97,7 @@
                                     alt="用户头像" />
                                 <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{
                                     userNameNickname
-                                }}</span>
+                                    }}</span>
                             </div>
                         </menu>
                     </Transition>
@@ -279,6 +279,7 @@ onMounted(() => {
 
 <style scoped>
 .default-layout {
+    position: relative;
     width: 100vw;
     height: 100vh;
     background: var(--ch-feature-card-bg);

@@ -2,10 +2,11 @@ import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
+import { logger } from "@/utils";
 
 async function errorHandlerPluginFn(fastify: FastifyInstance) {
     fastify.setErrorHandler((error, _request, reply) => {
-        fastify.log.error(error);
+        logger.error(error);
         if (error instanceof BizException) {
             return reply.status(error.bizCode.httpStatus).send({
                 code: error.bizCode.code,

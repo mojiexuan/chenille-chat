@@ -19,5 +19,4 @@ export type MessageCallback = {
 export type ChatCallback = {
   onAbort?: AiAbort;
   onMessage?: (message: MessageCallback) => void;
-  onTitle?: (sessionId: number, title: string) => void;
 };

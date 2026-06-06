@@ -3,6 +3,7 @@ import { Message } from "@/types";
 import { lazySchema, parseWithSchema } from "@/utils";
 import z from "zod/v4";
 import { agentService } from "@/services";
+import { logger } from "@/utils";
 
 const MAX_CONVERSATION_TEXT = 1000;
 
@@ -58,6 +59,7 @@ export async function generateSessionTitle(
 ): Promise<string | null> {
   const agent = await agentService.getGenerateSessionTitleAgent();
   if (!agent) {
+    logger.error("会话标题生成智能体未配置");
     return null;
   }
   const result = await clientService.chat({

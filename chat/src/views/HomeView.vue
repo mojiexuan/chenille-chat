@@ -8,9 +8,114 @@
                     :smooth-streaming="item.isStreaming ? 'auto' : false" :final="item.isStreaming"
                     :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming">
                 </MarkdownRender>
+                <!-- 状态功能栏 -->
+                <div class="home-container-status-bar"
+                    v-if="item.role === 'assistant' && !item.isStreaming && !sessionStore.isReplying">
+                    <!-- 复制 -->
+                    <svg class="home-container-status-bar-button" width="20" height="20" viewBox="0 0 48 48" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M13 12.4316V7.8125C13 6.2592 14.2592 5 15.8125 5H40.1875C41.7408 5 43 6.2592 43 7.8125V32.1875C43 33.7408 41.7408 35 40.1875 35H35.5163"
+                            stroke="#81858c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M32.1875 13H7.8125C6.2592 13 5 14.2592 5 15.8125V40.1875C5 41.7408 6.2592 43 7.8125 43H32.1875C33.7408 43 35 41.7408 35 40.1875V15.8125C35 14.2592 33.7408 13 32.1875 13Z"
+                            fill="none" stroke="#81858c" stroke-width="4" stroke-linejoin="round" />
+                    </svg>
+                    <!-- 分享 -->
+                    <svg class="home-container-status-bar-button" width="20" height="20" viewBox="0 0 48 48" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M26 4L44 22L26 39V28C12 28 6 43 6 43C6 26 11 15 26 15V4Z" fill="none" stroke="#3c3c43"
+                            stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <!-- 重新生成 -->
+                    <svg class="home-container-status-bar-button" width="20" height="20" viewBox="0 0 48 48" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M36.7279 36.7279C33.4706 39.9853 28.9706 42 24 42C14.0589 42 6 33.9411 6 24C6 14.0589 14.0589 6 24 6C28.9706 6 33.4706 8.01472 36.7279 11.2721C38.3859 12.9301 42 17 42 17"
+                            stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M42 8V17H33" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <!-- token数据 -->
+                    <div class="home-container-status-bar-token">
+                        <!-- 提示词token -->
+                        <div v-if="item.promptTokens && item.promptTokens > 0"
+                            class="home-container-status-bar-token-item" data-tooltip="提示词token">
+                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M40 20C40 26.8077 35.7484 32.6224 29.7555 34.9336H24H18.2445C12.2516 32.6224 8 26.8077 8 20C8 11.1634 15.1634 4 24 4C32.8366 4 40 11.1634 40 20Z"
+                                    fill="none" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path
+                                    d="M29.7557 34.9336L29.0766 43.0831C29.0334 43.6014 28.6001 44 28.08 44H19.9203C19.4002 44 18.9669 43.6014 18.9238 43.0831L18.2446 34.9336"
+                                    stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M18 17V23L24 20L30 23V17" stroke="#3c3c43" stroke-width="4"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span>{{ item.promptTokens }}</span>
+                        </div>
+                        <!-- 回答token -->
+                        <div v-if="item.completionTokens && item.completionTokens > 0"
+                            class="home-container-status-bar-token-item" data-tooltip="回答token">
+                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M25.5 36H21L11 41V36H4V6H44V17" stroke="#3c3c43" stroke-width="4"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 14H15L18 14" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M12 20H18L24 20" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M29 30L35 35L44 24" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            <span>{{ item.completionTokens }}</span>
+                        </div>
+                        <!-- 总token -->
+                        <div v-if="item.totalTokens && item.totalTokens > 0"
+                            class="home-container-status-bar-token-item" data-tooltip="总token">
+                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 24L15.25 25.25M44 14L24 34L22.75 32.75" stroke="#3c3c43" stroke-width="4"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 24L14 34L34 14" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            <span>{{ item.totalTokens }}</span>
+                        </div>
+                        <!-- 缓存命中token -->
+                        <div v-if="item.cachedTokens && item.cachedTokens > 0"
+                            class="home-container-status-bar-token-item" data-tooltip="缓存命中token">
+                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M44 31C44 36.5228 39.5228 41 34 41C32.2091 41 30.5281 40.5292 29.0741 39.7046C26.5143 38.2529 24.6579 35.7046 24.1436 32.6983C24.0492 32.1463 24 31.5789 24 31C24 28.4323 24.9678 26.0906 26.5585 24.3198C28.3892 22.2818 31.0449 21 34 21C39.5228 21 44 25.4772 44 31Z"
+                                    fill="none" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path
+                                    d="M34 12V20V21C31.0449 21 28.3892 22.2818 26.5585 24.3198C24.9678 26.0906 24 28.4323 24 31C24 31.5789 24.0492 32.1463 24.1436 32.6983C24.6579 35.7046 26.5143 38.2529 29.0741 39.7046C26.4116 40.5096 22.8776 41 19 41C10.7157 41 4 38.7614 4 36V28V20V12"
+                                    stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M34 12C34 14.7614 27.2843 17 19 17C10.7157 17 4 14.7614 4 12C4 9.23858 10.7157 7 19 7C27.2843 7 34 9.23858 34 12Z"
+                                    fill="none" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M4 28C4 30.7614 10.7157 33 19 33C20.807 33 22.5393 32.8935 24.1436 32.6983"
+                                    stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 20C4 22.7614 10.7157 25 19 25C21.7563 25 24.339 24.7522 26.5585 24.3198"
+                                    stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M34 26L31 30L37 32L34 36" stroke="#3c3c43" stroke-width="4"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span>{{ item.cachedTokens }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <img v-if="sessionStore.isReplying" class="home-container-replying" src="../assets/images/replying.svg"
                 alt="思考中" />
+            <!-- 错误提示 -->
+            <div class="home-container-error"></div>
+            <!-- 打招呼 -->
             <div class="home-container-hi" v-if="sessionStore.currentSession.messages.length === 0">
                 <span class="home-container-hi-say">你好，{{ userStore.user.nickname || '你在忙什么？' }}</span>
             </div>
@@ -120,10 +225,18 @@ function sendClick() {
             }
 
             if (msg.content) {
-                if (!assistant) {
-                    return;
+                if (assistant) {
+                    assistant.content += msg.content;
                 }
-                assistant.content += msg.content;
+            }
+
+            if (msg.usage) {
+                if (assistant) {
+                    assistant.promptTokens = msg.usage.prompt_tokens || 0
+                    assistant.completionTokens = msg.usage.completion_tokens || 0
+                    assistant.totalTokens = msg.usage.total_tokens || 0
+                    assistant.cachedTokens = msg.usage.prompt_tokens_details?.cached_tokens || 0
+                }
             }
 
             if (msg.finished) {
@@ -140,10 +253,19 @@ function sendClick() {
                 assistant.isStreaming = false;
             }
         },
-        (param) => {
-            sessionStore.updateCurrentSessionId(param.sessionId);
-            sessionStore.updateCurrentSessionTitle(param.title);
-        })
+        () => {
+            // 请求完成
+            if (sessionStore.isReplying) {
+                sessionStore.isReplying = false;
+            }
+        },
+        () => {
+            // 请求错误
+            if (sessionStore.isReplying) {
+                sessionStore.isReplying = false;
+            }
+        },
+    );
 }
 </script>
 
@@ -168,9 +290,74 @@ function sendClick() {
     overflow-x: hidden;
 }
 
+.home-container-status-bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .home-container-replying {
     width: 20px;
     height: 20px;
+}
+
+.home-container-status-bar-button,
+.home-container-status-bar-button path {
+    cursor: pointer;
+    stroke: var(--ch-text-color-2);
+}
+
+.home-container-status-bar-button:hover path {
+    stroke: var(--ch-text-color-1);
+}
+
+.home-container-status-bar-token {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.home-container-status-bar-token-item,
+.home-container-status-bar-token-item path {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    stroke: var(--ch-text-color-2);
+    color: var(--ch-text-color-2);
+}
+
+.home-container-status-bar-token-item[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: 4px 10px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--ch-white-bg-black);
+    white-space: nowrap;
+    background: var(--ch-black-bg-white);
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.home-container-status-bar-token-item[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.home-container-status-bar-token-item:hover,
+.home-container-status-bar-token-item:hover path {
+    stroke: var(--ch-text-color-1);
+    color: var(--ch-text-color-1);
 }
 
 .home-container-empty {
@@ -189,6 +376,7 @@ function sendClick() {
     font-size: 28px;
     font-weight: 500;
     line-height: 1.3;
+    user-select: none;
 }
 
 .home-container-user-message {

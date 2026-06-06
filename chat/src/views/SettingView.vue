@@ -108,6 +108,7 @@ function logoutClick() {
     font-weight: 400;
     font-weight: 400;
     line-height: 24px;
+    user-select: none;
 }
 
 .setting-button-item {
@@ -116,6 +117,7 @@ function logoutClick() {
     padding: 0 16px;
     display: flex;
     align-items: center;
+    user-select: none;
 }
 
 .setting-button-item:hover {
