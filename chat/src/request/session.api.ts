@@ -1,5 +1,5 @@
 import type { SessionDetail, Message, SessionItem } from '@/types';
-import { get } from './fetch';
+import { get, del } from './fetch';
 
 /**
  * 获取会话标题
@@ -17,4 +17,13 @@ export const getSessionRequest = async (sessionId: number): Promise<SessionDetai
             ...res.session,
             messages: res.messages,
         }));
+}
+
+/**
+ * 删除会话
+ */
+export const deleteSessionRequest = (sessionId: number) => {
+    return del(`/chat/session/${sessionId}`, {
+        showSuccessToast: true,
+    });
 }

@@ -28,6 +28,7 @@
                 </div>
             </section>
             <section class="default-layout-nav-content">
+                <!-- 会话列表 -->
                 <section class="default-layout-nav-content-session">
                     <div class="default-layout-nav-content-session-item" v-for="item in sessionStore.sessions"
                         :key="item.id" @click="sessionItemClick(item.id)"
@@ -35,13 +36,36 @@
                         <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
                         }}</span>
                         <div class="default-layout-nav-content-session-item-more"
-                            @click.stop="sessionMoreClick(item.id)">
+                            @click.stop="sessionMoreClick($event)">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="24" cy="12" r="3" fill="#3c3c43" />
                                 <circle cx="24" cy="24" r="3" fill="#3c3c43" />
                                 <circle cx="24" cy="35" r="3" fill="#3c3c43" />
                             </svg>
+                            <ContextMenu :visible="sessionMenuVisible" :anchor="sessionMenuAnchor"
+                                @close="sessionMenuVisible = false">
+                                <div class="default-layout-nav-content-session-item-more-menu">
+                                    <div class="default-layout-nav-content-session-item-more-menu-item default-layout-nav-content-session-item-more-menu-item-delete"
+                                        @click="handleDeleteSession(item.id)">
+                                        <svg width="16" height="16" viewBox="0 0 48 48" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M8 11L40 11" stroke="#fd6b6d" stroke-width="4"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M18 5L30 5" stroke="#fd6b6d" stroke-width="4"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path
+                                                d="M12 17H36V40C36 41.6569 34.6569 43 33 43H15C13.3431 43 12 41.6569 12 40V17Z"
+                                                fill="none" stroke="#fd6b6d" stroke-width="4" stroke-linejoin="round" />
+                                            <path d="M20 25L28 33" stroke="#fd6b6d" stroke-width="4"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M28 25L20 33" stroke="#fd6b6d" stroke-width="4"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <span style="color: #fd6b6d">删除会话</span>
+                                    </div>
+                                </div>
+                            </ContextMenu>
                         </div>
                     </div>
                 </section>
@@ -126,6 +150,8 @@ import { useSessionStore, useUserStore } from '@/stores';
 import { useRouter, useRoute } from 'vue-router';
 import type { Model } from '@/types';
 import { getModelListRequest } from '@/request';
+import ContextMenu from '@/components/menu/ContextMenu.vue';
+import { useConfirm } from '@/composables';
 
 // 路由
 const router = useRouter();
@@ -136,6 +162,9 @@ const route = useRoute();
 const userStore = useUserStore();
 // 会话store
 const sessionStore = useSessionStore();
+
+// 确认弹窗
+const confirm = useConfirm();
 
 // 页面标题
 const pageTitle = computed(() => {
@@ -154,6 +183,10 @@ const userNameNickname = computed(() => userStore.user.nickname);
 const footerMeActive = ref(false);
 // 侧边栏是否显示
 const sidebarActive = ref(true);
+
+// 会话右键菜单
+const sessionMenuVisible = ref(false);
+const sessionMenuAnchor = ref({ x: 0, y: 0 });
 
 // 模型列表
 const modelList = ref<Model[]>([]);
@@ -216,7 +249,22 @@ function sessionItemClick(sessionId: number) {
 /**
  * 点击会话更多
  */
-function sessionMoreClick(sessionId: number) {
+function sessionMoreClick(e: MouseEvent) {
+    sessionMenuAnchor.value = { x: e.clientX, y: e.clientY };
+    sessionMenuVisible.value = !sessionMenuVisible.value;
+}
+
+/**
+ * 处理删除会话
+ */
+function handleDeleteSession(sessionId: number) {
+    confirm.error({
+        title: '确认删除',
+        message: '该对话内容和分享链接将被一并删除且无法恢复！',
+        onConfirm: () => {
+            sessionStore.deleteSession(sessionId);
+        }
+    });
 }
 
 onMounted(() => {
@@ -335,6 +383,30 @@ onMounted(() => {
 
 .default-layout-nav-content-session-item-more:hover {
     background-color: var(--ch-button-hover-bg);
+}
+
+.default-layout-nav-content-session-item-more-menu {
+    width: 150px;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: var(--ch-bg-color-card);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+}
+
+.default-layout-nav-content-session-item-more-menu-item {
+    width: 100%;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    padding: 0 10px;
+    cursor: pointer;
+}
+
+.default-layout-nav-content-session-item-more-menu-item:hover {
+    background: var(--ch-feature-card-hover-bg);
 }
 
 .default-layout-nav-footer-me {

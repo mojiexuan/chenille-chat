@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import type { MessageStreaming, SessionItem, Session } from "@/types";
-import { getSessionList, getSessionRequest } from "@/request";
+import { getSessionList, getSessionRequest, deleteSessionRequest } from "@/request";
 
 /**
  * 会话store
@@ -56,7 +56,7 @@ export const useSessionStore = defineStore("session", () => {
     function updateCurrentSessionTitle(title: string): void {
         if (currentSession.value.id !== void 0 && title && title !== "新会话") {
             currentSession.value.title = title;
-            if(sessions.value.find((item) => item.id === currentSession.value.id)){
+            if (sessions.value.find((item) => item.id === currentSession.value.id)) {
                 return;
             }
             sessions.value.unshift({
@@ -124,6 +124,22 @@ export const useSessionStore = defineStore("session", () => {
             })
     }
 
+    /**
+     * 删除会话
+     * @param sessionId 会话ID
+     * @author 陈佳宝
+     * @date 2026-05-31
+     */
+    async function deleteSession(sessionId: number) {
+        await deleteSessionRequest(sessionId);
+        // 如果当前会话是删除的会话，重置当前会话
+        if (currentSession.value.id === sessionId) {
+            resetCurrentSession();
+        }
+        // 删除会话列表中的会话
+        sessions.value = sessions.value.filter((item) => item.id !== sessionId);
+    }
+
     return {
         sessions,
         currentSession,
@@ -135,5 +151,6 @@ export const useSessionStore = defineStore("session", () => {
         addCurrentSessionMessage,
         getMessageInCurrentSession,
         switchCurrentSession,
+        deleteSession,
     };
 });

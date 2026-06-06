@@ -50,6 +50,17 @@ class SessionService {
   }
 
   /**
+   * 删除会话
+   * @param sessionId 会话ID
+   * @param userId 用户ID
+   */
+  async deleteSession(sessionId: number, userId: number) {
+    await db
+      .delete(sessions)
+      .where(and(eq(sessions.id, sessionId), eq(sessions.userId, userId)));
+  }
+
+  /**
    * 获取或创建会话
    * @param sessionId 会话ID
    * @param userId 用户ID

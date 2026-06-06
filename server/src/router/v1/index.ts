@@ -13,6 +13,7 @@ import {
   getModelProviderListHandler,
   getModelListByProviderIdHandler,
   getAgentListHandler,
+  deleteSessionHandler,
 } from "@/controllers";
 import { verifyJwt, requireRole } from "@/plugins";
 import { UserRole } from "@/enumeration";
@@ -35,6 +36,7 @@ export async function v1Router(fastify: FastifyInstance) {
         "/chat/session/:sessionId/title",
         getSessionTitleHandler,
       );
+      scope.delete("/chat/session/:sessionId", deleteSessionHandler);
       scope.get("/chat/session/:sessionId", getSessionHandler);
       scope.get("/chat/model/list", getModelListHandler);
     });

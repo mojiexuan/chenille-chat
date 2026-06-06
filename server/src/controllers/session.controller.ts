@@ -99,3 +99,23 @@ export async function getSessionHandler(
     "获取会话成功",
   );
 }
+
+/**
+ * 删除会话
+ */
+export async function deleteSessionHandler(request: FastifyRequest, reply: FastifyReply,) {
+  const parsed = sessionRequestDto.safeParse(request.params);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  // 从请求中获取用户 ID
+  const userId = request.userId;
+  if (typeof userId !== "number") {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  await sessionService.deleteSession(parsed.data.sessionId, userId);
+  return reply.success(null, "删除会话成功");
+}

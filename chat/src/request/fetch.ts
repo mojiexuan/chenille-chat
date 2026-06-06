@@ -180,6 +180,8 @@ export async function request<T = unknown, P = unknown>(
         headers: requestHeaders,
     };
 
+    const method = (restOptions.method || 'GET').toUpperCase();
+
     // 处理请求体和参数
     // 如果直接传入了 body（如 FormData），优先使用 body
     if (body) {
@@ -190,10 +192,9 @@ export async function request<T = unknown, P = unknown>(
         }
     } else if (params) {
         // 否则根据 method 处理 params
-        const method = (restOptions.method || 'GET').toUpperCase();
-
         if (method === 'GET' || method === 'DELETE') {
             // GET/DELETE 请求，将参数添加到 URL
+            requestHeaders.delete('Content-Type');
             const searchParams = new URLSearchParams(params as Record<string, string>);
             const separator = fullUrl.includes('?') ? '&' : '?';
             requestInit.body = void 0;
@@ -204,6 +205,11 @@ export async function request<T = unknown, P = unknown>(
         } else {
             // POST/PUT/PATCH 请求，将参数放到 body
             requestInit.body = JSON.stringify(params);
+        }
+    } else {
+        // 无 params 也无 body 的 GET/DELETE，移除 Content-Type
+        if (method === 'GET' || method === 'DELETE') {
+            requestHeaders.delete('Content-Type');
         }
     }
 
