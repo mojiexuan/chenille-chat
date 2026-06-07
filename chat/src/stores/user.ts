@@ -6,7 +6,7 @@ import { defineStore } from 'pinia'
 import router from '@/router'
 import { TOKEN_KEY } from '@/config'
 import { useAuth, useToast } from '@/composables'
-import { phoneLoginRequest, userInfoRequest } from '@/request'
+import { phoneLoginRequest, userInfoRequest, userUsageAiTokenRequest } from '@/request'
 import defaultAvatar from '@/assets/images/avatar.png'
 
 /**
@@ -108,6 +108,18 @@ export const useUserStore = defineStore('user', () => {
         useAuth().show()
     }
 
+    /**
+     * 获取用户使用AI令牌
+     * @author 陈佳宝
+     * @date 2026-01-22
+     */
+    async function getUserUsageAiToken(): Promise<void> {
+        const data = await userUsageAiTokenRequest()
+        if (data) {
+            user.value.usageToken = data
+        }
+    }
+
     return {
         user,
         isLogin,
@@ -115,5 +127,6 @@ export const useUserStore = defineStore('user', () => {
         phoneLogin,
         refreshUserInfo,
         logout,
+        getUserUsageAiToken,
     }
 })

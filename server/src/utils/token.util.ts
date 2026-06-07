@@ -1,4 +1,5 @@
 import { Message, SystemPrompt } from "@/types";
+import { SIZE_UNITS } from "@/constants";
 
 /**
  * 快速预估文本 Token 用量
@@ -60,4 +61,17 @@ export function estimateMessagesTokens(messages: Message[]) {
     }
     return acc;
   }, 0);
+}
+
+/**
+ * 格式化数字，添加单位
+ */
+export function formatNumber(num: number, decimals: number = 2): string {
+  if (num === 0) return "0";
+  const tier = Math.floor(Math.log10(Math.abs(num)) / 3);
+  const suffix = SIZE_UNITS[tier] || "";
+  const scaled = num / Math.pow(10, tier * 3);
+  const fixed = scaled.toFixed(decimals);
+  const trimmed = fixed.replace(/\.0+$/, "").replace(/(\.\d*?[1-9])0+$/, "$1");
+  return trimmed + (suffix ? suffix : "");
 }

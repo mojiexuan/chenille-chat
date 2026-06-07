@@ -1,4 +1,4 @@
-import type { User } from '@/types';
+import type { User, UserUsageAiToken } from '@/types';
 import { get, post, patch } from './fetch';
 
 /**
@@ -24,4 +24,11 @@ export const updateUserAvatarRequest = (file: File) => {
     return post<void>("/user/me/avatar", void 0, {
         body: formData,
     });
+}
+
+/**
+ * 获取用户使用AI令牌
+ */
+export const userUsageAiTokenRequest = () => {
+    return get<UserUsageAiToken>("/user/me/ai/token");
 }

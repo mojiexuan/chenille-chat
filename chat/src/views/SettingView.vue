@@ -14,6 +14,30 @@
                 </svg>
             </div>
         </div>
+        <!-- token 数据 -->
+        <div v-if="userStore.user.usageToken" class="setting-card-token">
+            <div class="setting-card-token-item">
+                <h4>总消耗token</h4>
+                <div class="setting-card-token-item-content">
+                    <span>{{ userStore.user.usageToken.totalTokens }}</span>
+                </div>
+            </div>
+            <div class="setting-card-token-item">
+                <h4>总命中缓存token</h4>
+                <div class="setting-card-token-item-content">
+                    <span>{{ userStore.user.usageToken.cachedTokens }}</span>
+                </div>
+            </div>
+            <div class="setting-card-token-item">
+                <h4>总缓存命中率</h4>
+                <div class="setting-card-token-item-content">
+                    <span>
+                        {{ userStore.user.usageToken.cacheHitRate }}
+                        <span class="setting-card-token-item-content-percent">%</span>
+                    </span>
+                </div>
+            </div>
+        </div>
         <!-- 退出登录 -->
         <a class="setting-button-item setting-button-item-logout" @click="logoutClick">退出登录</a>
     </div>
@@ -22,6 +46,7 @@
 <script setup lang="ts" name="setting">
 import { useConfirm } from '@/composables';
 import { useUserStore } from '@/stores';
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 // 确认弹窗
@@ -50,6 +75,10 @@ function logoutClick() {
         }
     })
 }
+
+onMounted(() => {
+    userStore.getUserUsageAiToken();
+})
 </script>
 
 <style scoped>
@@ -109,6 +138,42 @@ function logoutClick() {
     font-weight: 400;
     line-height: 24px;
     user-select: none;
+}
+
+.setting-card-token {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.setting-card-token-item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background-color: var(--ch-feature-card-bg);
+    border-radius: 8px;
+    min-height: 48px;
+    padding: 16px 16px;
+}
+
+.setting-card-token-item h4 {
+    font-size: 14px;
+}
+
+.setting-card-token-item-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 400;
+    padding: 16px 0;
+    color: var(--ch-main-color);
+}
+
+.setting-card-token-item-content-percent {
+    font-size: 14px;
 }
 
 .setting-button-item {

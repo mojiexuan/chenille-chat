@@ -68,3 +68,15 @@ export async function meUpdateUserInfoHandler(
   const set = await userService.updateProfile(userId, parsed.data);
   return reply.success(set, "用户信息更新成功");
 }
+
+/**
+ * 用户使用AI令牌
+ */
+export async function meUsageAiTokenHandle(request: FastifyRequest, reply: FastifyReply) {
+  const userId = request.userId;
+  if (typeof userId !== "number") {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  const usage = await userService.getUserUsageAiToken(userId);
+  return reply.success(usage, "用户使用AI Token");
+}

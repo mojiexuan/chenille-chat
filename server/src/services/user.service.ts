@@ -1,10 +1,10 @@
-import { db, users, loginLogs } from "@/db";
-import { eq, desc } from "drizzle-orm";
+import { db, users, loginLogs, aiTokenUsages } from "@/db";
+import { eq, desc, sum } from "drizzle-orm";
 import { userSafeInfo } from "@/vo";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { ossService } from "@/services";
-import { logger } from "@/utils";
+import { logger, formatNumber } from "@/utils";
 import type { MultipartFile } from "@fastify/multipart";
 import { MeUpdateUserInfoDto } from "@/dto";
 
@@ -84,6 +84,27 @@ class UserService {
    * 绑定微信账号
    */
   async bindWeChat() { }
+
+  /**
+   * 获取用户使用AI令牌
+   */
+  async getUserUsageAiToken(userId: number) {
+    const [row] = await db
+      .select({
+        totalTokens: sum(aiTokenUsages.totalTokens),
+        cachedTokens: sum(aiTokenUsages.cachedTokens)
+      })
+      .from(aiTokenUsages)
+      .where(eq(aiTokenUsages.userId, userId));
+    const total = Number(row.totalTokens) || 0;
+    const cached = Number(row.cachedTokens) || 0;
+    const hitRate = total > 0 ? Number((cached / total) * 100).toFixed(2) : 0;
+    return {
+      totalTokens: formatNumber(total),
+      cachedTokens: formatNumber(cached),
+      cacheHitRate: hitRate
+    };
+  }
 }
 
 export const userService = new UserService();

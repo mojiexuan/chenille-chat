@@ -9,6 +9,7 @@ import {
   getSessionHandler,
   meUpdateAvatarHandler,
   meUpdateUserInfoHandler,
+  meUsageAiTokenHandle,
   getModelListHandler,
   getModelProviderListHandler,
   getModelListByProviderIdHandler,
@@ -30,6 +31,7 @@ export async function v1Router(fastify: FastifyInstance) {
       scope.get("/user/me", meGetInfoHandler);
       scope.post("/user/me/avatar", meUpdateAvatarHandler);
       scope.patch("/user/me/info", meUpdateUserInfoHandler);
+      scope.get("/user/me/ai/token", meUsageAiTokenHandle);
       scope.post("/chat/sse", chatSseHandler);
       scope.get("/chat/session/list", getSessionListHandler);
       scope.get(
