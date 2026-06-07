@@ -38,6 +38,19 @@
                 </div>
             </div>
         </div>
+        <!-- 帮助与反馈 -->
+        <div class="setting-block">
+            <h3>帮助与反馈</h3>
+            <div class="setting-card">
+                <a class="setting-card-item" href="https://txc.qq.com/products/800853" target="_blank">
+                    <span class="setting-card-item-name">意见反馈</span>
+                    <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12L31 24L19 36" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
+        </div>
         <!-- 退出登录 -->
         <a class="setting-button-item setting-button-item-logout" @click="logoutClick">退出登录</a>
     </div>
@@ -90,6 +103,13 @@ onMounted(() => {
     flex-direction: column;
     padding-top: 12px;
     gap: 24px;
+    user-select: none;
+}
+
+.setting-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .setting-card {
@@ -111,6 +131,7 @@ onMounted(() => {
     height: 100%;
     display: flex;
     align-items: center;
+    cursor: pointer;
 }
 
 .setting-card-item-user {
@@ -174,6 +195,10 @@ onMounted(() => {
 
 .setting-card-token-item-content-percent {
     font-size: 14px;
+}
+
+.setting-card-item-name {
+    flex: 1;
 }
 
 .setting-button-item {
