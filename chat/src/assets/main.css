@@ -1,5 +1,6 @@
-@import "markstream-vue/index.css" layer(components);
+@import "markstream-vue/index.css";
 @import "katex/dist/katex.min.css";
+@import "./render.node.css";
 
 html[data-theme="light"] {
   --ch-main-color: #f15a29;

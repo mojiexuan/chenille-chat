@@ -4,7 +4,8 @@
             :class="{ 'home-container-empty': sessionStore.currentSession.messages.length === 0 }">
             <section v-for="item in sessionStore.currentSession.messages" :key="item.id"
                 :class="`home-container-${item.role}-message`">
-                <details v-if="item.role === 'assistant'" class="home-container-assistant-message-thinking">
+                <details v-if="item.role === 'assistant' && item.reasoning && item.reasoning.length > 0"
+                    class="home-container-assistant-message-thinking">
                     <summary class="home-container-assistant-message-thinking-summary">
                         <span>思考过程</span>
                         <svg class="home-container-assistant-message-thinking-summary-open" width="20" height="20"
@@ -37,7 +38,10 @@
                         </MarkdownRender>
                     </div>
                 </details>
-                <MarkdownRender :custom-id="item.role + '-chat'" :content="item.content" :typewriter="item.isStreaming"
+                <div v-if="item.role === 'user'" class="home-container-user-message-content">
+                    {{ item.content }}
+                </div>
+                <MarkdownRender v-else custom-id="assistant-chat" :content="item.content" :typewriter="item.isStreaming"
                     :smooth-streaming="item.isStreaming" :final="item.isStreaming"
                     :max-live-nodes="item.isStreaming ? 320 : 0" :fade="!item.isStreaming" mode="chat"
                     :code-block-monaco-options="{
@@ -204,7 +208,7 @@
 <script setup lang="ts" name="home">
 import { ref, computed, shallowRef } from 'vue';
 import { aiChatSse, getSessionTitleRequest } from '@/request';
-import MarkdownRender, { type MarkdownIt } from 'markstream-vue';
+import MarkdownRender, { setDefaultI18nMap, type MarkdownIt } from 'markstream-vue';
 import { useSessionStore, useUserStore } from '@/stores';
 
 // 会话store
@@ -217,6 +221,28 @@ const editorMessage = ref('');
 const isSendButtonActive = computed(() => editorMessage.value.trim().length > 0);
 // 当前请求控制器
 const abortController = shallowRef<AbortController | null>(null);
+
+/**
+ * 设置默认的国际化映射
+ */
+setDefaultI18nMap({
+    'common.copy': '复制',
+    'common.copied': '已复制',
+    'common.decrease': '减少',
+    'common.reset': '重置',
+    'common.increase': '增加',
+    'common.expand': '展开',
+    'common.collapse': '收起',
+    'common.preview': '预览',
+    'common.source': '源码',
+    'common.export': '导出',
+    'common.open': '打开',
+    'common.zoomIn': '放大',
+    'common.zoomOut': '缩小',
+    'common.resetZoom': '重置缩放',
+    'image.loadError': '图片加载失败',
+    'image.loading': '图片加载中...',
+});
 
 /**
  * 编辑器键盘事件处理
@@ -279,7 +305,10 @@ function sendClick() {
             // 有推理内容
             if (msg.reasoning && msg.reasoning.length > 0) {
                 if (assistant) {
-                    assistant.reasoning = msg.reasoning;
+                    if (!assistant.reasoning) {
+                        assistant.reasoning = '';
+                    }
+                    assistant.reasoning += msg.reasoning;
                 }
             }
 
@@ -453,7 +482,7 @@ function sendClick() {
     gap: 6px;
 }
 
-[data-custom-id="user-chat"] {
+.home-container-user-message-content {
     max-width: 85%;
     background-color: var(--ch-feature-card-bg);
     border-radius: 12px 2px 12px 12px;

@@ -1,0 +1,29 @@
+[data-custom-id="assistant-chat"] {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+[data-custom-id="assistant-chat"] .paragraph-node {
+  margin: 0;
+}
+
+[data-custom-id="assistant-chat"] .code-block-container {
+  margin: 0;
+  background-color: var(--ch-feature-card-bg);
+}
+
+[data-custom-id="assistant-chat"] .monaco-editor .margin,
+[data-custom-id="assistant-chat"] .monaco-editor-background {
+  background-color: var(--ch-feature-card-bg);
+}
+
+[data-custom-id="assistant-chat"] pre[class^="language-"]:focus,
+[data-custom-id="assistant-chat"] pre[class*=" language-"]:focus {
+  outline: none;
+  outline-offset: 0;
+}
+
+[data-custom-id="assistant-chat"] .code-action-btn:not([aria-label]) {
+  display: none;
+}

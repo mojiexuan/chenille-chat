@@ -99,7 +99,6 @@ class OpenAiModel extends AiModel {
         if (!options.stream) {
           const text = (stream as OpenAI.Chat.Completions.ChatCompletion)
             .choices?.[0]?.message?.content;
-          result.reasoning = "";
           result.message.content = text || "";
           result.finished = true;
           const toolCalls = (stream as OpenAI.Chat.Completions.ChatCompletion)
@@ -149,8 +148,14 @@ class OpenAiModel extends AiModel {
           }
 
           result.finished = finishReason === "stop";
-          result.reasoning = reasoningContent;
-          result.message.content = content;
+          if (reasoningContent.length > 0) {
+            result.reasoning = reasoningContent;
+          } else {
+            result.reasoning = void 0;
+          }
+          if (content.length > 0) {
+            result.message.content = content;
+          }
           options.onChunk?.(result);
 
           if (finishReason === "stop") {

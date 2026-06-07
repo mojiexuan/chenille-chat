@@ -85,7 +85,7 @@ class SessionService {
     sessionId: number,
     role: AiRole,
     content: string,
-    reasoning?: string,
+    reasoning?: string | null,
     usage?: ChatUsage,
     meta?: unknown,
   ) {
@@ -95,7 +95,7 @@ class SessionService {
         sessionId,
         role,
         content,
-        reasoning,
+        reasoning: reasoning || null,
         promptTokens: usage?.prompt_tokens || 0,
         completionTokens: usage?.completion_tokens || 0,
         totalTokens: usage?.total_tokens || 0,

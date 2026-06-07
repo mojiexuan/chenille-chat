@@ -77,7 +77,7 @@ class AiService {
     });
 
     // 缓存生成的内容
-    let reasoning = "";
+    let reasoning: string | null = null;
     let content = "";
     let usage: ChatUsage | null = null;
 
@@ -100,8 +100,15 @@ class AiService {
         onAbort: params.callback?.onAbort,
         onChunk: (chunk) => {
           // 缓存生成的内容
-          reasoning += chunk.reasoning || "";
-          content += chunk.message.content || "";
+          if (chunk.reasoning) {
+            if (!reasoning) {
+              reasoning = "";
+            }
+            reasoning += chunk.reasoning;
+          }
+          if (chunk.message.content) {
+            content += chunk.message.content;
+          }
           usage = chunk.usage || null;
           // 发送消息回调
           if (params.callback && params.callback.onMessage) {
@@ -133,7 +140,7 @@ class AiService {
       usage,
       systemPrompt,
       contextMessages,
-      reasoning,
+      reasoning || "",
       content,
     );
     sessionService.addMessage(session.id, AiRole.Assistant, content, reasoning, usage);
