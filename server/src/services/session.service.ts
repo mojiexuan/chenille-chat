@@ -1,4 +1,4 @@
-import { db, sessions, messages } from "@/db";
+import { db, sessions, messages, aiTokenUsages } from "@/db";
 import { eq, asc, desc, count, and } from "drizzle-orm";
 import { AiRole } from "@/enumeration";
 import {
@@ -11,6 +11,7 @@ import {
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { generateSessionTitle } from "@/session";
+import { logger } from "@/utils";
 
 /**
  * 会话服务
@@ -82,6 +83,7 @@ class SessionService {
    * @param meta 消息元数据
    */
   async addMessage(
+    userId: number,
     sessionId: number,
     role: AiRole,
     content: string,
@@ -103,6 +105,20 @@ class SessionService {
         meta,
       })
       .returning();
+    if (usage) {
+      // 记录token使用日志，不在意插入失败
+      db.insert(aiTokenUsages)
+        .values({
+          userId,
+          sessionId,
+          messageId: message.id,
+          promptTokens: usage.prompt_tokens || 0,
+          completionTokens: usage.completion_tokens || 0,
+          totalTokens: usage.total_tokens || 0,
+          cachedTokens: usage.prompt_tokens_details.cached_tokens || 0,
+        })
+        .catch((e) => logger.warn(e, "记录token使用日志失败"));
+    }
     return message;
   }
 

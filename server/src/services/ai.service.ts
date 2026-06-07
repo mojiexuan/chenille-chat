@@ -40,6 +40,7 @@ class AiService {
 
     // 添加用户消息到会话
     await sessionService.addMessage(
+      params.userId,
       session.id,
       AiRole.User,
       params.data.message,
@@ -143,7 +144,8 @@ class AiService {
       reasoning || "",
       content,
     );
-    sessionService.addMessage(session.id, AiRole.Assistant, content, reasoning, usage);
+    // 添加AI消息记录到会话
+    sessionService.addMessage(params.userId, session.id, AiRole.Assistant, content, reasoning, usage);
   }
 
   /**

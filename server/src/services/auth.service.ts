@@ -10,9 +10,10 @@ import {
 import { BizException } from "@/exception";
 import { BizCode, LoginType, LoginStatus } from "@/enumeration";
 import { db, loginLogs, users } from "@/db";
-import { eq, max } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { config } from "@/config";
 import type { JwtPayload } from "@/types";
+import { logger } from "@/utils";
 
 const SMS_CODE_TTL = 300;
 const SMS_RATE_TTL = 60;
@@ -99,16 +100,19 @@ class AuthService {
     let userId: number;
 
     if (!existingUser) {
-      const [{ maxId }] = await db.select({ maxId: max(users.id) }).from(users);
-      const username = String(100000000 + (maxId ?? 0) + 1);
-      const [newUser] = await db
-        .insert(users)
-        .values({
-          phone,
-          username,
-          nickname: randomStr(4, CharType.Upper),
-        })
-        .returning({ id: users.id });
+      const newUser = await db.transaction(async (tx) => {
+        const [user] = await tx
+          .insert(users)
+          .values({
+            phone,
+            username: phone,
+            nickname: randomStr(4, CharType.Upper),
+          })
+          .returning({ id: users.id });
+        const username = String(100000000 + user.id);
+        await tx.update(users).set({ username }).where(eq(users.id, user.id));
+        return user;
+      })
       userId = newUser.id;
     } else {
       userId = existingUser.id;
@@ -125,7 +129,8 @@ class AuthService {
       ip,
       userAgent,
       token,
-    });
+    })
+      .catch((e) => logger.error(e, "记录登录日志失败"));
 
     return token;
   }
