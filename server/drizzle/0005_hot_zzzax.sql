@@ -1,0 +1,1 @@
+ALTER TABLE "c_messages" ADD COLUMN "reasoning" text;

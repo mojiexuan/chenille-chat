@@ -21,6 +21,7 @@ export interface Message {
     id: number;
     role: 'user' | 'assistant';
     content: string;
+    reasoning?: string;
     promptTokens?: number,
     completionTokens?: number,
     totalTokens?: number,

@@ -136,7 +136,7 @@ class AiService {
       reasoning,
       content,
     );
-    sessionService.addMessage(session.id, AiRole.Assistant, content, usage);
+    sessionService.addMessage(session.id, AiRole.Assistant, content, reasoning, usage);
   }
 
   /**

@@ -2,8 +2,41 @@
     <div class="home">
         <div class="home-container"
             :class="{ 'home-container-empty': sessionStore.currentSession.messages.length === 0 }">
-            <div v-for="item in sessionStore.currentSession.messages" :key="item.id"
+            <section v-for="item in sessionStore.currentSession.messages" :key="item.id"
                 :class="`home-container-${item.role}-message`">
+                <details v-if="item.role === 'assistant'" class="home-container-assistant-message-thinking">
+                    <summary class="home-container-assistant-message-thinking-summary">
+                        <span>思考过程</span>
+                        <svg class="home-container-assistant-message-thinking-summary-open" width="20" height="20"
+                            viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 30L25 18L37 30" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <svg class="home-container-assistant-message-thinking-summary-close" width="20" height="20"
+                            viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M36 18L24 30L12 18" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </summary>
+                    <div class="home-container-assistant-message-thinking-content">
+                        <MarkdownRender :custom-id="item.role + '-chat'" :content="item.reasoning"
+                            :typewriter="item.isStreaming" :smooth-streaming="item.isStreaming ? 'auto' : false"
+                            :final="item.isStreaming" :max-live-nodes="item.isStreaming ? 0 : undefined"
+                            :fade="!item.isStreaming" mode="chat" :code-block-monaco-options="{
+                                themes: ['vitesse-light'],
+                                theme: 'vitesse-light',
+                                MAX_HEIGHT: 640,
+                            }" :code-block-props="{
+                                stream: item.isStreaming,
+                                showTooltips: false,
+                                showExpandButton: false,
+                                showCollapseButton: false,
+                                showFontSizeButtons: false,
+                                showPreviewButton: false,
+                            }">
+                        </MarkdownRender>
+                    </div>
+                </details>
                 <MarkdownRender :custom-id="item.role + '-chat'" :content="item.content" :typewriter="item.isStreaming"
                     :smooth-streaming="item.isStreaming ? 'auto' : false" :final="item.isStreaming"
                     :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming" mode="chat"
@@ -11,6 +44,13 @@
                         themes: ['vitesse-light'],
                         theme: 'vitesse-light',
                         MAX_HEIGHT: 640,
+                    }" :code-block-props="{
+                        stream: item.isStreaming,
+                        showTooltips: false,
+                        showExpandButton: false,
+                        showCollapseButton: false,
+                        showFontSizeButtons: false,
+                        showPreviewButton: false,
                     }">
                 </MarkdownRender>
                 <!-- 状态功能栏 -->
@@ -115,7 +155,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
             <img v-if="sessionStore.isReplying" class="home-container-replying" src="../assets/images/replying.svg"
                 alt="思考中" />
             <!-- 错误提示 -->
@@ -229,6 +269,14 @@ function sendClick() {
                 sessionStore.updateCurrentSessionId(msg.sessionId);
             }
 
+            // 有推理内容
+            if (msg.reasoning && msg.reasoning.length > 0) {
+                if (assistant) {
+                    assistant.reasoning = msg.reasoning;
+                }
+            }
+
+            // 有内容
             if (msg.content && msg.content.length > 0) {
                 if (assistant) {
                     assistant.content += msg.content;
@@ -405,7 +453,50 @@ function sendClick() {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+    gap: 12px;
+}
+
+.home-container-assistant-message-thinking {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-container-assistant-message-thinking-summary {
+    display: flex;
+    align-items: center;
     gap: 6px;
+    font-size: 14px;
+    list-style: none;
+    user-select: none;
+    cursor: pointer;
+}
+
+.home-container-assistant-message-thinking-summary-close {
+    display: flex;
+}
+
+.home-container-assistant-message-thinking[open] .home-container-assistant-message-thinking-summary-close {
+    display: none;
+}
+
+.home-container-assistant-message-thinking-summary-open {
+    display: none;
+}
+
+.home-container-assistant-message-thinking[open] .home-container-assistant-message-thinking-summary-open {
+    display: flex;
+}
+
+.home-container-assistant-message-thinking-summary::marker {
+    display: none;
+}
+
+.home-container-assistant-message-thinking-content {
+    color: hsl(0 0% 43%);
+    border-left: 2.14286px solid var(--ch-line-color);
+    padding-left: 12.85714px;
+    margin-top: 12px;
 }
 
 .home-input-area {

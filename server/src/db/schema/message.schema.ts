@@ -24,6 +24,7 @@ export const messages = pgTable(
       onDelete: "set null",
     }),
     role: varchar("role", { length: 20 }).$type<AiRole>().notNull(), // "user" | "assistant" | "system"
+    reasoning: text("reasoning"), // 推理内容
     content: text("content").notNull(), // 存完整的 Message 内容（文本）
     promptTokens: integer("prompt_tokens").default(0).notNull(), // 提示token数
     completionTokens: integer("completion_tokens").default(0).notNull(), // 完成token数
