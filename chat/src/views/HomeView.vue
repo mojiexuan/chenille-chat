@@ -20,8 +20,8 @@
                     </summary>
                     <div class="home-container-assistant-message-thinking-content">
                         <MarkdownRender :custom-id="item.role + '-chat'" :content="item.reasoning"
-                            :typewriter="item.isStreaming" :smooth-streaming="item.isStreaming ? 'auto' : false"
-                            :final="item.isStreaming" :max-live-nodes="item.isStreaming ? 0 : undefined"
+                            :typewriter="item.isStreaming" :smooth-streaming="item.isStreaming"
+                            :final="item.isStreaming" :max-live-nodes="item.isStreaming ? 320 : 0"
                             :fade="!item.isStreaming" mode="chat" :code-block-monaco-options="{
                                 themes: ['vitesse-light'],
                                 theme: 'vitesse-light',
@@ -33,13 +33,13 @@
                                 showCollapseButton: false,
                                 showFontSizeButtons: false,
                                 showPreviewButton: false,
-                            }">
+                            }" :custom-markdown-it="customMarkdownIt">
                         </MarkdownRender>
                     </div>
                 </details>
                 <MarkdownRender :custom-id="item.role + '-chat'" :content="item.content" :typewriter="item.isStreaming"
-                    :smooth-streaming="item.isStreaming ? 'auto' : false" :final="item.isStreaming"
-                    :max-live-nodes="item.isStreaming ? 0 : undefined" :fade="!item.isStreaming" mode="chat"
+                    :smooth-streaming="item.isStreaming" :final="item.isStreaming"
+                    :max-live-nodes="item.isStreaming ? 320 : 0" :fade="!item.isStreaming" mode="chat"
                     :code-block-monaco-options="{
                         themes: ['vitesse-light'],
                         theme: 'vitesse-light',
@@ -51,11 +51,11 @@
                         showCollapseButton: false,
                         showFontSizeButtons: false,
                         showPreviewButton: false,
-                    }">
+                    }" :custom-markdown-it="customMarkdownIt">
                 </MarkdownRender>
                 <!-- 状态功能栏 -->
-                <div class="home-container-status-bar"
-                    v-if="item.role === 'assistant' && !item.isStreaming && !sessionStore.isReplying">
+                <div :class="[`home-container-${item.role}-status-bar`]"
+                    v-if="!item.isStreaming && !sessionStore.isReplying">
                     <!-- 复制 -->
                     <svg class="home-container-status-bar-button" width="20" height="20" viewBox="0 0 48 48" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
@@ -67,14 +67,14 @@
                             fill="none" stroke="#81858c" stroke-width="4" stroke-linejoin="round" />
                     </svg>
                     <!-- 分享 -->
-                    <svg class="home-container-status-bar-button" width="20" height="20" viewBox="0 0 48 48" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
+                    <svg v-if="item.role === 'assistant'" class="home-container-status-bar-button" width="20"
+                        height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M26 4L44 22L26 39V28C12 28 6 43 6 43C6 26 11 15 26 15V4Z" fill="none" stroke="#3c3c43"
                             stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <!-- 重新生成 -->
-                    <svg class="home-container-status-bar-button" width="20" height="20" viewBox="0 0 48 48" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
+                    <svg v-if="item.role === 'assistant'" class="home-container-status-bar-button" width="20"
+                        height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M36.7279 36.7279C33.4706 39.9853 28.9706 42 24 42C14.0589 42 6 33.9411 6 24C6 14.0589 14.0589 6 24 6C28.9706 6 33.4706 8.01472 36.7279 11.2721C38.3859 12.9301 42 17 42 17"
                             stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
@@ -82,7 +82,7 @@
                             stroke-linejoin="round" />
                     </svg>
                     <!-- token数据 -->
-                    <div class="home-container-status-bar-token">
+                    <div v-if="item.role === 'assistant'" class="home-container-status-bar-token">
                         <!-- 提示词token -->
                         <div v-if="item.promptTokens && item.promptTokens > 0"
                             class="home-container-status-bar-token-item" data-tooltip="提示词token">
@@ -204,7 +204,7 @@
 <script setup lang="ts" name="home">
 import { ref, computed, shallowRef } from 'vue';
 import { aiChatSse, getSessionTitleRequest } from '@/request';
-import MarkdownRender from 'markstream-vue';
+import MarkdownRender, { type MarkdownIt } from 'markstream-vue';
 import { useSessionStore, useUserStore } from '@/stores';
 
 // 会话store
@@ -229,6 +229,13 @@ function handleEditorKeydown(e: KeyboardEvent) {
         e.preventDefault();
         sendClick();
     }
+}
+
+/**
+ * 自定义Markdown-it插件
+ */
+function customMarkdownIt(md: MarkdownIt) {
+    return md;
 }
 
 /**
@@ -343,8 +350,14 @@ function sendClick() {
     overflow-x: hidden;
 }
 
-.home-container-status-bar {
+.home-container-assistant-status-bar {
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.home-container-user-status-bar {
     display: flex;
     align-items: center;
     gap: 16px;
