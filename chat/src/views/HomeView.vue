@@ -62,7 +62,7 @@
                     v-if="!item.isStreaming && !sessionStore.isReplying">
                     <!-- 复制 -->
                     <svg class="home-container-status-bar-button" width="20" height="20" viewBox="0 0 48 48" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
+                        xmlns="http://www.w3.org/2000/svg" @click="handleCopyTextClick(item.content)">
                         <path
                             d="M13 12.4316V7.8125C13 6.2592 14.2592 5 15.8125 5H40.1875C41.7408 5 43 6.2592 43 7.8125V32.1875C43 33.7408 41.7408 35 40.1875 35H35.5163"
                             stroke="#81858c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
@@ -210,7 +210,11 @@ import { ref, computed, shallowRef } from 'vue';
 import { aiChatSse, getSessionTitleRequest } from '@/request';
 import MarkdownRender, { setDefaultI18nMap, type MarkdownIt } from 'markstream-vue';
 import { useSessionStore, useUserStore } from '@/stores';
+import { copyTextToClipboard } from '@/utils';
+import { useToast } from '@/composables';
 
+// 提示框
+const toast = useToast();
 // 会话store
 const sessionStore = useSessionStore();
 // 用户store
@@ -262,6 +266,19 @@ function handleEditorKeydown(e: KeyboardEvent) {
  */
 function customMarkdownIt(md: MarkdownIt) {
     return md;
+}
+
+/**
+ * 复制文本到剪贴板
+ * @param text 要复制的文本
+ */
+async function handleCopyTextClick(text: string) {
+    copyTextToClipboard(text)
+        .then((res) => {
+            if (res) {
+                toast.success('已复制');
+            }
+        })
 }
 
 /**
