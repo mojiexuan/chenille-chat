@@ -34,38 +34,15 @@
                         :key="item.id" @click="sessionItemClick(item.id)"
                         :class="{ 'active': item.id === sessionStore.currentSession.id }">
                         <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
-                            }}</span>
+                        }}</span>
                         <div class="default-layout-nav-content-session-item-more"
-                            @click.stop="sessionMoreClick($event)">
+                            @click.stop="sessionMoreClick($event, item.id)">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="24" cy="12" r="3" fill="#3c3c43" />
                                 <circle cx="24" cy="24" r="3" fill="#3c3c43" />
                                 <circle cx="24" cy="35" r="3" fill="#3c3c43" />
                             </svg>
-                            <ContextMenu :visible="sessionMenuVisible" :anchor="sessionMenuAnchor"
-                                @close="sessionMenuVisible = false">
-                                <div class="default-layout-nav-content-session-item-more-menu">
-                                    <div class="default-layout-nav-content-session-item-more-menu-item default-layout-nav-content-session-item-more-menu-item-delete"
-                                        @click="handleDeleteSession(item.id)">
-                                        <svg width="16" height="16" viewBox="0 0 48 48" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M8 11L40 11" stroke="#fd6b6d" stroke-width="4"
-                                                stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M18 5L30 5" stroke="#fd6b6d" stroke-width="4"
-                                                stroke-linecap="round" stroke-linejoin="round" />
-                                            <path
-                                                d="M12 17H36V40C36 41.6569 34.6569 43 33 43H15C13.3431 43 12 41.6569 12 40V17Z"
-                                                fill="none" stroke="#fd6b6d" stroke-width="4" stroke-linejoin="round" />
-                                            <path d="M20 25L28 33" stroke="#fd6b6d" stroke-width="4"
-                                                stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M28 25L20 33" stroke="#fd6b6d" stroke-width="4"
-                                                stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <span style="color: #fd6b6d">删除会话</span>
-                                    </div>
-                                </div>
-                            </ContextMenu>
                         </div>
                     </div>
                 </section>
@@ -97,7 +74,7 @@
                                     alt="用户头像" />
                                 <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{
                                     userNameNickname
-                                    }}</span>
+                                }}</span>
                             </div>
                         </menu>
                     </Transition>
@@ -134,7 +111,7 @@
                     <!-- 标题 -->
                     <span class="default-layout-content-header-left-title ellipsis">{{ pageTitle }}</span>
                     <!-- 当前会话信息 -->
-                    <div class="default-layout-content-header-left-session-info">
+                    <div v-if="route.name === 'Home'" class="default-layout-content-header-left-session-info">
                         <!-- 当前会话总token数 -->
                         <div v-if="sessionStore.currentSessionTotalTokens > 0"
                             class="default-layout-content-header-left-session-info-item">
@@ -194,6 +171,27 @@
                 </div>
             </main>
         </div>
+        <!-- 会话列表的更多操作菜单 -->
+        <ContextMenu :visible="sessionMenuVisible" :anchor="sessionMenuAnchor" @close="sessionMenuVisible = false">
+            <div class="default-layout-nav-content-session-item-more-menu">
+                <div class="default-layout-nav-content-session-item-more-menu-item default-layout-nav-content-session-item-more-menu-item-delete"
+                    @click="handleDeleteSession">
+                    <svg width="16" height="16" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 11L40 11" stroke="#fd6b6d" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M18 5L30 5" stroke="#fd6b6d" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 17H36V40C36 41.6569 34.6569 43 33 43H15C13.3431 43 12 41.6569 12 40V17Z"
+                            fill="none" stroke="#fd6b6d" stroke-width="4" stroke-linejoin="round" />
+                        <path d="M20 25L28 33" stroke="#fd6b6d" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M28 25L20 33" stroke="#fd6b6d" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span style="color: #fd6b6d">删除会话</span>
+                </div>
+            </div>
+        </ContextMenu>
     </div>
 </template>
 
@@ -240,6 +238,9 @@ const sidebarActive = ref(true);
 // 会话右键菜单
 const sessionMenuVisible = ref(false);
 const sessionMenuAnchor = ref({ x: 0, y: 0 });
+
+// 会话右键菜单目标会话ID
+const sessionMenuTarget = ref<number | null>(null);
 
 // 模型列表
 const modelList = ref<Model[]>([]);
@@ -302,7 +303,8 @@ function sessionItemClick(sessionId: number) {
 /**
  * 点击会话更多
  */
-function sessionMoreClick(e: MouseEvent) {
+function sessionMoreClick(e: MouseEvent, sessionId: number) {
+    sessionMenuTarget.value = sessionId;
     sessionMenuAnchor.value = { x: e.clientX, y: e.clientY };
     sessionMenuVisible.value = !sessionMenuVisible.value;
 }
@@ -310,12 +312,18 @@ function sessionMoreClick(e: MouseEvent) {
 /**
  * 处理删除会话
  */
-function handleDeleteSession(sessionId: number) {
+function handleDeleteSession() {
+    if (!sessionMenuTarget.value) {
+        return;
+    }
     confirm.error({
         title: '确认删除',
         message: '该对话内容和分享链接将被一并删除且无法恢复！',
-        onConfirm: () => {
-            sessionStore.deleteSession(sessionId);
+        onConfirm: async () => {
+            if (sessionMenuTarget.value) {
+                await sessionStore.deleteSession(sessionMenuTarget.value);
+                sessionMenuTarget.value = null;
+            }
         }
     });
 }
