@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import type { MessageStreaming, SessionItem, Session } from "@/types";
 import { getSessionList, getSessionRequest, deleteSessionRequest } from "@/request";
@@ -21,6 +21,16 @@ export const useSessionStore = defineStore("session", () => {
     });
     // 是否正在回复
     const isReplying = ref(false);
+    // 当前会话总token数
+    const currentSessionTotalTokens = computed(() => {
+        return currentSession.value.messages.reduce((sum, msg) => sum + (msg.totalTokens || 0), 0);
+    });
+    // 当前会话总缓存token数
+    const currentSessionCachedTokens = computed(() => {
+        return currentSession.value.messages.reduce((sum, msg) => sum + (msg.cachedTokens || 0), 0);
+    });
+    // 缓存命中率
+    const currentSessionCacheHitRate = computed(() => currentSessionTotalTokens.value > 0 ? Math.round((currentSessionCachedTokens.value / currentSessionTotalTokens.value) * 100) : 0)
 
     /**
      * 获取会话列表
@@ -143,6 +153,9 @@ export const useSessionStore = defineStore("session", () => {
     return {
         sessions,
         currentSession,
+        currentSessionTotalTokens,
+        currentSessionCachedTokens,
+        currentSessionCacheHitRate,
         isReplying,
         getSessions,
         updateCurrentSessionId,

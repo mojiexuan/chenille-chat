@@ -133,6 +133,59 @@
                     </div>
                     <!-- 标题 -->
                     <span class="default-layout-content-header-left-title ellipsis">{{ pageTitle }}</span>
+                    <!-- 当前会话信息 -->
+                    <div class="default-layout-content-header-left-session-info">
+                        <!-- 当前会话总token数 -->
+                        <div v-if="sessionStore.currentSessionTotalTokens > 0"
+                            class="default-layout-content-header-left-session-info-item">
+                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 24L15.25 25.25M44 14L24 34L22.75 32.75" stroke="#3c3c43" stroke-width="4"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 24L14 34L34 14" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            <span>{{ sessionStore.currentSessionTotalTokens }}</span>
+                        </div>
+                        <!-- 当前会话总缓存token数 -->
+                        <div v-if="sessionStore.currentSessionCachedTokens > 0"
+                            class="default-layout-content-header-left-session-info-item">
+                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M44 31C44 36.5228 39.5228 41 34 41C32.2091 41 30.5281 40.5292 29.0741 39.7046C26.5143 38.2529 24.6579 35.7046 24.1436 32.6983C24.0492 32.1463 24 31.5789 24 31C24 28.4323 24.9678 26.0906 26.5585 24.3198C28.3892 22.2818 31.0449 21 34 21C39.5228 21 44 25.4772 44 31Z"
+                                    fill="none" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path
+                                    d="M34 12V20V21C31.0449 21 28.3892 22.2818 26.5585 24.3198C24.9678 26.0906 24 28.4323 24 31C24 31.5789 24.0492 32.1463 24.1436 32.6983C24.6579 35.7046 26.5143 38.2529 29.0741 39.7046C26.4116 40.5096 22.8776 41 19 41C10.7157 41 4 38.7614 4 36V28V20V12"
+                                    stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M34 12C34 14.7614 27.2843 17 19 17C10.7157 17 4 14.7614 4 12C4 9.23858 10.7157 7 19 7C27.2843 7 34 9.23858 34 12Z"
+                                    fill="none" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M4 28C4 30.7614 10.7157 33 19 33C20.807 33 22.5393 32.8935 24.1436 32.6983"
+                                    stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 20C4 22.7614 10.7157 25 19 25C21.7563 25 24.339 24.7522 26.5585 24.3198"
+                                    stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M34 26L31 30L37 32L34 36" stroke="#3c3c43" stroke-width="4"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span>{{ sessionStore.currentSessionCachedTokens }}</span>
+                        </div>
+                        <!-- 当前会话缓存命中率 -->
+                        <div v-if="sessionStore.currentSessionCacheHitRate > 0"
+                            class="default-layout-content-header-left-session-info-item">
+                            <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M16.3446 5.51758C13.9 6.53124 11.7001 8.01574 9.85786 9.85797C6.23858 13.4773 4 18.4773 4 24.0001C4 35.0458 12.9543 44.0001 24 44.0001V44.0001C29.5228 44.0001 34.5228 41.7615 38.1421 38.1422C39.9844 36.3 41.4689 34.1001 42.4825 31.6555"
+                                    stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M24 24H44C44 12.9543 35.0457 4 24 4L24 24Z" fill="none" stroke="#3c3c43"
+                                    stroke-width="4" stroke-linejoin="round" />
+                            </svg>
+                            <span>{{ sessionStore.currentSessionCacheHitRate }}%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <main class="default-layout-content-main">
@@ -540,7 +593,7 @@ onMounted(() => {
 .default-layout-content-header-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 16px;
 }
 
 .default-layout-content-header-back-button {
@@ -568,6 +621,20 @@ onMounted(() => {
 .default-layout-content-header-left-title {
     font-size: 14px;
     font-weight: 600;
+    user-select: none;
+}
+
+.default-layout-content-header-left-session-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.default-layout-content-header-left-session-info-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
     user-select: none;
 }
 
