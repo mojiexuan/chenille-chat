@@ -1,4 +1,0 @@
-ALTER TABLE "c_ai_token_usages" ADD COLUMN "session_id" integer;--> statement-breakpoint
-ALTER TABLE "c_ai_token_usages" ADD COLUMN "message_id" integer;--> statement-breakpoint
-ALTER TABLE "c_ai_token_usages" ADD CONSTRAINT "c_ai_token_usages_session_id_c_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."c_sessions"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "c_ai_token_usages" ADD CONSTRAINT "c_ai_token_usages_message_id_c_messages_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."c_messages"("id") ON DELETE set null ON UPDATE no action;
