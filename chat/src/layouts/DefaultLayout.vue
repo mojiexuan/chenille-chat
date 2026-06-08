@@ -580,6 +580,7 @@ onMounted(() => {
 }
 
 .default-layout-content {
+    position: relative;
     flex: 1;
     height: 100%;
     background: var(--ch-bg-color-card);
@@ -649,16 +650,13 @@ onMounted(() => {
 .default-layout-content-main {
     width: 100%;
     height: calc(100vh - var(--ch-height-header) - 12px);
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .default-layout-content-main-container {
-    width: 100%;
     max-width: 960px;
-    height: calc(100vh - var(--ch-height-header) - 12px);
-    padding: 0 20px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    min-height: calc(100vh - var(--ch-height-header) - 12px);
     margin: 0 auto;
     transition: all .3s ease;
 }

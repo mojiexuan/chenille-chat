@@ -334,8 +334,7 @@ function sendClick() {
 
 <style scoped>
 .home {
-    width: 100%;
-    height: 100%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -348,9 +347,7 @@ function sendClick() {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 16px 0;
-    overflow-y: auto;
-    overflow-x: hidden;
+    padding: 16px 20px;
 }
 
 .home-container-assistant-status-bar {
@@ -516,7 +513,11 @@ function sendClick() {
 }
 
 .home-input-area {
+    position: sticky;
+    bottom: 0;
     width: 100%;
+    padding: 0 20px 12px;
+    background-color: var(--ch-bg-color-card);
     display: flex;
     flex-direction: column;
     justify-content: center;
