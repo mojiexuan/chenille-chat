@@ -1,0 +1,104 @@
+.shiki,
+.hljs {
+  background-color: var(--ch-feature-card-bg) !important;
+}
+
+html[data-theme="light"] .shiki,
+html[data-theme="light"] .shiki span {
+  color: var(--shiki-light);
+}
+
+html[data-theme="dark"] .shiki,
+html[data-theme="dark"] .shiki span {
+  color: var(--shiki-dark);
+}
+
+.line,
+.hljs code {
+  padding: 0 24px;
+}
+
+.shiki .highlighted {
+  background-color: var(--ch-custom-block-info-bg);
+  width: 100%;
+  transition: background-color 0.5s;
+  display: inline-block;
+}
+
+.shiki .error {
+  background-color: var(--ch-custom-block-danger-bg);
+  width: 100%;
+  transition: background-color 0.5s;
+  display: inline-block;
+}
+
+.shiki .warning {
+  background-color: var(--ch-custom-block-warning-bg);
+  width: 100%;
+  transition: background-color 0.5s;
+  display: inline-block;
+}
+
+.shiki .remove {
+  background-color: var(--ch-custom-block-danger-bg);
+  width: 100%;
+  transition: background-color 0.5s;
+  display: inline-block;
+}
+
+.shiki .remove::before {
+  position: absolute;
+  left: 10px;
+  content: "-";
+  color: var(--ch-code-line-diff-remove-left-icon);
+}
+
+.shiki .add {
+  background-color: var(--ch-code-line-diff-add);
+  width: 100%;
+  transition: background-color 0.5s;
+  display: inline-block;
+}
+
+.shiki .add::before {
+  position: absolute;
+  left: 10px;
+  content: "+";
+  color: var(--ch-code-line-diff-add-left-icon);
+}
+
+.has-focused .line:not(.focused) {
+  filter: blur(0.095rem);
+  opacity: 0.7;
+  transition:
+    filter 0.35s,
+    opacity 0.35s;
+}
+
+.has-focused:hover .line:not(.focused) {
+  filter: blur(0);
+}
+
+html[data-theme="light"] .hljs-attr {
+  color: #d32f2f;
+}
+
+html[data-theme="dark"] .hljs-attr {
+  color: #f8f8f8;
+}
+
+html[data-theme="light"] .hljs-string {
+  color: #22863a;
+}
+
+html[data-theme="dark"] .hljs-string {
+  color: #ffab70;
+}
+
+html[data-theme="light"] .hljs-number {
+  color: #1976d2;
+}
+
+html[data-theme="dark"] .hljs-number {
+  color: #f8f8f8;
+}

@@ -1,0 +1,334 @@
+.markdown-renderer img {
+  max-width: 100%;
+  border-radius: 5px;
+}
+
+.markdown-renderer :not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) > a {
+  font-weight: 500;
+  color: var(--ch-main-color);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition:
+    color 0.25s,
+    opacity 0.25s;
+}
+
+.markdown-renderer h1,
+.markdown-renderer h2,
+.markdown-renderer h3,
+.markdown-renderer h4,
+.markdown-renderer h5,
+.markdown-renderer h6 {
+  position: relative;
+  font-weight: 600;
+  outline: none;
+}
+
+.markdown-renderer h1 {
+  letter-spacing: -0.02em;
+  line-height: 40px;
+  font-size: 28px;
+}
+
+.markdown-renderer h2 {
+  margin: 48px 0 16px;
+  border-top: 1px solid var(--ch-border-card-color);
+  padding-top: 24px;
+  letter-spacing: -0.02em;
+  line-height: 32px;
+  font-size: 24px;
+}
+
+.markdown-renderer h2 a {
+  color: var(--ch-text-color-1);
+}
+
+.markdown-renderer h3 a {
+  color: var(--ch-text-color-1);
+}
+
+.markdown-renderer h4 a {
+  color: var(--ch-text-color-1);
+}
+
+.markdown-renderer h5 a {
+  color: var(--ch-text-color-1);
+}
+
+.markdown-renderer h6 a {
+  color: var(--ch-text-color-1);
+}
+
+.markdown-renderer p {
+  line-height: 28px;
+  margin: 16px 0;
+}
+
+.markdown-renderer ul,
+.markdown-renderer ol {
+  padding-left: 1.25rem;
+  margin: 16px 0;
+}
+
+.markdown-renderer ul {
+  list-style-type: disc;
+}
+
+.markdown-renderer :not(pre) > code {
+  border-radius: 4px;
+  padding: 3px 6px;
+  background-color: var(--ch-code-bg);
+  transition:
+    color 0.25s,
+    background-color 0.5s;
+}
+
+.markdown-renderer :not(pre, h1, h2, h3, h4, h5, h6) > code {
+  font-size: var(--ch-code-font-size);
+  color: var(--ch-code-color);
+}
+
+.markdown-renderer pre {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+  position: relative;
+  z-index: 1;
+  padding: 20px 0;
+}
+
+.markdown-renderer pre,
+.markdown-renderer pre code {
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  tab-size: 4;
+  hyphens: none;
+}
+
+.markdown-renderer pre code {
+  display: block;
+  width: fit-content;
+  min-width: 100%;
+}
+
+.article-content-pre-copy {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid var(--ch-border-divider-color);
+  border-radius: 4px;
+  background-color: var(--ch-bg-color-card);
+  opacity: 0;
+  transition:
+    border-color 0.25s,
+    background-color 0.25s,
+    opacity 0.25s;
+}
+
+.markdown-renderer pre:hover .article-content-pre-copy {
+  opacity: 1;
+}
+
+.article-content-pre-lang {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 12px;
+  z-index: 2;
+  font-weight: 500;
+  color: var(--ch-text-color-3);
+}
+
+.custom-container,
+.markdown-alert {
+  margin: 16px 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 16px 16px 8px;
+  line-height: 24px;
+  font-size: 14px;
+  color: var(--ch-text-color-2);
+}
+
+.custom-container-title,
+.markdown-alert-title {
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.custom-container-info,
+.markdown-alert-note {
+  border-color: var(--ch-custom-block-info-bg);
+  background-color: var(--ch-custom-block-info-bg);
+}
+
+.markdown-alert-important {
+  border-color: var(--ch-custom-block-important-bg);
+  background-color: var(--ch-custom-block-important-bg);
+}
+
+.custom-container-tip,
+.markdown-alert-tip {
+  border-color: var(--ch-custom-block-tip-bg);
+  background-color: var(--ch-custom-block-tip-bg);
+}
+
+.custom-container-warning,
+.markdown-alert-warning {
+  border-color: var(--ch-custom-block-warning-bg);
+  background-color: var(--ch-custom-block-warning-bg);
+}
+
+.custom-container-danger,
+.markdown-alert-caution {
+  border-color: var(--ch-custom-block-danger-bg);
+  background-color: var(--ch-custom-block-danger-bg);
+}
+
+.custom-container-details {
+  border-color: var(--ch-custom-block-details-bg);
+  background-color: var(--ch-custom-block-details-bg);
+}
+
+.custom-container-details summary {
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.footnote-backref {
+  color: var(--ch-main-color);
+}
+
+.katex-html[aria-hidden="true"] {
+  display: none;
+}
+
+.spoiler {
+  background-color: var(--ch-black-bg-white);
+  color: var(--ch-black-bg-white);
+  cursor: help;
+  border-radius: 0.2em;
+}
+
+.spoiler:hover {
+  background-color: transparent;
+}
+
+.task-list-container {
+  list-style-type: none !important;
+  padding: 0 !important;
+}
+
+.task-list-item {
+  display: flex;
+  align-items: center;
+}
+
+.task-list-item-checkbox[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1em;
+  height: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  margin-right: 10px;
+  background-color: var(--ch-checkbox-disabled-bg);
+}
+
+.task-list-item-checkbox[type="checkbox"]:checked {
+  background-color: var(--ch-main-color);
+  border-color: var(--ch-main-color);
+}
+
+.task-list-item-checkbox[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.325em;
+  height: 0.625em;
+  border: solid var(--ch-bg-color-card);
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -60%) rotate(45deg);
+}
+
+.markdown-renderer table {
+  border-collapse: collapse;
+  margin: 20px 0;
+  display: block;
+  overflow-x: auto;
+}
+
+:where([dir="ltr"]) .markdown-renderer th {
+  text-align: left;
+}
+
+.markdown-renderer th,
+.markdown-renderer td {
+  border: 1px solid var(--ch-border-divider-color);
+  padding: 8px 16px;
+}
+
+.markdown-renderer th {
+  color: var(--ch-text-color-blank);
+  background-color: var(--ch-feature-card-bg);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.markdown-renderer tr {
+  background-color: var(--ch-bg-color-card);
+  border-top: 1px solid var(--ch-border-divider-color);
+}
+
+.markdown-renderer td {
+  font-size: 14px;
+}
+
+.markdown-renderer tr:nth-child(2n) {
+  background-color: var(--ch-feature-card-bg);
+}
+
+.markdown-renderer td.yes {
+  color: red;
+}
+
+.chart {
+  padding: 48px 0 24px 0;
+}
+
+.chart svg {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+.chart svg text {
+  fill: var(--ch-text-color-1) !important;
+}
+
+.chart svg text[stroke] {
+  stroke: var(--ch-bg-color-card);
+}
+
+.chart-pc {
+  display: none;
+}
+
+.chart-mobile {
+  display: block;
+}

@@ -1,7 +1,3 @@
-@import "markstream-vue/index.css";
-@import "katex/dist/katex.min.css";
-@import "./render.node.css";
-
 html[data-theme="light"] {
   --ch-main-color: #f15a29;
   --ch-main-hover-color: #e23914;
@@ -11,6 +7,8 @@ html[data-theme="light"] {
   --ch-button-hover-bg: #dbdbe2;
   --ch-text-color-1: #3c3c43;
   --ch-text-color-2: #81858c;
+  --ch-text-color-3: #3c3c438f;
+  --ch-text-color-blank: #67676c;
   --ch-text-white-color: #ffffff;
   --ch-mask-active: rgba(0, 0, 0, 0.6);
   --ch-black-bg-white: #1b1b1f;
@@ -28,6 +26,19 @@ html[data-theme="light"] {
   --ch-border-divider-color: #e2e2e3;
   --ch-box-shadow-1: 0 12px 32px #0000001a, 0 2px 6px #00000014;
   --ch-box-shadow-2: 0 6px 30px 0 rgba(0, 0, 0, 0.08);
+  --ch-code-bg: #8e96aa24;
+  --ch-code-font-size: 0.875em;
+  --ch-code-color: #f47643;
+  --ch-code-line-diff-add: #10b98124;
+  --ch-code-line-diff-remove-left-icon: #b8272c;
+  --ch-code-line-diff-add-left-icon: #18794e;
+  --ch-checkbox-disabled-bg: #f3f4f6;
+  --ch-custom-block-info-bg: #8e96aa24;
+  --ch-custom-block-tip-bg: #ebfef7;
+  --ch-custom-block-important-bg: #f1ecfc;
+  --ch-custom-block-warning-bg: #eab30824;
+  --ch-custom-block-danger-bg: #f43f5e24;
+  --ch-custom-block-details-bg: var(--ch-custom-block-info-bg);
   --ch-height-header: 52px;
   --ch-scrollbar-thumb-color: #8b8b8b;
   --ch-scrollbar-thumb-hover-color: #636363;

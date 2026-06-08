@@ -1,7 +1,5 @@
 <template>
-    <div class="markdown-renderer" v-html="renderedHtml">
-
-    </div>
+    <div class="markdown-renderer" v-html="renderedHtml"></div>
 </template>
 
 <script setup lang="ts" name="MarkdownRenderer">
@@ -95,10 +93,10 @@ const addCustomContainer = (
     container.forEach((item) => {
         md.use(markdownitcontainer, item.name, {
             render: function (tokens: MarkdownItContainerTokenType[], idx: number) {
-                const m = tokens[idx].info.split(" ");
-                if (tokens[idx].nesting === 1) {
+                const m = tokens[idx]?.info.split(" ") || [];
+                if (tokens[idx]?.nesting === 1) {
                     return `<div class="custom-container custom-container-${item.name
-                        }"><div class="custom-container-title">${m.length > 2 ? md.utils.escapeHtml(m[2]) : item.title
+                        }"><div class="custom-container-title">${m.length > 2 ? md.utils.escapeHtml(m[2] || "") : item.title
                         }</div>\n`;
                 } else {
                     return "</div>\n";
@@ -144,6 +142,9 @@ const md = MarkdownItAsync("commonmark", {
         deep: true,
         titleRender: (tokens, idx) => {
             const token = tokens[idx];
+            if (!token) {
+                return "";
+            }
             const content = token.content.trim();
             return `<div class="markdown-alert-title">${alertTitleMap[content] || content
                 }</div>`;
@@ -205,9 +206,9 @@ addCustomContainer(md, [
 
 md.use(markdownitcontainer, "details", {
     render: function (tokens: MarkdownItContainerTokenType[], idx: number) {
-        const m = tokens[idx].info.split(" ");
-        if (tokens[idx].nesting === 1) {
-            return `<details class="custom-container custom-container-details"><summary class="custom-container-title">${m.length > 2 ? md.utils.escapeHtml(m[2]) : "详情"
+        const m = tokens[idx]?.info.split(" ") || [];
+        if (tokens[idx]?.nesting === 1) {
+            return `<details class="custom-container custom-container-details"><summary class="custom-container-title">${m.length > 2 ? md.utils.escapeHtml(m[2] || "") : "详情"
                 }</summary>\n`;
         } else {
             return "</details>\n";
@@ -239,6 +240,7 @@ function doRender(content: string) {
  * 节流渲染
  */
 function scheduleRender(newContent: string) {
+    console.log("scheduleRender", newContent);
     pendingContent = newContent;
     if (rafId !== null) return;
     rafId = requestAnimationFrame(() => {
@@ -249,7 +251,9 @@ function scheduleRender(newContent: string) {
         }
     });
 }
-watch(() => props.content, scheduleRender);
+watch(() => props.content, scheduleRender, { immediate: true });
 </script>
 
-<style scoped></style>
+<style>
+@import "../../assets/css/index.css";
+</style>
