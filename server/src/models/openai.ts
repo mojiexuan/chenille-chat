@@ -157,6 +157,8 @@ class OpenAiModel extends AiModel {
             result.message.content = content;
           }
           options.onChunk?.(result);
+          result.reasoning = void 0;
+          result.message.content = "";
 
           if (finishReason === "stop") {
             break;
