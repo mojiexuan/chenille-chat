@@ -16,3 +16,50 @@ declare module 'vue-cropper' {
     const VueCropper: VueCropperInstance
     export { VueCropper }
 }
+
+declare module "markdown-it-ins" {
+    const markdownItPlugin: MarkdownIt.PluginSimple;
+    export = markdownItPlugin;
+}
+
+declare module "markdown-it-mark" {
+    const markdownItPlugin: MarkdownIt.PluginSimple;
+    export = markdownItPlugin;
+}
+
+declare module "markdown-it-sub" {
+    const markdownItPlugin: MarkdownIt.PluginSimple;
+    export = markdownItPlugin;
+}
+
+declare module "markdown-it-sup" {
+    const markdownItPlugin: MarkdownIt.PluginSimple;
+    export = markdownItPlugin;
+}
+
+declare module "markdown-it-footnote" {
+    const markdownItPlugin: MarkdownIt.PluginSimple;
+    export = markdownItPlugin;
+}
+
+declare module "markdown-it-deflist" {
+    const markdownItPlugin: MarkdownIt.PluginSimple;
+    export = markdownItPlugin;
+}
+
+declare module "markdown-it-abbr" {
+    const markdownItPlugin: MarkdownIt.PluginSimple;
+    export = markdownItPlugin;
+}
+
+declare module "markdown-it-emoji" {
+    const markdownItPlugin = {
+        full: MarkdownIt.PluginSimple,
+    };
+    export = markdownItPlugin;
+}
+
+declare module "markdown-it-container" {
+    const markdownItPlugin: MarkdownIt.PluginSimple;
+    export = markdownItPlugin;
+}
