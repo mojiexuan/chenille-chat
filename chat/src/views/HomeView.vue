@@ -20,7 +20,7 @@
                         </svg>
                     </summary>
                     <div class="home-container-assistant-message-thinking-content">
-                        <MarkdownRender :custom-id="item.role + '-chat'" :content="item.reasoning"
+                        <!-- <MarkdownRender :custom-id="item.role + '-chat'" :content="item.reasoning"
                             :typewriter="item.isStreaming" :smooth-streaming="item.isStreaming"
                             :final="item.isStreaming" :max-live-nodes="item.isStreaming ? 320 : 0"
                             :fade="!item.isStreaming" mode="chat" :code-block-monaco-options="{
@@ -35,28 +35,14 @@
                                 showFontSizeButtons: false,
                                 showPreviewButton: false,
                             }" :custom-markdown-it="customMarkdownIt">
-                        </MarkdownRender>
+                        </MarkdownRender> -->
+                        <MarkdownRenderer :content="item.reasoning"></MarkdownRenderer>
                     </div>
                 </details>
                 <div v-if="item.role === 'user'" class="home-container-user-message-content">
                     {{ item.content }}
                 </div>
-                <MarkdownRender v-else custom-id="assistant-chat" :content="item.content" :typewriter="item.isStreaming"
-                    :smooth-streaming="item.isStreaming" :final="item.isStreaming"
-                    :max-live-nodes="item.isStreaming ? 320 : 0" :fade="!item.isStreaming" mode="chat"
-                    :code-block-monaco-options="{
-                        themes: ['vitesse-light'],
-                        theme: 'vitesse-light',
-                        MAX_HEIGHT: 640,
-                    }" :code-block-props="{
-                        stream: item.isStreaming,
-                        showTooltips: false,
-                        showExpandButton: false,
-                        showCollapseButton: false,
-                        showFontSizeButtons: false,
-                        showPreviewButton: false,
-                    }" :custom-markdown-it="customMarkdownIt">
-                </MarkdownRender>
+                <MarkdownRenderer v-else :content="item.content"></MarkdownRenderer>
                 <!-- 状态功能栏 -->
                 <div :class="[`home-container-${item.role}-status-bar`]"
                     v-if="!item.isStreaming && !sessionStore.isReplying">
@@ -208,10 +194,10 @@
 <script setup lang="ts" name="home">
 import { ref, computed, shallowRef } from 'vue';
 import { aiChatSse, getSessionTitleRequest } from '@/request';
-import MarkdownRender, { setDefaultI18nMap, type MarkdownIt } from 'markstream-vue';
 import { useSessionStore, useUserStore } from '@/stores';
 import { copyTextToClipboard } from '@/utils';
 import { useToast } from '@/composables';
+import MarkdownRenderer from '@/components/renderer/MarkdownRenderer.vue';
 
 // 提示框
 const toast = useToast();
@@ -227,28 +213,6 @@ const isSendButtonActive = computed(() => editorMessage.value.trim().length > 0)
 const abortController = shallowRef<AbortController | null>(null);
 
 /**
- * 设置默认的国际化映射
- */
-setDefaultI18nMap({
-    'common.copy': '复制',
-    'common.copied': '已复制',
-    'common.decrease': '减少',
-    'common.reset': '重置',
-    'common.increase': '增加',
-    'common.expand': '展开',
-    'common.collapse': '收起',
-    'common.preview': '预览',
-    'common.source': '源码',
-    'common.export': '导出',
-    'common.open': '打开',
-    'common.zoomIn': '放大',
-    'common.zoomOut': '缩小',
-    'common.resetZoom': '重置缩放',
-    'image.loadError': '图片加载失败',
-    'image.loading': '图片加载中...',
-});
-
-/**
  * 编辑器键盘事件处理
  */
 function handleEditorKeydown(e: KeyboardEvent) {
@@ -259,13 +223,6 @@ function handleEditorKeydown(e: KeyboardEvent) {
         e.preventDefault();
         sendClick();
     }
-}
-
-/**
- * 自定义Markdown-it插件
- */
-function customMarkdownIt(md: MarkdownIt) {
-    return md;
 }
 
 /**

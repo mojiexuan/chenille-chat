@@ -1,5 +1,5 @@
 <template>
-    <div class="markdown-renderer">
+    <div class="markdown-renderer" v-html="renderedHtml">
 
     </div>
 </template>
@@ -44,7 +44,7 @@ import { ruby as markdownitruby } from "@mdit/plugin-ruby";
 import { spoiler as markdownitspoiler } from "@mdit/plugin-spoiler";
 import { tasklist as markdownittasklist } from "@mdit/plugin-tasklist";
 import type { MarkdownItContainerTokenType } from "@/types";
-import { watch } from 'vue';
+import { watch, ref } from 'vue';
 
 /**
  * 定义组件属性
@@ -218,17 +218,38 @@ md.use(markdownitcontainer, "details", {
 // 禁止将电子邮件转换为链接
 md.linkify.set({ fuzzyEmail: false });
 
+const renderedHtml = ref("");
+let pendingContent: string | null = null;
+let rafId: number | null = null;
+
 /**
  * 渲染markdown内容
  */
-function render(newContent: string) {
-    md.renderAsync(newContent)
-        .then((html) => { })
+function doRender(content: string) {
+    md.renderAsync(content)
+        .then((html) => {
+            renderedHtml.value = html;
+        })
         .catch((err) => {
             console.error(err);
         })
 }
-watch(() => props.content, render);
+
+/**
+ * 节流渲染
+ */
+function scheduleRender(newContent: string) {
+    pendingContent = newContent;
+    if (rafId !== null) return;
+    rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (pendingContent !== null) {
+            doRender(pendingContent);
+            pendingContent = null;
+        }
+    });
+}
+watch(() => props.content, scheduleRender);
 </script>
 
 <style scoped></style>
