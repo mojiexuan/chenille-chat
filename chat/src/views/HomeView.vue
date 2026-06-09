@@ -5,7 +5,8 @@
             <section v-for="item in sessionStore.currentSession.messages" :key="item.id"
                 :class="`home-container-${item.role}-message`">
                 <details v-if="item.role === 'assistant' && item.reasoning && item.reasoning.length > 0"
-                    class="home-container-assistant-message-thinking">
+                    class="home-container-assistant-message-thinking"
+                    :open="item.reasoning.length > 0 && item.content.length === 0">
                     <summary class="home-container-assistant-message-thinking-summary">
                         <span>思考过程</span>
                         <svg class="home-container-assistant-message-thinking-summary-open" width="20" height="20"
@@ -339,6 +340,7 @@ function sendClick() {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    flex: 1;
 }
 
 .home-container {

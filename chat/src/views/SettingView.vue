@@ -120,7 +120,7 @@ onMounted(() => {
     padding: 0 16px;
     border-radius: 8px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
 }
 
 .setting-card-user {
