@@ -8,6 +8,7 @@ html[data-theme="light"] {
   --ch-text-color-1: #3c3c43;
   --ch-text-color-2: #81858c;
   --ch-text-color-3: #3c3c438f;
+  --ch-text-color-4: #470809;
   --ch-text-color-blank: #67676c;
   --ch-text-white-color: #ffffff;
   --ch-mask-active: rgba(0, 0, 0, 0.6);
@@ -20,6 +21,7 @@ html[data-theme="light"] {
   --ch-tip-prompt-hover-color: #00a081;
   --ch-tip-error-color: #fd6b6d;
   --ch-tip-error-hover-color: #f53e41;
+  --ch-tip-error-bg-color: #ffe1e1;
   --ch-tip-warning-color: #faad14;
   --ch-tip-warning-hover-color: #dd7f02;
   --ch-border-card-color: rgba(60, 60, 60, 0.12);

@@ -97,6 +97,7 @@ onMounted(() => {
 
 <style scoped>
 .setting {
+    width: 550px;
     max-width: 550px;
     margin: 0 auto;
     height: 100%;

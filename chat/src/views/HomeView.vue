@@ -6,7 +6,7 @@
                 :class="`home-container-${item.role}-message`">
                 <details v-if="item.role === 'assistant' && item.reasoning && item.reasoning.length > 0"
                     class="home-container-assistant-message-thinking"
-                    :open="item.reasoning.length > 0 && item.content.length === 0">
+                    :open="item.reasoning.length > 0 && item.content.length === 0 && item.isStreaming">
                     <summary class="home-container-assistant-message-thinking-summary">
                         <span>思考过程</span>
                         <svg class="home-container-assistant-message-thinking-summary-open" width="20" height="20"
@@ -44,6 +44,10 @@
                     {{ item.content }}
                 </div>
                 <MarkdownRenderer v-else :content="item.content"></MarkdownRenderer>
+                <!-- 错误消息 -->
+                <div class="home-container-error-message" v-if="item.error !== undefined">
+                    <span>{{ item.error }}</span>
+                </div>
                 <!-- 状态功能栏 -->
                 <div :class="[`home-container-${item.role}-status-bar`]"
                     v-if="!item.isStreaming && !sessionStore.isReplying">
@@ -270,6 +274,11 @@ function sendClick() {
         message,
         (msg) => {
             if (msg.error) {
+                if (assistant) {
+                    assistant.error = msg.error;
+                    assistant.isStreaming = false;
+                }
+                abortController.value?.abort(msg.error);
                 return;
             }
 
@@ -311,10 +320,11 @@ function sendClick() {
                             sessionStore.updateCurrentSessionTitle(title);
                         })
                 }
-                if (!assistant) {
-                    return;
+                if (assistant) {
+                    assistant.isStreaming = false;
                 }
-                assistant.isStreaming = false;
+                abortController.value?.abort();
+                return;
             }
         },
         () => {
@@ -322,12 +332,14 @@ function sendClick() {
             if (sessionStore.isReplying) {
                 sessionStore.isReplying = false;
             }
+            abortController.value?.abort();
         },
         () => {
             // 请求错误
             if (sessionStore.isReplying) {
                 sessionStore.isReplying = false;
             }
+            abortController.value?.abort();
         },
     );
 }
@@ -512,6 +524,16 @@ function sendClick() {
     border-left: 2.14286px solid var(--ch-line-color);
     padding-left: 12.85714px;
     margin-top: 12px;
+}
+
+.home-container-error-message {
+    width: 100%;
+    background-color: var(--ch-tip-error-bg-color);
+    color: var(--ch-text-color-4);
+    border: 1px solid var(--ch-tip-error-color);
+    border-radius: 5px;
+    padding: 8px 12px;
+    user-select: none;
 }
 
 .home-input-area {
