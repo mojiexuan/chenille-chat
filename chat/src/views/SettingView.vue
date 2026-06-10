@@ -38,6 +38,16 @@
                 </div>
             </div>
         </div>
+        <!-- 数据管理 -->
+        <div class="setting-block">
+            <h3>数据管理</h3>
+            <div class="setting-card">
+                <!-- 位置 -->
+                <div class="setting-card-item">
+                    <span class="setting-card-item-name">位置</span>
+                </div>
+            </div>
+        </div>
         <!-- 帮助与反馈 -->
         <div class="setting-block">
             <h3>帮助与反馈</h3>
