@@ -165,7 +165,7 @@
                     </div>
                 </div>
             </div>
-            <main class="default-layout-content-main">
+            <main ref="contentMainRef" class="default-layout-content-main">
                 <div class="default-layout-content-main-container">
                     <router-view></router-view>
                 </div>
@@ -196,7 +196,7 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, provide } from 'vue'
 import { useSessionStore, useUserStore } from '@/stores';
 import { useRouter, useRoute } from 'vue-router';
 import type { Model } from '@/types';
@@ -244,6 +244,26 @@ const sessionMenuTarget = ref<number | null>(null);
 
 // 模型列表
 const modelList = ref<Model[]>([]);
+
+// 内容区域滚动容器
+const contentMainRef = ref<HTMLElement>();
+
+// 提供滚动到内容区域底部的方法
+provide('scrollMainToBottom', scrollMainToBottom);
+
+/**
+ * 滚动到内容区域底部
+ * @param force 是否强制滚动
+ */
+function scrollMainToBottom(force: boolean = false) {
+    const el = contentMainRef.value;
+    if (!el) return;
+    const threshold = 80;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+    if (force || atBottom) {
+        el.scrollTop = el.scrollHeight;
+    }
+}
 
 /**
  * 点击返回按钮

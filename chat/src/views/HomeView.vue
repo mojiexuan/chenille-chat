@@ -197,7 +197,7 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { ref, computed, shallowRef } from 'vue';
+import { ref, computed, shallowRef, nextTick, inject } from 'vue';
 import { aiChatSse, getSessionTitleRequest } from '@/request';
 import { useSessionStore, useUserStore } from '@/stores';
 import { copyTextToClipboard } from '@/utils';
@@ -216,6 +216,8 @@ const editorMessage = ref('');
 const isSendButtonActive = computed(() => editorMessage.value.trim().length > 0);
 // 当前请求控制器
 const abortController = shallowRef<AbortController | null>(null);
+// 滚动到内容区域底部的方法
+const scrollMainToBottom = inject<(force?: boolean) => void>('scrollMainToBottom', () => { });
 
 /**
  * 编辑器键盘事件处理
@@ -293,6 +295,7 @@ function sendClick() {
                         assistant.reasoning = '';
                     }
                     assistant.reasoning += msg.reasoning;
+                    nextTick(() => scrollMainToBottom());
                 }
             }
 
@@ -300,6 +303,7 @@ function sendClick() {
             if (msg.content && msg.content.length > 0) {
                 if (assistant) {
                     assistant.content += msg.content;
+                    nextTick(() => scrollMainToBottom());
                 }
             }
 
