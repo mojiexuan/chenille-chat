@@ -44,7 +44,13 @@
             <div class="setting-card">
                 <!-- 位置 -->
                 <div class="setting-card-item">
-                    <span class="setting-card-item-name">位置</span>
+                    <div class="setting-card-item-left">
+                        <span class="setting-card-item-left-name">位置</span>
+                        <span class="setting-card-item-left-desc">启用后，位置信息可帮助 Chenille 提供更相关的信息，例如本地推荐、新闻和天气。</span>
+                    </div>
+                    <div class="setting-card-item-right">
+                        <ToggleComponent v-model="isLocationEnabled" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -54,11 +60,15 @@
             <div class="setting-card">
                 <!-- 意见反馈 -->
                 <a class="setting-card-item" href="https://txc.qq.com/products/800853" target="_blank">
-                    <span class="setting-card-item-name">意见反馈</span>
-                    <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 12L31 24L19 36" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
+                    <div class="setting-card-item-left">
+                        <span class="setting-card-item-left-name">意见反馈</span>
+                    </div>
+                    <div class="setting-card-item-right">
+                        <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12L31 24L19 36" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
                 </a>
             </div>
         </div>
@@ -70,8 +80,9 @@
 <script setup lang="ts" name="setting">
 import { useConfirm } from '@/composables';
 import { useUserStore } from '@/stores';
-import { onMounted } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import ToggleComponent from '@/components/toggle/ToggleComponent.vue';
 
 // 确认弹窗
 const confirm = useConfirm();
@@ -79,6 +90,13 @@ const confirm = useConfirm();
 const userStore = useUserStore();
 // 路由
 const router = useRouter();
+// 位置开关
+const isLocationEnabled = ref(userStore.user.settings?.isLocationEnabled || false);
+
+// 监听位置开关变化
+watch(isLocationEnabled, async (val) => {
+    await userStore.updateUserSettings({ isLocationEnabled: val });
+});
 
 /**
  * 用户资料点击事件
@@ -127,7 +145,6 @@ onMounted(() => {
 .setting-card {
     width: 100%;
     background-color: var(--ch-feature-card-bg);
-    min-height: 48px;
     padding: 0 16px;
     border-radius: 8px;
     display: flex;
@@ -140,10 +157,11 @@ onMounted(() => {
 
 .setting-card-item {
     width: 100%;
-    height: 100%;
+    min-height: 48px;
+    padding: 12px 0;
     display: flex;
     align-items: center;
-    cursor: pointer;
+    gap: 16px;
 }
 
 .setting-card-item-user {
@@ -209,8 +227,17 @@ onMounted(() => {
     font-size: 14px;
 }
 
-.setting-card-item-name {
+.setting-card-item-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     flex: 1;
+}
+
+.setting-card-item-left-desc {
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--ch-text-color-2);
 }
 
 .setting-button-item {

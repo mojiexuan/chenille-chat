@@ -2,7 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { userService } from "@/services";
-import { meUpdateUserInfoDto } from "@/dto";
+import { meUpdateUserInfoDto, meUserSettingsDto } from "@/dto";
 
 /**
  * 获取用户信息
@@ -79,4 +79,35 @@ export async function meUsageAiTokenHandle(request: FastifyRequest, reply: Fasti
   }
   const usage = await userService.getUserUsageAiToken(userId);
   return reply.success(usage, "用户使用AI Token");
+}
+
+/**
+ * 获取用户设置信息
+ */
+export async function meUserSettingsHandler(request: FastifyRequest, reply: FastifyReply) {
+  const userId = request.userId;
+  if (typeof userId !== "number") {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  const settings = await userService.getUserSetting(userId);
+  return reply.success(settings, "用户设置");
+}
+
+/**
+ * 更新用户设置
+ */
+export async function meUpdateUserSettingsHandler(request: FastifyRequest, reply: FastifyReply) {
+  const parsed = meUserSettingsDto.safeParse(request.body);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  const userId = request.userId;
+  if (typeof userId !== "number") {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  const settings = await userService.updateUserSettings(userId, parsed.data);
+  return reply.success(settings, "用户设置更新成功");
 }

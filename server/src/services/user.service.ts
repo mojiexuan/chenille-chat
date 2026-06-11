@@ -1,12 +1,12 @@
-import { db, users, loginLogs, aiTokenUsages } from "@/db";
+import { db, users, loginLogs, aiTokenUsages, userSettings } from "@/db";
 import { eq, desc, sum } from "drizzle-orm";
-import { userSafeInfo } from "@/vo";
+import { userSafeInfo, userSettingsInfo } from "@/vo";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { ossService } from "@/services";
 import { logger, formatNumber } from "@/utils";
 import type { MultipartFile } from "@fastify/multipart";
-import { MeUpdateUserInfoDto } from "@/dto";
+import { MeUpdateUserInfoDto, MeUserSettingsDto } from "@/dto";
 
 /**
  * 用户服务
@@ -104,6 +104,44 @@ class UserService {
       cachedTokens: formatNumber(cached),
       cacheHitRate: hitRate
     };
+  }
+
+  /**
+   * 获取用户设置信息
+   * @param userId 用户ID
+   * @returns 用户设置信息
+   */
+  async getUserSetting(userId: number) {
+    let [row] = await db
+      .select(userSettingsInfo)
+      .from(userSettings)
+      .where(eq(userSettings.userId, userId))
+      .limit(1);
+    if (!row) {
+      row = {
+        isLocationEnabled: false,
+      }
+    }
+    return row;
+  }
+
+  /**
+   * 更新用户设置
+   */
+  async updateUserSettings(userId: number, data: MeUserSettingsDto) {
+    const set: Record<string, unknown> = {};
+    if (data.isLocationEnabled !== undefined) {
+      set.isLocationEnabled = data.isLocationEnabled;
+    }
+    if (Object.keys(set).length === 0) {
+      return;
+    }
+    const [row] = await db
+      .insert(userSettings)
+      .values({ userId, ...set })
+      .onConflictDoUpdate({ target: userSettings.userId, set })
+      .returning();
+    return row;
   }
 }
 

@@ -8,6 +8,13 @@
       "when": 1780935016057,
       "tag": "0000_lucky_paibok",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781138011806,
+      "tag": "0001_woozy_greymalkin",
+      "breakpoints": true
     }
   ]
 }

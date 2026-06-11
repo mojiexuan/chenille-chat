@@ -1,4 +1,4 @@
-import type { User, UserUsageAiToken } from '@/types';
+import type { User, UserUsageAiToken, UserSettings } from '@/types';
 import { get, post, patch } from './fetch';
 
 /**
@@ -31,4 +31,18 @@ export const updateUserAvatarRequest = (file: File) => {
  */
 export const userUsageAiTokenRequest = () => {
     return get<UserUsageAiToken>("/user/me/ai/token");
+}
+
+/**
+ * 获取用户设置
+ */
+export const userSettingsRequest = () => {
+    return get<UserSettings>("/user/me/settings");
+}
+
+/**
+ * 更新用户设置
+ */
+export const updateUserSettingsRequest = (data: Partial<UserSettings>) => {
+    return patch<UserSettings>("/user/me/settings", data);
 }

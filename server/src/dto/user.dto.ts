@@ -10,3 +10,12 @@ export const meUpdateUserInfoDto = z.object({
 });
 
 export type MeUpdateUserInfoDto = z.infer<typeof meUpdateUserInfoDto>;
+
+/**
+ * 更新用户设置DTO
+ */
+export const meUserSettingsDto = z.object({
+  isLocationEnabled: z.boolean().optional(),
+});
+
+export type MeUserSettingsDto = z.infer<typeof meUserSettingsDto>;

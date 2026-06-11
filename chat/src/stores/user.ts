@@ -1,4 +1,4 @@
-import type { User } from '@/types'
+import type { User, UserSettings } from '@/types'
 
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
@@ -6,7 +6,7 @@ import { defineStore } from 'pinia'
 import router from '@/router'
 import { TOKEN_KEY } from '@/config'
 import { useAuth, useToast } from '@/composables'
-import { phoneLoginRequest, userInfoRequest, userUsageAiTokenRequest } from '@/request'
+import { phoneLoginRequest, userInfoRequest, userUsageAiTokenRequest, userSettingsRequest, updateUserSettingsRequest } from '@/request'
 import defaultAvatar from '@/assets/images/avatar.png'
 
 /**
@@ -19,6 +19,9 @@ export const useUserStore = defineStore('user', () => {
         nickname: '未登录',
         avatar: defaultAvatar,
         token: localStorage.getItem(TOKEN_KEY),
+        settings: {
+            isLocationEnabled: false,
+        },
     })
 
     /**
@@ -67,25 +70,32 @@ export const useUserStore = defineStore('user', () => {
      * @date 2026-01-22
      */
     async function refreshUserInfo(): Promise<void> {
-        const data = await userInfoRequest()
-        if (data.username) {
-            user.value.username = data.username
-        }
-        if (data.avatar) {
-            user.value.avatar = data.avatar
-        }
-        if (data.nickname) {
-            user.value.nickname = data.nickname
-        }
-        if (data.email) {
-            user.value.email = data.email
-        }
-        if (data.phone) {
-            user.value.phone = data.phone
-        }
-        if (data.gender) {
-            user.value.gender = data.gender
-        }
+        Promise.all([
+            userInfoRequest(),
+            userSettingsRequest()
+        ]).then(([me, meSettings]) => {
+            if (me.username) {
+                user.value.username = me.username
+            }
+            if (me.avatar) {
+                user.value.avatar = me.avatar
+            }
+            if (me.nickname) {
+                user.value.nickname = me.nickname
+            }
+            if (me.email) {
+                user.value.email = me.email
+            }
+            if (me.phone) {
+                user.value.phone = me.phone
+            }
+            if (me.gender) {
+                user.value.gender = me.gender
+            }
+            if (meSettings) {
+                user.value.settings = meSettings
+            }
+        });
     }
 
     /**
@@ -120,6 +130,18 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    /**
+     * 更新用户设置
+     * @author 陈佳宝
+     * @date 2026-01-22
+     */
+    async function updateUserSettings(data: Partial<UserSettings>): Promise<void> {
+        const settings = await updateUserSettingsRequest(data)
+        if (settings) {
+            user.value.settings = settings
+        }
+    }
+
     return {
         user,
         isLogin,
@@ -128,5 +150,6 @@ export const useUserStore = defineStore('user', () => {
         refreshUserInfo,
         logout,
         getUserUsageAiToken,
+        updateUserSettings,
     }
 })

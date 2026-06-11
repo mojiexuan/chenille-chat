@@ -10,6 +10,7 @@ export interface User {
     gender?: string;
     token?: string | null;
     usageToken?: UserUsageAiToken;
+    settings?: UserSettings;
 }
 
 /**
@@ -19,4 +20,11 @@ export interface UserUsageAiToken {
     totalTokens: number;
     cachedTokens: number;
     cacheHitRate: number;
+}
+
+/**
+ * 用户设置
+ */
+export interface UserSettings {
+    isLocationEnabled: boolean;
 }
