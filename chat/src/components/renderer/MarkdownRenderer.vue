@@ -42,7 +42,7 @@ import { ruby as markdownitruby } from "@mdit/plugin-ruby";
 import { spoiler as markdownitspoiler } from "@mdit/plugin-spoiler";
 import { tasklist as markdownittasklist } from "@mdit/plugin-tasklist";
 import type { MarkdownItContainerTokenType } from "@/types";
-import { watch, ref } from 'vue';
+import { watch, ref, nextTick } from 'vue';
 
 /**
  * 定义组件属性
@@ -219,6 +219,11 @@ md.use(markdownitcontainer, "details", {
 // 禁止将电子邮件转换为链接
 md.linkify.set({ fuzzyEmail: false });
 
+// 定义事件
+const emit = defineEmits<{
+    rendered: [];
+}>();
+
 const renderedHtml = ref("");
 let pendingContent: string | null = null;
 let rafId: number | null = null;
@@ -230,6 +235,7 @@ function doRender(content: string) {
     md.renderAsync(content)
         .then((html) => {
             renderedHtml.value = html;
+            nextTick(() => emit('rendered'));
         })
         .catch((err) => {
             console.error(err);

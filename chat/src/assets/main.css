@@ -80,6 +80,7 @@ a:active {
   word-break: break-all;
   background: none;
   outline: none;
+  -webkit-user-drag: none;
 }
 
 img {

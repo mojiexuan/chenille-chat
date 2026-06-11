@@ -1,5 +1,9 @@
 /// <reference types="vite/client" />
 
+interface Window {
+    showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle>;
+}
+
 declare module 'vue-cropper' {
     export interface VueCropperInstance {
         getCropBlob(callback: (blob: Blob) => void): void

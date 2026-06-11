@@ -162,33 +162,52 @@
         </div>
         <div class="home-input-area">
             <div class="home-input-area-box">
-                <div class="home-input-area-box-editor-wrapper" :data-message="editorMessage">
-                    <textarea class="home-input-area-box-editor" v-model="editorMessage"
-                        placeholder="聊点什么？shift+enter换行" spellcheck="false" autocomplete="off" autocapitalize="off"
-                        enterkeyhint="send" @keydown="handleEditorKeydown"></textarea>
+                <div class="home-input-area-box-editor">
+                    <div class="home-input-area-box-editor-wrapper" :data-message="editorMessage">
+                        <textarea class="home-input-area-box-editor-wrapper-textarea" v-model="editorMessage"
+                            placeholder="聊点什么？shift+enter换行" spellcheck="false" autocomplete="off" autocapitalize="off"
+                            enterkeyhint="send" @keydown="handleEditorKeydown"></textarea>
+                    </div>
+                    <!-- 功能区域 -->
+                    <div class="home-input-area-box-editor-end">
+                        <div class="home-input-area-box-editor-end-left"></div>
+                        <div class="home-input-area-box-editor-end-right">
+                            <!-- 发送暂停按钮 -->
+                            <a class="home-input-area-box-editor-end-right-send-button"
+                                :class="{ 'active': isSendButtonActive }" @click="sendClick">
+                                <svg v-if="sessionStore.isReplying" width="20" height="20" viewBox="0 0 48 48"
+                                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M34 12H14C12.8954 12 12 12.8954 12 14V34C12 35.1046 12.8954 36 14 36H34C35.1046 36 36 35.1046 36 34V14C36 12.8954 35.1046 12 34 12Z"
+                                        fill="#ffffff" stroke="#ffffff" stroke-width="4" />
+                                </svg>
+                                <svg v-else width="20" height="20" viewBox="0 0 48 48" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M24.0083 12.1006V36.0001" stroke="#ffffff" stroke-width="4"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M12 24L24 12L36 24" stroke="#ffffff" stroke-width="4"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <!-- 功能区域 -->
-                <div class="home-input-area-box-editor-end">
-                    <div class="home-input-area-box-editor-end-left"></div>
-                    <div class="home-input-area-box-editor-end-right">
-                        <!-- 发送暂停按钮 -->
-                        <a class="home-input-area-box-editor-end-right-send-button"
-                            :class="{ 'active': isSendButtonActive }" @click="sendClick">
-                            <svg v-if="sessionStore.isReplying" width="20" height="20" viewBox="0 0 48 48" fill="none"
+                <!-- 工作区操作 -->
+                <div v-if="isSupportDirectoryPicker" class="home-input-area-box-work">
+                    <div class="home-input-area-box-work-left">
+                        <div class="home-input-area-box-work-left-item">
+                            <svg width="18" height="18" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
-                                    d="M34 12H14C12.8954 12 12 12.8954 12 14V34C12 35.1046 12.8954 36 14 36H34C35.1046 36 36 35.1046 36 34V14C36 12.8954 35.1046 12 34 12Z"
-                                    fill="#ffffff" stroke="#ffffff" stroke-width="4" />
+                                    d="M5 8C5 6.89543 5.89543 6 7 6H19L24 12H41C42.1046 12 43 12.8954 43 14V40C43 41.1046 42.1046 42 41 42H7C5.89543 42 5 41.1046 5 40V8Z"
+                                    fill="none" stroke="#3c3c43" stroke-width="4" stroke-linejoin="round" />
+                                <path d="M18 27H30" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
+                                <path d="M24 21L24 33" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
                             </svg>
-                            <svg v-else width="20" height="20" viewBox="0 0 48 48" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path d="M24.0083 12.1006V36.0001" stroke="#ffffff" stroke-width="4"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M12 24L24 12L36 24" stroke="#ffffff" stroke-width="4" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </svg>
-                        </a>
+                            <span>选择文件夹</span>
+                        </div>
                     </div>
+                    <div class="home-input-area-box-work-right"></div>
                 </div>
             </div>
             <div class="home-input-area-tip">内容由AI生成，请仔细甄别</div>
@@ -218,6 +237,8 @@ const isSendButtonActive = computed(() => editorMessage.value.trim().length > 0)
 const abortController = shallowRef<AbortController | null>(null);
 // 滚动到内容区域底部的方法
 const scrollMainToBottom = inject<(force?: boolean) => void>('scrollMainToBottom', () => { });
+// 是否支持文件夹选择
+const isSupportDirectoryPicker = ref(window.showDirectoryPicker !== void 0);
 
 /**
  * 编辑器键盘事件处理
@@ -477,6 +498,8 @@ function sendClick() {
     border-radius: 12px 2px 12px 12px;
     font-size: 16px;
     padding: 8px 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .home-container-assistant-message {
@@ -555,13 +578,21 @@ function sendClick() {
 .home-input-area-box {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    background-color: var(--ch-feature-card-bg);
+    border-radius: 10px;
+}
+
+.home-input-area-box-editor {
+    display: flex;
+    flex-direction: column;
     gap: 12px;
     width: 100%;
     background-color: var(--ch-bg-color-card);
-    box-shadow: var(--ch-box-shadow-2);
     border-radius: 10px;
     border: 1px solid var(--ch-border-card-color);
     padding: 16px 16px 10px 16px;
+    box-shadow: var(--ch-box-shadow-2);
 }
 
 .home-input-area-box-editor-wrapper {
@@ -580,12 +611,12 @@ function sendClick() {
 }
 
 .home-input-area-box-editor-wrapper::after,
-.home-input-area-box-editor {
+.home-input-area-box-editor-wrapper-textarea {
     font-size: 14px;
     line-height: 22px;
 }
 
-.home-input-area-box-editor {
+.home-input-area-box-editor-wrapper-textarea {
     grid-area: 1 / 1;
     width: 100%;
     max-height: 132px;
@@ -632,6 +663,34 @@ function sendClick() {
 .home-input-area-box-editor-end-right-send-button.active {
     opacity: 1;
     cursor: pointer;
+}
+
+.home-input-area-box-work {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+}
+
+.home-input-area-box-work-left {
+    display: flex;
+    align-items: center;
+}
+
+.home-input-area-box-work-left-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 4px 8px;
+    user-select: none;
+    cursor: pointer;
+}
+
+.home-input-area-box-work-left-item:hover {
+    background: var(--ch-feature-card-hover-bg);
 }
 
 .home-input-area-tip {
