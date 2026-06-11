@@ -8,6 +8,7 @@ import { TOKEN_KEY } from '@/config'
 import { useAuth, useToast } from '@/composables'
 import { phoneLoginRequest, userInfoRequest, userUsageAiTokenRequest, userSettingsRequest, updateUserSettingsRequest } from '@/request'
 import defaultAvatar from '@/assets/images/avatar.png'
+import { useModelStore } from './model'
 
 /**
  * 用户store
@@ -70,10 +71,13 @@ export const useUserStore = defineStore('user', () => {
      * @date 2026-01-22
      */
     async function refreshUserInfo(): Promise<void> {
+        // 模型store
+        const modelStore = useModelStore()
         Promise.all([
             userInfoRequest(),
-            userSettingsRequest()
-        ]).then(([me, meSettings]) => {
+            userSettingsRequest(),
+            modelStore.refreshModelList(),
+        ]).then(([me, meSettings, _]) => {
             if (me.username) {
                 user.value.username = me.username
             }

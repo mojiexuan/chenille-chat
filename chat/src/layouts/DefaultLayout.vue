@@ -199,8 +199,6 @@
 import { computed, ref, onMounted, provide } from 'vue'
 import { useSessionStore, useUserStore } from '@/stores';
 import { useRouter, useRoute } from 'vue-router';
-import type { Model } from '@/types';
-import { getModelListRequest } from '@/request';
 import ContextMenu from '@/components/menu/ContextMenu.vue';
 import { useConfirm } from '@/composables';
 
@@ -241,9 +239,6 @@ const sessionMenuAnchor = ref({ x: 0, y: 0 });
 
 // 会话右键菜单目标会话ID
 const sessionMenuTarget = ref<number | null>(null);
-
-// 模型列表
-const modelList = ref<Model[]>([]);
 
 // 内容区域滚动容器
 const contentMainRef = ref<HTMLElement>();
@@ -350,10 +345,7 @@ function handleDeleteSession() {
 
 onMounted(() => {
     if (userStore.isLogin) {
-        Promise.all([sessionStore.getSessions(), getModelListRequest()])
-            .then((res) => {
-                modelList.value = res[1];
-            })
+        sessionStore.getSessions()
     }
 })
 </script>

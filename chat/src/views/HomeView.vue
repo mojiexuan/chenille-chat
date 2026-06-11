@@ -172,6 +172,8 @@
                     <div class="home-input-area-box-editor-end">
                         <div class="home-input-area-box-editor-end-left"></div>
                         <div class="home-input-area-box-editor-end-right">
+                            <!-- 模型选择 -->
+                            <div class="home-input-area-box-editor-end-right-model-select"></div>
                             <!-- 发送暂停按钮 -->
                             <a class="home-input-area-box-editor-end-right-send-button"
                                 :class="{ 'active': isSendButtonActive }" @click="sendClick">

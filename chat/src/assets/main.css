@@ -42,8 +42,6 @@ html[data-theme="light"] {
   --ch-custom-block-danger-bg: #f43f5e24;
   --ch-custom-block-details-bg: var(--ch-custom-block-info-bg);
   --ch-height-header: 52px;
-  --ch-scrollbar-thumb-color: #8b8b8b;
-  --ch-scrollbar-thumb-hover-color: #636363;
 }
 
 *,
@@ -134,7 +132,7 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--ch-scrollbar-thumb-color);
+  background: var(--ch-feature-card-bg);
   background-clip: padding-box;
   border: 3px solid transparent;
   border-radius: 10px;
@@ -142,7 +140,7 @@ select {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--ch-scrollbar-thumb-hover-color);
+  background: var(--ch-feature-card-hover-bg);
   background-clip: padding-box;
   border: 3px solid transparent;
 }

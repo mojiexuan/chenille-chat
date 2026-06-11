@@ -36,23 +36,3 @@ export interface ChatSseMessage {
   /** 错误信息 */
   error?: string;
 }
-
-/**
- * 模型
- */
-export interface Model {
-  id: number;
-  providerId: number;
-  name: string;
-  description: string;
-  canThinking: boolean;
-  canInputImage: boolean;
-  canOutputImage: boolean;
-  canInputVideo: boolean;
-  canOutputVideo: boolean;
-  canInputAudio: boolean;
-  canOutputAudio: boolean;
-  isActive: boolean;
-  isDefault: boolean;
-  sortOrder: number;
-}
