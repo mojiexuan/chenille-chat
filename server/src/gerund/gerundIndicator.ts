@@ -112,7 +112,7 @@ export async function generateGerundIndicator(content: string) {
     },
   );
   const indicator: string[] =
-    parseWithSchema<{ indicator: string[] }>(
+    parseWithSchema(
       indicatorSchema(),
       result.message.content,
     )?.indicator || [];

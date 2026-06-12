@@ -43,9 +43,9 @@ async function seedAgents() {
       description: "聊天时，若未传入模型Id，默认使用该模型Id",
     },
     {
-      name: "加载指示器",
-      key: AgentKey.GenerateLoadingIndicator,
-      description: "根据会话内容生成加载指示器，主要是个小创意",
+      name: "动词指示器",
+      key: AgentKey.GenerateGerundIndicator,
+      description: "根据会话内容生成动词指示器，主要是个小创意",
     },
   ];
 

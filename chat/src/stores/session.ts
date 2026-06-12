@@ -35,6 +35,8 @@ export const useSessionStore = defineStore("session", () => {
     const currentSessionWorkSpace = ref<string | null>(null);
     // 当前会话工作空间状态
     const isCurrentSessionWorkSpaceStatus = ref<"none" | "ready" | "error">("none");
+    // 加载指示器
+    const gerundIndicator = ref(["加载中", "处理中", "工作中"]);
 
     /**
      * 获取会话列表
@@ -172,6 +174,7 @@ export const useSessionStore = defineStore("session", () => {
         isReplying,
         currentSessionWorkSpace,
         isCurrentSessionWorkSpaceStatus,
+        gerundIndicator,
         getSessions,
         updateCurrentSessionId,
         updateCurrentSessionTitle,

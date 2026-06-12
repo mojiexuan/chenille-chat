@@ -1,52 +1,22 @@
 <template>
   <div class="home">
-    <div
-      class="home-container"
-      :class="{ 'home-container-empty': sessionStore.currentSession.messages.length === 0 }"
-    >
-      <section
-        v-for="item in sessionStore.currentSession.messages"
-        :key="item.id"
-        :class="`home-container-${item.role}-message`"
-      >
-        <details
-          v-if="item.role === 'assistant' && item.reasoning && item.reasoning.length > 0"
+    <div class="home-container" :class="{ 'home-container-empty': sessionStore.currentSession.messages.length === 0 }">
+      <section v-for="item in sessionStore.currentSession.messages" :key="item.id"
+        :class="`home-container-${item.role}-message`">
+        <details v-if="item.role === 'assistant' && item.reasoning && item.reasoning.length > 0"
           class="home-container-assistant-message-thinking"
-          :open="item.reasoning.length > 0 && item.content.length === 0 && item.isStreaming"
-        >
+          :open="item.reasoning.length > 0 && item.content.length === 0 && item.isStreaming">
           <summary class="home-container-assistant-message-thinking-summary">
             <span>思考过程</span>
-            <svg
-              class="home-container-assistant-message-thinking-summary-open"
-              width="20"
-              height="20"
-              viewBox="0 0 48 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M13 30L25 18L37 30"
-                stroke="#3c3c43"
-                stroke-width="4"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+            <svg class="home-container-assistant-message-thinking-summary-open" width="20" height="20"
+              viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13 30L25 18L37 30" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
-            <svg
-              class="home-container-assistant-message-thinking-summary-close"
-              width="20"
-              height="20"
-              viewBox="0 0 48 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M36 18L24 30L12 18"
-                stroke="#3c3c43"
-                stroke-width="4"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+            <svg class="home-container-assistant-message-thinking-summary-close" width="20" height="20"
+              viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M36 18L24 30L12 18" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </summary>
           <div class="home-container-assistant-message-thinking-content">
@@ -78,285 +48,119 @@
           <span>{{ item.error }}</span>
         </div>
         <!-- 状态功能栏 -->
-        <div
-          :class="[`home-container-${item.role}-status-bar`]"
-          v-if="!item.isStreaming && !sessionStore.isReplying"
-        >
+        <div :class="[`home-container-${item.role}-status-bar`]" v-if="!item.isStreaming && !sessionStore.isReplying">
           <!-- 复制 -->
-          <svg
-            class="home-container-status-bar-button"
-            width="20"
-            height="20"
-            viewBox="0 0 48 48"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            @click="handleCopyTextClick(item.content)"
-          >
+          <svg class="home-container-status-bar-button" width="20" height="20" viewBox="0 0 48 48" fill="none"
+            xmlns="http://www.w3.org/2000/svg" @click="handleCopyTextClick(item.content)">
             <path
               d="M13 12.4316V7.8125C13 6.2592 14.2592 5 15.8125 5H40.1875C41.7408 5 43 6.2592 43 7.8125V32.1875C43 33.7408 41.7408 35 40.1875 35H35.5163"
-              stroke="#81858c"
-              stroke-width="4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
+              stroke="#81858c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
             <path
               d="M32.1875 13H7.8125C6.2592 13 5 14.2592 5 15.8125V40.1875C5 41.7408 6.2592 43 7.8125 43H32.1875C33.7408 43 35 41.7408 35 40.1875V15.8125C35 14.2592 33.7408 13 32.1875 13Z"
-              fill="none"
-              stroke="#81858c"
-              stroke-width="4"
-              stroke-linejoin="round"
-            />
+              fill="none" stroke="#81858c" stroke-width="4" stroke-linejoin="round" />
           </svg>
           <!-- 分享 -->
-          <svg
-            v-if="item.role === 'assistant'"
-            class="home-container-status-bar-button"
-            width="20"
-            height="20"
-            viewBox="0 0 48 48"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M26 4L44 22L26 39V28C12 28 6 43 6 43C6 26 11 15 26 15V4Z"
-              fill="none"
-              stroke="#3c3c43"
-              stroke-width="4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
+          <svg v-if="item.role === 'assistant'" class="home-container-status-bar-button" width="20" height="20"
+            viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M26 4L44 22L26 39V28C12 28 6 43 6 43C6 26 11 15 26 15V4Z" fill="none" stroke="#3c3c43"
+              stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           <!-- 重新生成 -->
-          <svg
-            v-if="item.role === 'assistant'"
-            class="home-container-status-bar-button"
-            width="20"
-            height="20"
-            viewBox="0 0 48 48"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg v-if="item.role === 'assistant'" class="home-container-status-bar-button" width="20" height="20"
+            viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M36.7279 36.7279C33.4706 39.9853 28.9706 42 24 42C14.0589 42 6 33.9411 6 24C6 14.0589 14.0589 6 24 6C28.9706 6 33.4706 8.01472 36.7279 11.2721C38.3859 12.9301 42 17 42 17"
-              stroke="#3c3c43"
-              stroke-width="4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M42 8V17H33"
-              stroke="#3c3c43"
-              stroke-width="4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
+              stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M42 8V17H33" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           <!-- token数据 -->
           <div v-if="item.role === 'assistant'" class="home-container-status-bar-token">
             <!-- 提示词token -->
-            <div
-              v-if="item.promptTokens && item.promptTokens > 0"
-              class="home-container-status-bar-token-item"
-              data-tooltip="提示词token"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+            <div v-if="item.promptTokens && item.promptTokens > 0" class="home-container-status-bar-token-item"
+              data-tooltip="提示词token">
+              <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M40 20C40 26.8077 35.7484 32.6224 29.7555 34.9336H24H18.2445C12.2516 32.6224 8 26.8077 8 20C8 11.1634 15.1634 4 24 4C32.8366 4 40 11.1634 40 20Z"
-                  fill="none"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+                  fill="none" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
                 <path
                   d="M29.7557 34.9336L29.0766 43.0831C29.0334 43.6014 28.6001 44 28.08 44H19.9203C19.4002 44 18.9669 43.6014 18.9238 43.0831L18.2446 34.9336"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M18 17V23L24 20L30 23V17"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+                  stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M18 17V23L24 20L30 23V17" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
               <span>{{ item.promptTokens }}</span>
             </div>
             <!-- 回答token -->
-            <div
-              v-if="item.completionTokens && item.completionTokens > 0"
-              class="home-container-status-bar-token-item"
-              data-tooltip="回答token"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M25.5 36H21L11 41V36H4V6H44V17"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M12 14H15L18 14"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M12 20H18L24 20"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M29 30L35 35L44 24"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+            <div v-if="item.completionTokens && item.completionTokens > 0" class="home-container-status-bar-token-item"
+              data-tooltip="回答token">
+              <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M25.5 36H21L11 41V36H4V6H44V17" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <path d="M12 14H15L18 14" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <path d="M12 20H18L24 20" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <path d="M29 30L35 35L44 24" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
               <span>{{ item.completionTokens }}</span>
             </div>
             <!-- 总token -->
-            <div
-              v-if="item.totalTokens && item.totalTokens > 0"
-              class="home-container-status-bar-token-item"
-              data-tooltip="总token"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M14 24L15.25 25.25M44 14L24 34L22.75 32.75"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M4 24L14 34L34 14"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+            <div v-if="item.totalTokens && item.totalTokens > 0" class="home-container-status-bar-token-item"
+              data-tooltip="总token">
+              <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 24L15.25 25.25M44 14L24 34L22.75 32.75" stroke="#3c3c43" stroke-width="4"
+                  stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M4 24L14 34L34 14" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
               <span>{{ item.totalTokens }}</span>
             </div>
             <!-- 缓存命中token -->
-            <div
-              v-if="item.cachedTokens && item.cachedTokens > 0"
-              class="home-container-status-bar-token-item"
-              data-tooltip="缓存命中token"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+            <div v-if="item.cachedTokens && item.cachedTokens > 0" class="home-container-status-bar-token-item"
+              data-tooltip="缓存命中token">
+              <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M44 31C44 36.5228 39.5228 41 34 41C32.2091 41 30.5281 40.5292 29.0741 39.7046C26.5143 38.2529 24.6579 35.7046 24.1436 32.6983C24.0492 32.1463 24 31.5789 24 31C24 28.4323 24.9678 26.0906 26.5585 24.3198C28.3892 22.2818 31.0449 21 34 21C39.5228 21 44 25.4772 44 31Z"
-                  fill="none"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+                  fill="none" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
                 <path
                   d="M34 12V20V21C31.0449 21 28.3892 22.2818 26.5585 24.3198C24.9678 26.0906 24 28.4323 24 31C24 31.5789 24.0492 32.1463 24.1436 32.6983C24.6579 35.7046 26.5143 38.2529 29.0741 39.7046C26.4116 40.5096 22.8776 41 19 41C10.7157 41 4 38.7614 4 36V28V20V12"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+                  stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
                 <path
                   d="M34 12C34 14.7614 27.2843 17 19 17C10.7157 17 4 14.7614 4 12C4 9.23858 10.7157 7 19 7C27.2843 7 34 9.23858 34 12Z"
-                  fill="none"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M4 28C4 30.7614 10.7157 33 19 33C20.807 33 22.5393 32.8935 24.1436 32.6983"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M4 20C4 22.7614 10.7157 25 19 25C21.7563 25 24.339 24.7522 26.5585 24.3198"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M34 26L31 30L37 32L34 36"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+                  fill="none" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M4 28C4 30.7614 10.7157 33 19 33C20.807 33 22.5393 32.8935 24.1436 32.6983" stroke="#3c3c43"
+                  stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M4 20C4 22.7614 10.7157 25 19 25C21.7563 25 24.339 24.7522 26.5585 24.3198" stroke="#3c3c43"
+                  stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M34 26L31 30L37 32L34 36" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
               <span>{{ item.cachedTokens }}</span>
             </div>
           </div>
         </div>
       </section>
-      <img
-        v-if="sessionStore.isReplying"
-        class="home-container-replying"
-        src="../assets/images/replying.svg"
-        alt="思考中"
-      />
+      <!-- 等待动画 -->
+      <div v-if="sessionStore.isReplying" class="home-container-replying">
+        <img class="home-container-replying-image" src="../assets/images/replying.svg" alt="思考中" />
+        <RotatingText :texts="sessionStore.gerundIndicator" animate-presence-mode="wait" :rotation-interval="3000"
+          :stagger-duration="0.025" />
+      </div>
       <!-- 错误提示 -->
       <div class="home-container-error"></div>
       <!-- 打招呼 -->
       <div class="home-container-hi" v-if="sessionStore.currentSession.messages.length === 0">
-        <span class="home-container-hi-say"
-          >你好，{{ userStore.user.nickname || "你在忙什么？" }}</span
-        >
+        <span class="home-container-hi-say">你好，{{ userStore.user.nickname || "你在忙什么？" }}</span>
       </div>
     </div>
     <div class="home-input-area">
       <div class="home-input-area-box">
         <div class="home-input-area-box-editor">
           <div class="home-input-area-box-editor-wrapper" :data-message="editorMessage">
-            <textarea
-              class="home-input-area-box-editor-wrapper-textarea"
-              v-model="editorMessage"
-              placeholder="聊点什么？shift+enter换行"
-              spellcheck="false"
-              autocomplete="off"
-              autocapitalize="off"
-              enterkeyhint="send"
-              @keydown="handleEditorKeydown"
-            ></textarea>
+            <textarea class="home-input-area-box-editor-wrapper-textarea" v-model="editorMessage"
+              placeholder="聊点什么？shift+enter换行" spellcheck="false" autocomplete="off" autocapitalize="off"
+              enterkeyhint="send" @keydown="handleEditorKeydown"></textarea>
           </div>
           <!-- 功能区域 -->
           <div class="home-input-area-box-editor-end">
@@ -365,48 +169,19 @@
               <!-- 模型选择 -->
               <div class="home-input-area-box-editor-end-right-model-select"></div>
               <!-- 发送暂停按钮 -->
-              <a
-                class="home-input-area-box-editor-end-right-send-button"
-                :class="{ active: isSendButtonActive }"
-                @click="sendClick"
-              >
-                <svg
-                  v-if="sessionStore.isReplying"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 48 48"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+              <a class="home-input-area-box-editor-end-right-send-button" :class="{ active: isSendButtonActive }"
+                @click="sendClick">
+                <svg v-if="sessionStore.isReplying" width="20" height="20" viewBox="0 0 48 48" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
                   <path
                     d="M34 12H14C12.8954 12 12 12.8954 12 14V34C12 35.1046 12.8954 36 14 36H34C35.1046 36 36 35.1046 36 34V14C36 12.8954 35.1046 12 34 12Z"
-                    fill="#ffffff"
-                    stroke="#ffffff"
-                    stroke-width="4"
-                  />
+                    fill="#ffffff" stroke="#ffffff" stroke-width="4" />
                 </svg>
-                <svg
-                  v-else
-                  width="20"
-                  height="20"
-                  viewBox="0 0 48 48"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M24.0083 12.1006V36.0001"
-                    stroke="#ffffff"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    d="M12 24L24 12L36 24"
-                    stroke="#ffffff"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
+                <svg v-else width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24.0083 12.1006V36.0001" stroke="#ffffff" stroke-width="4" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                  <path d="M12 24L24 12L36 24" stroke="#ffffff" stroke-width="4" stroke-linecap="round"
+                    stroke-linejoin="round" />
                 </svg>
               </a>
             </div>
@@ -417,78 +192,33 @@
           <div class="home-input-area-box-work-left">
             <div class="home-input-area-box-work-left-item" @click="selectDirectoryClick">
               <!-- 选择文件夹图标 -->
-              <svg
-                v-if="sessionStore.isCurrentSessionWorkSpaceStatus === 'none'"
-                width="18"
-                height="18"
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg v-if="sessionStore.isCurrentSessionWorkSpaceStatus === 'none'" width="18" height="18"
+                viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M5 8C5 6.89543 5.89543 6 7 6H19L24 12H41C42.1046 12 43 12.8954 43 14V40C43 41.1046 42.1046 42 41 42H7C5.89543 42 5 41.1046 5 40V8Z"
-                  fill="none"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linejoin="round"
-                />
+                  fill="none" stroke="#3c3c43" stroke-width="4" stroke-linejoin="round" />
                 <path d="M18 27H30" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
                 <path d="M24 21L24 33" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
               </svg>
               <!-- 文件夹异常 -->
-              <svg
-                v-if="sessionStore.isCurrentSessionWorkSpaceStatus === 'error'"
-                width="20"
-                height="20"
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg v-if="sessionStore.isCurrentSessionWorkSpaceStatus === 'error'" width="20" height="20"
+                viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M43 23V14C43 12.8954 42.1046 12 41 12H24L19 6H7C5.89543 6 5 6.89543 5 8V40C5 41.1046 5.89543 42 7 42H22"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M30 30L40 40"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M40 30L30 40"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+                  stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M30 30L40 40" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <path d="M40 30L30 40" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
               <!-- 文件夹准备好 -->
-              <svg
-                v-if="sessionStore.isCurrentSessionWorkSpaceStatus === 'ready'"
-                width="18"
-                height="18"
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg v-if="sessionStore.isCurrentSessionWorkSpaceStatus === 'ready'" width="18" height="18"
+                viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M43 23V14C43 12.8954 42.1046 12 41 12H24L19 6H7C5.89543 6 5 6.89543 5 8V40C5 41.1046 5.89543 42 7 42H22"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M29 38L34 42L43 31"
-                  stroke="#3c3c43"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+                  stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M29 38L34 42L43 31" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
               <span>{{ sessionStore.currentSessionWorkSpace || "选择文件夹" }}</span>
             </div>
@@ -508,6 +238,7 @@ import { useSessionStore, useUserStore } from "@/stores";
 import { copyTextToClipboard } from "@/utils";
 import { useToast } from "@/composables";
 import MarkdownRenderer from "@/components/renderer/MarkdownRenderer.vue";
+import RotatingText from "@/component/RotatingText/RotatingText.vue";
 
 // 提示框
 const toast = useToast();
@@ -522,7 +253,7 @@ const isSendButtonActive = computed(() => editorMessage.value.trim().length > 0)
 // 当前请求控制器
 const abortController = shallowRef<AbortController | null>(null);
 // 滚动到内容区域底部的方法
-const scrollMainToBottom = inject<(force?: boolean) => void>("scrollMainToBottom", () => {});
+const scrollMainToBottom = inject<(force?: boolean) => void>("scrollMainToBottom", () => { });
 // 是否支持文件夹选择
 const isSupportDirectoryPicker = ref(window.showDirectoryPicker !== void 0);
 
@@ -579,11 +310,12 @@ function sendClick() {
 
   // 获取动词指示器
   getGerundIndicator(message).then((res) => {
-    if (assistant) {
-      assistant.gerundIndicator = res.join("、");
+    if (res && res.length > 0) {
+      sessionStore.gerundIndicator
     }
   });
 
+  // 发起请求
   abortController.value = aiChatSse(
     sessionStore.currentSession.id,
     message,
@@ -710,6 +442,12 @@ function selectDirectoryClick() {
 }
 
 .home-container-replying {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-container-replying-image {
   width: 20px;
   height: 20px;
 }
@@ -837,8 +575,7 @@ function selectDirectoryClick() {
   display: flex;
 }
 
-.home-container-assistant-message-thinking[open]
-  .home-container-assistant-message-thinking-summary-close {
+.home-container-assistant-message-thinking[open] .home-container-assistant-message-thinking-summary-close {
   display: none;
 }
 
@@ -846,8 +583,7 @@ function selectDirectoryClick() {
   display: none;
 }
 
-.home-container-assistant-message-thinking[open]
-  .home-container-assistant-message-thinking-summary-open {
+.home-container-assistant-message-thinking[open] .home-container-assistant-message-thinking-summary-open {
   display: flex;
 }
 
