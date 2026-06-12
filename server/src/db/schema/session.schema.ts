@@ -10,6 +10,7 @@ export const sessions = pgTable("c_sessions", {
     parentId: integer("parent_id")
         .references((): any => sessions.id, { onDelete: "set null" }),
     title: varchar("title", { length: 255 }),
+    workSpace: varchar("work_space", { length: 550 }), // 工作空间
     createdDate: date("created_date").default(sql`CURRENT_DATE`).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")

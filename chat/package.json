@@ -25,6 +25,7 @@
     "@mdit/plugin-spoiler": "^0.23.2",
     "@mdit/plugin-tasklist": "^0.23.2",
     "@shikijs/transformers": "^4.2.0",
+    "idb-keyval": "^6.2.5",
     "katex": "^0.17.0",
     "markdown-it-abbr": "^2.0.0",
     "markdown-it-anchor": "^9.2.0",

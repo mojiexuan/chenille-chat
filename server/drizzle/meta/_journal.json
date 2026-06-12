@@ -15,6 +15,13 @@
       "when": 1781138011806,
       "tag": "0001_woozy_greymalkin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781222363746,
+      "tag": "0002_wise_sunspot",
+      "breakpoints": true
     }
   ]
 }

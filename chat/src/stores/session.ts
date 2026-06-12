@@ -31,6 +31,10 @@ export const useSessionStore = defineStore("session", () => {
     });
     // 缓存命中率
     const currentSessionCacheHitRate = computed(() => currentSessionTotalTokens.value > 0 ? Math.round((currentSessionCachedTokens.value / currentSessionTotalTokens.value) * 100) : 0)
+    // 当前会话工作空间
+    const currentSessionWorkSpace = ref<string | null>(null);
+    // 当前会话工作空间状态
+    const isCurrentSessionWorkSpaceStatus = ref<"none" | "ready" | "error">("none");
 
     /**
      * 获取会话列表
@@ -150,6 +154,15 @@ export const useSessionStore = defineStore("session", () => {
         sessions.value = sessions.value.filter((item) => item.id !== sessionId);
     }
 
+    /**
+     * 更新当前会话工作空间
+     * @author 陈佳宝
+     * @date 2026-05-31
+     */
+    function updateCurrentSessionWorkSpace(workSpace: string | null): void {
+        currentSessionWorkSpace.value = workSpace;
+    }
+
     return {
         sessions,
         currentSession,
@@ -157,6 +170,8 @@ export const useSessionStore = defineStore("session", () => {
         currentSessionCachedTokens,
         currentSessionCacheHitRate,
         isReplying,
+        currentSessionWorkSpace,
+        isCurrentSessionWorkSpaceStatus,
         getSessions,
         updateCurrentSessionId,
         updateCurrentSessionTitle,
@@ -165,5 +180,6 @@ export const useSessionStore = defineStore("session", () => {
         getMessageInCurrentSession,
         switchCurrentSession,
         deleteSession,
+        updateCurrentSessionWorkSpace,
     };
 });
