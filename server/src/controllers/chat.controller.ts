@@ -1,50 +1,59 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
-import { chatSseDto } from "@/dto";
+import { chatSseDto, chatGerundIndicatorDto } from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode, SseEventName } from "@/enumeration";
 import { aiService } from "@/services";
 import type { SseEventChunk } from "@/types";
+import { generateGerundIndicator } from "@/gerund";
 
 /**
  * 聊天控制器
  * @param request 请求
  * @param reply 响应
  */
-export async function chatSseHandler(request: FastifyRequest, reply: FastifyReply) {
-    const parsed = chatSseDto.safeParse(request.body);
-    if (!parsed.success) {
-        throw new BizException(BizCode.PARAM_INVALID, parsed.error.issues[0]?.message);
-    }
+export async function chatSseHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const parsed = chatSseDto.safeParse(request.body);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
 
-    reply.raw.writeHead(200, {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-    });
+  reply.raw.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+  });
 
-    let aborted = false;
-    request.raw.on("close", () => {
-        aborted = true;
-    });
+  let aborted = false;
+  request.raw.on("close", () => {
+    aborted = true;
+  });
 
-    await aiService.chat({
-        data: parsed.data, userId: request.userId!, callback: {
-            onAbort: (abort) => {
-                request.raw.on("close", abort)
-            },
-            onMessage: (message) => {
-                if (aborted) {
-                    return;
-                }
-                sseSend(reply, {
-                    event: SseEventName.AI_CHAT_MESSAGE,
-                    data: message,
-                });
-            }
+  await aiService.chat({
+    data: parsed.data,
+    userId: request.userId!,
+    callback: {
+      onAbort: (abort) => {
+        request.raw.on("close", abort);
+      },
+      onMessage: (message) => {
+        if (aborted) {
+          return;
         }
-    });
+        sseSend(reply, {
+          event: SseEventName.AI_CHAT_MESSAGE,
+          data: message,
+        });
+      },
+    },
+  });
 
-    reply.raw.end();
+  reply.raw.end();
 }
 
 /**
@@ -53,5 +62,25 @@ export async function chatSseHandler(request: FastifyRequest, reply: FastifyRepl
  * @param data 事件数据
  */
 function sseSend(reply: FastifyReply, data: SseEventChunk) {
-    reply.raw.write(`event: ${data.event}\ndata: ${JSON.stringify(data.data)}\n\n`);
+  reply.raw.write(
+    `event: ${data.event}\ndata: ${JSON.stringify(data.data)}\n\n`,
+  );
+}
+
+/**
+ * 获取动词指示器
+ */
+export async function chatGerundIndicatorHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const parsed = chatGerundIndicatorDto.safeParse(request.body);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  const gerundIndicator = await generateGerundIndicator(parsed.data.content);
+  return reply.success(gerundIndicator, "获取动词指示器成功");
 }

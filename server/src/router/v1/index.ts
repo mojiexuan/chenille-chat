@@ -9,6 +9,7 @@ import {
   meUserSettingsHandler,
   meUpdateUserSettingsHandler,
   chatSseHandler,
+  chatGerundIndicatorHandler,
   getSessionListHandler,
   getSessionTitleHandler,
   getSessionHandler,
@@ -37,11 +38,9 @@ export async function v1Router(fastify: FastifyInstance) {
       scope.get("/user/me/settings", meUserSettingsHandler);
       scope.patch("/user/me/settings", meUpdateUserSettingsHandler);
       scope.post("/chat/sse", chatSseHandler);
+      scope.post("/chat/gerund", chatGerundIndicatorHandler);
       scope.get("/chat/session/list", getSessionListHandler);
-      scope.get(
-        "/chat/session/:sessionId/title",
-        getSessionTitleHandler,
-      );
+      scope.get("/chat/session/:sessionId/title", getSessionTitleHandler);
       scope.delete("/chat/session/:sessionId", deleteSessionHandler);
       scope.get("/chat/session/:sessionId", getSessionHandler);
       scope.get("/chat/model/list", getModelListHandler);
@@ -49,8 +48,14 @@ export async function v1Router(fastify: FastifyInstance) {
     // 管理员用户
     authScope.register(async (adminScope) => {
       adminScope.addHook("preHandler", requireRole(UserRole.Admin));
-      adminScope.get("/admin/chat/model/provider/list", getModelProviderListHandler);
-      adminScope.get("/admin/chat/model/:providerId/list", getModelListByProviderIdHandler);
+      adminScope.get(
+        "/admin/chat/model/provider/list",
+        getModelProviderListHandler,
+      );
+      adminScope.get(
+        "/admin/chat/model/:providerId/list",
+        getModelListByProviderIdHandler,
+      );
       adminScope.get("/admin/agent/list", getAgentListHandler);
     });
   });
