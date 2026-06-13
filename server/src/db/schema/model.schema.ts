@@ -25,6 +25,8 @@ export const models = pgTable("c_models", {
     .$type<ReasoningEffort>()
     .notNull()
     .default(ReasoningEffort.High), // 思考努力："high"
+  canInputText: boolean("canInputText").default(true).notNull(), // 是否支持输入文本
+  canOutputText: boolean("canOutputText").default(true).notNull(), // 是否支持输出文本
   canInputImage: boolean("canInputImage").default(false).notNull(), // 是否支持输入图片
   canOutputImage: boolean("canOutputImage").default(false).notNull(), // 是否支持输出图片
   canInputVideo: boolean("canInputVideo").default(false).notNull(), // 是否支持输入视频
