@@ -255,7 +255,9 @@ const abortController = shallowRef<AbortController | null>(null);
 // 滚动到内容区域底部的方法
 const scrollMainToBottom = inject<(force?: boolean) => void>("scrollMainToBottom", () => { });
 // 是否支持文件夹选择
-const isSupportDirectoryPicker = ref(window.showDirectoryPicker !== void 0);
+// const isSupportDirectoryPicker = ref(window.showDirectoryPicker !== void 0);
+// !TODO: 临时关闭文件夹选择功能
+const isSupportDirectoryPicker = ref(false);
 
 /**
  * 编辑器键盘事件处理
