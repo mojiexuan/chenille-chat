@@ -1,7 +1,9 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import type { MessageStreaming, SessionItem, Session } from "@/types";
-import { getSessionList, getSessionRequest, deleteSessionRequest } from "@/request";
+import { getSessionList, getSessionRequest, deleteSessionRequest, updateSessionRequest } from "@/request";
+import { getValidDirectoryHandle, saveDirectoryHandle } from "@/utils";
+import { IndexedKeyEnum } from "@/enumeration";
 
 /**
  * 会话store
@@ -32,11 +34,68 @@ export const useSessionStore = defineStore("session", () => {
     // 缓存命中率
     const currentSessionCacheHitRate = computed(() => currentSessionTotalTokens.value > 0 ? Math.round((currentSessionCachedTokens.value / currentSessionTotalTokens.value) * 100) : 0)
     // 当前会话工作空间
-    const currentSessionWorkSpace = ref<string | null>(null);
+    const currentSessionWorkSpace = ref<FileSystemDirectoryHandle | null>(null);
     // 当前会话工作空间状态
     const isCurrentSessionWorkSpaceStatus = ref<"none" | "ready" | "error">("none");
     // 加载指示器
     const gerundIndicator = ref(["加载中", "处理中", "工作中"]);
+
+    /**
+     * 查询当前会话工作空间
+     * @author 陈佳宝
+     * @date 2026-05-31
+     */
+    async function queryCurrentSessionWorkSpace() {
+        if (currentSession.value.id === void 0) {
+            currentSessionWorkSpace.value = null;
+            isCurrentSessionWorkSpaceStatus.value = "none";
+            return;
+        }
+
+        try {
+            const handle = await getValidDirectoryHandle(IndexedKeyEnum.WORK_SPACE + currentSession.value.id);
+            if (handle && handle.kind === "directory") {
+                currentSessionWorkSpace.value = handle;
+                isCurrentSessionWorkSpaceStatus.value = "ready";
+                if (currentSession.value.workSpace !== handle.name) {
+                    currentSession.value.workSpace = handle.name;
+                    updateSessionRequest(currentSession.value.id!, { workSpace: handle.name });
+                }
+            } else {
+                currentSessionWorkSpace.value = null;
+                if (currentSession.value.workSpace) {
+                    isCurrentSessionWorkSpaceStatus.value = "error";
+                } else {
+                    isCurrentSessionWorkSpaceStatus.value = "none";
+                }
+            }
+        } catch {
+            currentSessionWorkSpace.value = null;
+            if (currentSession.value.workSpace) {
+                isCurrentSessionWorkSpaceStatus.value = "error";
+            } else {
+                isCurrentSessionWorkSpaceStatus.value = "none";
+            }
+        }
+    }
+
+    /**
+     * 设置当前会话工作空间
+     * @author 陈佳宝
+     * @date 2026-05-31
+     */
+    async function setCurrentSessionWorkSpace(handle: FileSystemDirectoryHandle) {
+        currentSessionWorkSpace.value = handle;
+        isCurrentSessionWorkSpaceStatus.value = "ready";
+        await saveDirectoryHandle(IndexedKeyEnum.WORK_SPACE + currentSession.value.id, handle);
+        if (currentSession.value.workSpace !== handle.name) {
+            currentSession.value.workSpace = handle.name;
+            // 更新会话工作空间
+            if (currentSession.value.id !== void 0) {
+                updateSessionRequest(currentSession.value.id!, { workSpace: handle.name });
+            }
+        }
+    }
 
     /**
      * 获取会话列表
@@ -97,6 +156,10 @@ export const useSessionStore = defineStore("session", () => {
             title: "新会话",
             messages: [],
         };
+        isReplying.value = false;
+        currentSessionWorkSpace.value = null;
+        isCurrentSessionWorkSpaceStatus.value = "none";
+        gerundIndicator.value = ["加载中", "处理中", "工作中"];
     }
 
     /**
@@ -127,8 +190,9 @@ export const useSessionStore = defineStore("session", () => {
         if (currentSession.value.id === sessionId) {
             return;
         }
-        getSessionRequest(sessionId)
-            .then((res) => {
+        currentSession.value.id = sessionId;
+        Promise.all([getSessionRequest(sessionId), queryCurrentSessionWorkSpace()])
+            .then(([res, _]) => {
                 currentSession.value = {
                     id: res.id,
                     title: res.title,
@@ -138,6 +202,9 @@ export const useSessionStore = defineStore("session", () => {
                     })),
                 }
             })
+            .catch(() => {
+                resetCurrentSession();
+            });
     }
 
     /**
@@ -154,15 +221,6 @@ export const useSessionStore = defineStore("session", () => {
         }
         // 删除会话列表中的会话
         sessions.value = sessions.value.filter((item) => item.id !== sessionId);
-    }
-
-    /**
-     * 更新当前会话工作空间
-     * @author 陈佳宝
-     * @date 2026-05-31
-     */
-    function updateCurrentSessionWorkSpace(workSpace: string | null): void {
-        currentSessionWorkSpace.value = workSpace;
     }
 
     return {
@@ -183,6 +241,7 @@ export const useSessionStore = defineStore("session", () => {
         getMessageInCurrentSession,
         switchCurrentSession,
         deleteSession,
-        updateCurrentSessionWorkSpace,
+        queryCurrentSessionWorkSpace,
+        setCurrentSessionWorkSpace,
     };
 });

@@ -38,6 +38,15 @@ class AiService {
       params.userId,
     );
 
+    // 更新会话工作空间
+    if (params.data.workSpace && session.workSpace !== params.data.workSpace) {
+      session.workSpace = params.data.workSpace;
+      await sessionService.updateSession(
+        params.userId,
+        session.id,
+        { workSpace: params.data.workSpace });
+    }
+
     // 添加用户消息到会话
     await sessionService.addMessage(
       params.userId,

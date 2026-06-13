@@ -220,7 +220,7 @@
                 <path d="M29 38L34 42L43 31" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
                   stroke-linejoin="round" />
               </svg>
-              <span>{{ sessionStore.currentSessionWorkSpace || "选择文件夹" }}</span>
+              <span>{{ sessionStore.currentSessionWorkSpace?.name || "选择文件夹" }}</span>
             </div>
           </div>
           <div class="home-input-area-box-work-right"></div>
@@ -235,7 +235,7 @@
 import { ref, computed, shallowRef, nextTick, inject } from "vue";
 import { aiChatSse, getSessionTitleRequest, getGerundIndicator } from "@/request";
 import { useSessionStore, useUserStore } from "@/stores";
-import { copyTextToClipboard } from "@/utils";
+import { copyTextToClipboard, pickDirectory } from "@/utils";
 import { useToast } from "@/composables";
 import MarkdownRenderer from "@/components/renderer/MarkdownRenderer.vue";
 import RotatingText from "@/component/RotatingText/RotatingText.vue";
@@ -318,7 +318,10 @@ function sendClick() {
   // 发起请求
   abortController.value = aiChatSse(
     sessionStore.currentSession.id,
-    message,
+    {
+      message,
+      ...(sessionStore.isCurrentSessionWorkSpaceStatus === "ready" ? { workSpace: sessionStore.currentSession.workSpace } : {}),
+    },
     (msg) => {
       if (msg.error) {
         if (assistant) {
@@ -396,16 +399,12 @@ function sendClick() {
  * 选择目录
  */
 function selectDirectoryClick() {
-  if (!window.showDirectoryPicker) {
-    toast.error("当前浏览器不支持该功能");
-    return;
-  }
-  window.showDirectoryPicker().then((dir) => {
-    if (dir && dir.name) {
-      sessionStore.updateCurrentSessionWorkSpace(dir.name);
-      sessionStore.isCurrentSessionWorkSpaceStatus = "ready";
-    }
-  });
+  pickDirectory()
+    .then((handle) => {
+      if (handle) {
+        sessionStore.setCurrentSessionWorkSpace(handle);
+      }
+    })
 }
 </script>
 

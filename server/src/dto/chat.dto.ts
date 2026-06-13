@@ -5,6 +5,7 @@ export const chatSseDto = z.object({
   sessionId: z.coerce.number().optional(),
   // provider: z.enum(["openai", "google", "anthropic"]).optional(),
   modelId: z.coerce.number().optional(),
+  workSpace: z.string().min(1, "工作空间不能为空").max(500, "工作空间最多500个字符").optional(),
 });
 
 export type ChatSseDto = z.infer<typeof chatSseDto>;

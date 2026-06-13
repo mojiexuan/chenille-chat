@@ -3,6 +3,7 @@ import {
   paginationRequestDto,
   sessionTitleRequestDto,
   sessionRequestDto,
+  updateSessionRequestDto,
 } from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
@@ -118,4 +119,31 @@ export async function deleteSessionHandler(request: FastifyRequest, reply: Fasti
   }
   await sessionService.deleteSession(parsed.data.sessionId, userId);
   return reply.success(null, "删除会话成功");
+}
+
+/**
+ * 更新会话工作空间和标题
+ */
+export async function updateSessionHandler(request: FastifyRequest, reply: FastifyReply,) {
+  const params = sessionRequestDto.safeParse(request.params);
+  if (!params.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      params.error.issues[0]?.message,
+    );
+  }
+  const parsed = updateSessionRequestDto.safeParse(request.body);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  // 从请求中获取用户 ID
+  const userId = request.userId;
+  if (typeof userId !== "number") {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  await sessionService.updateSession(userId, params.data.sessionId, parsed.data);
+  return reply.success(null, "更新会话成功");
 }

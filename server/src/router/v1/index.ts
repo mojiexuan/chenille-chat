@@ -18,6 +18,7 @@ import {
   getModelListByProviderIdHandler,
   getAgentListHandler,
   deleteSessionHandler,
+  updateSessionHandler,
 } from "@/controllers";
 import { verifyJwt, requireRole } from "@/plugins";
 import { UserRole } from "@/enumeration";
@@ -41,6 +42,7 @@ export async function v1Router(fastify: FastifyInstance) {
       scope.post("/chat/gerund", chatGerundIndicatorHandler);
       scope.get("/chat/session/list", getSessionListHandler);
       scope.get("/chat/session/:sessionId/title", getSessionTitleHandler);
+      scope.patch("/chat/session/:sessionId", updateSessionHandler);
       scope.delete("/chat/session/:sessionId", deleteSessionHandler);
       scope.get("/chat/session/:sessionId", getSessionHandler);
       scope.get("/chat/model/list", getModelListHandler);

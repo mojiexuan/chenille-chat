@@ -12,6 +12,7 @@ import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { generateSessionTitle } from "@/session";
 import { logger } from "@/utils";
+import { UpdateSessionRequestDto } from "@/dto";
 
 /**
  * 会话服务
@@ -178,6 +179,26 @@ class SessionService {
    */
   async updateSessionTitle(sessionId: number, title: string) {
     await db.update(sessions).set({ title }).where(eq(sessions.id, sessionId));
+  }
+
+  /**
+   * 更新会话工作空间和标题
+   */
+  async updateSession(userId: number, sessionId: number, updateSessionRequest: UpdateSessionRequestDto) {
+    const set: Record<string, unknown> = {};
+    if (updateSessionRequest.workSpace) {
+      set.workSpace = updateSessionRequest.workSpace;
+    }
+    if (updateSessionRequest.title) {
+      set.title = updateSessionRequest.title;
+    }
+    if (Object.keys(set).length === 0) {
+      return;
+    }
+    await db.update(sessions)
+      .set(set)
+      .where(and(eq(sessions.id, sessionId), eq(sessions.userId, userId)));
+    return set;
   }
 
   /**

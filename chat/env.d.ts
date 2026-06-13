@@ -1,8 +1,5 @@
 /// <reference types="vite/client" />
-
-interface Window {
-    showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle>;
-}
+/// <reference types="wicg-file-system-access" />
 
 declare module 'vue-cropper' {
     export interface VueCropperInstance {

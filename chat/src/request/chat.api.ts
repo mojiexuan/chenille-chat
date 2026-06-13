@@ -20,13 +20,13 @@ export const getSessionList = (params: PaginationRequest) => {
  */
 export const aiChatSse = (
   sessionId: number | undefined,
-  message: string,
+  params: Omit<AiChatParams, "sessionId">,
   onMessage: (msg: ChatSseMessage) => void,
   onComplete?: () => void,
   onError?: (error: Error) => void,
 ) => {
   return sse<ChatSseMessage, AiChatParams>("/chat/sse", {
-    params: { message, ...{ sessionId } },
+    params: { ...params, ...{ sessionId } },
     onMessage: (event) => {
       if (event.event === SseEventName.AI_CHAT_MESSAGE) {
         onMessage(event.data as ChatSseMessage);

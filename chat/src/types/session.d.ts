@@ -4,6 +4,7 @@
 export interface SessionItem {
     id: number;
     title: string;
+    workSpace?: string;
 }
 
 /**
