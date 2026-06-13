@@ -5,3 +5,4 @@ export * from './session';
 export * from './pagination';
 export * from './markdown';
 export * from './model';
+export * from './file';
