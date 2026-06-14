@@ -4,7 +4,7 @@
 export interface AiChatParams {
   message: string;
   sessionId?: number;
-  model?: string;
+  modelId?: number;
   workSpace?: string;
 }
 

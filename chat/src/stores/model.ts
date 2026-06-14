@@ -1,7 +1,9 @@
 import type { Model } from '@/types'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { getModelListRequest } from '@/request'
+import { get, set, del } from 'idb-keyval'
+import { IndexedKeyEnum } from '@/enumeration'
 
 /**
  * 用户store
@@ -29,6 +31,24 @@ export const useModelStore = defineStore('model', () => {
     ]);
 
     /**
+     * 当前选中的模型
+     */
+    const currentModel = computed(() => {
+        return models.value.find((item) => item.isDefault) || models.value[0];
+    })
+
+    /**
+     * 切换模型
+     * @param modelId 模型id
+     */
+    function switchModel(modelId: number) {
+        models.value.forEach((item) => {
+            item.isDefault = item.id === modelId;
+        });
+        set(IndexedKeyEnum.USER_SELECTED_MODEL, modelId);
+    }
+
+    /**
      * 刷新 AI 模型列表
      */
     function refreshModelList() {
@@ -50,11 +70,24 @@ export const useModelStore = defineStore('model', () => {
                     isDefault: true,
                     sortOrder: 0,
                 }, ...res];
+                get(IndexedKeyEnum.USER_SELECTED_MODEL)
+                    .then((data) => {
+                        let selectedModelId = Number(data || 0) || 0;
+                        if (selectedModelId < 0) {
+                            selectedModelId = 0;
+                        }
+                        switchModel(selectedModelId);
+                    })
+                    .catch(() => {
+                        switchModel(0);
+                    })
             })
     }
 
     return {
         models,
+        currentModel,
+        switchModel,
         refreshModelList,
     }
 })

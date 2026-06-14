@@ -53,7 +53,7 @@ class AgentService {
    * 获取Ai 聊天默认模型的智能体
    */
   async getAiChatDefaultModelAgent(modelId?: number) {
-    if (modelId) {
+    if (modelId && modelId > 0) {
       const [result] = await db
         .select({
           model: models,
