@@ -261,17 +261,7 @@
       <div class="home-input-area-tip">内容由AI生成，请仔细甄别</div>
     </div>
     <!-- AI语音通话 -->
-    <Transition name="voice-call">
-      <div v-if="showVoiceCall" class="home-voice-call">
-        <button class="home-voice-call-button-close" @click="closeVoiceCallClick">
-          <svg width="16" height="16" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 8L40 40" stroke="#1b1b1f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M8 40L40 8" stroke="#1b1b1f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-        <Orb :state="voiceCallState" :volume="volume" theme="bars" :size="240" />
-      </div>
-    </Transition>
+    <VoiceCall :show="showVoiceCall" @update:show="closeVoiceCallClick" />
   </div>
 </template>
 
@@ -283,8 +273,7 @@ import { copyTextToClipboard, pickDirectory } from "@/utils";
 import { useToast } from "@/composables";
 import MarkdownRenderer from "@/components/renderer/MarkdownRenderer.vue";
 import RotatingText from "@/component/RotatingText/RotatingText.vue";
-import { Orb, useAudioVolume } from 'orb-ui';
-import type { OrbState } from 'orb-ui';
+import VoiceCall from "@/components/home/VoiceCall.vue";
 
 // 提示框
 const toast = useToast();
@@ -306,10 +295,6 @@ const scrollMainToBottom = inject<(force?: boolean) => void>("scrollMainToBottom
 const isSupportDirectoryPicker = ref(false);
 // 是否显示语音通话
 const showVoiceCall = ref(false);
-// 语音通话状态
-const voiceCallState = ref<OrbState>('listening');
-// 语音通话音量
-const { volume, startMic, stop } = useAudioVolume()
 
 /**
  * 编辑器键盘事件处理
@@ -827,39 +812,5 @@ function closeVoiceCallClick() {
   padding: 6px 0;
   font-size: 11px;
   line-height: 16px;
-}
-
-.voice-call-enter-active,
-.voice-call-leave-active {
-  transition: transform 0.3s ease;
-}
-
-.voice-call-enter-from,
-.voice-call-leave-to {
-  transform: translateY(100%);
-}
-
-.home-voice-call {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: var(--ch-bg-color-card);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.home-voice-call-button-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
 }
 </style>
