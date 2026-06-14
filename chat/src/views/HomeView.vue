@@ -166,7 +166,8 @@
           <div class="home-input-area-box-editor-end">
             <!-- 左侧 -->
             <div class="home-input-area-box-editor-end-left">
-              <div class="home-input-area-box-editor-end-left-button">
+              <!-- 文件选择 -->
+              <div class="home-input-area-box-editor-end-left-button" @click="fileSelectClick">
                 <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M24.0605 10L24.0239 38" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
                     stroke-linejoin="round" />
@@ -300,6 +301,7 @@ import MarkdownRenderer from "@/components/renderer/MarkdownRenderer.vue";
 import RotatingText from "@/component/RotatingText/RotatingText.vue";
 import VoiceCall from "@/components/home/VoiceCall.vue";
 import ContextMenu from '@/components/menu/ContextMenu.vue';
+import { AI_CHAT_ACCEPTED_FILE_TYPES } from "@/constants";
 
 // 提示框
 const toast = useToast();
@@ -477,6 +479,22 @@ function selectDirectoryClick() {
         sessionStore.setCurrentSessionWorkSpace(handle);
       }
     })
+}
+
+/**
+ * 文件选择
+ */
+function fileSelectClick() {
+  const input =
+    document.createElement("input");
+  input.type = "file";
+  input.accept = AI_CHAT_ACCEPTED_FILE_TYPES.join(",");
+  input.multiple = true;
+  input.onchange = () => {
+    const files =
+      Array.from(input.files ?? []);
+  }
+  input.click();
 }
 
 /**

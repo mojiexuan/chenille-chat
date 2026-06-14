@@ -15,3 +15,4 @@ export type * from "./chat.type";
 export type * from "./sse.type";
 export type * from "./pagination.type";
 export type * from "./ip.type";
+export type * from "./document.type";
