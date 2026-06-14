@@ -47,6 +47,11 @@ async function seedAgents() {
       key: AgentKey.GenerateGerundIndicator,
       description: "根据会话内容生成动词指示器，主要是个小创意",
     },
+    {
+      name: "语音识别",
+      key: AgentKey.AsrRecognition,
+      description: "将音频转换为文本",
+    },
   ];
 
   for (const item of seedData) {

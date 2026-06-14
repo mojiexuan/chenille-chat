@@ -8,4 +8,6 @@ export enum AgentKey {
   AiChatDefaultModel = "ai:chat:default:model",
   // 动名词指示器
   GenerateGerundIndicator = "generate:gerund:indicator",
+  // 语音识别
+  AsrRecognition = "asr:recognition",
 }

@@ -9,7 +9,9 @@
 
     // Path mapping for cleaner imports.
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "orb-ui": ["./packages/orb-ui/index.ts"],
+      "orb-ui/adapters": ["./packages/orb-ui/adapters/index.ts"]
     },
 
     // `vue-tsc --build` produces a .tsbuildinfo file for incremental type-checking.

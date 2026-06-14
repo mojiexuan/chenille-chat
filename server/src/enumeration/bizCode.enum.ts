@@ -4,7 +4,7 @@ export class BizCode {
     readonly code: number,
     readonly httpStatus: number,
     readonly message: string,
-  ) {}
+  ) { }
 
   static readonly SUCCESS = new BizCode(20000, 200, "成功");
   static readonly FAIL = new BizCode(50000, 500, "请求失败");
@@ -46,4 +46,6 @@ export class BizCode {
   static readonly FILE_DELETE_FAIL = new BizCode(40042, 500, "文件删除失败");
   static readonly FILE_DOWNLOAD_FAIL = new BizCode(40043, 500, "文件下载失败");
   static readonly USER_UPDATE_FAIL = new BizCode(40051, 500, "用户更新失败");
+  static readonly ASR_AGENT_NOT_CONFIGURED = new BizCode(40060, 500, "语音识别代理未配置");
+  static readonly ASR_ERROR = new BizCode(40061, 500, "语音识别失败");
 }

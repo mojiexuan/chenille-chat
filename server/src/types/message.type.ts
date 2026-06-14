@@ -1,4 +1,6 @@
 import { ChatToolCall } from "./model.type";
+import { MessageAttachmentType } from "@/enumeration";
+import { ExactlyOne } from "./type";
 
 /**
  * 消息来源
@@ -28,7 +30,12 @@ export type MessageBase = {
  */
 export type AttachmentMessage = MessageBase & {
   type: "attachment";
-  path?: string;
+  content: ({
+    type: MessageAttachmentType;
+  } & ExactlyOne<{
+    url: string;
+    base64: string;
+  }>)[]
 };
 
 /**
@@ -39,8 +46,8 @@ export type UserMessage = MessageBase & {
   message: {
     role: "user";
     content:
-      | string
-      | Array<{ type: string; text?: string; [key: string]: unknown }>;
+    | string
+    | Array<{ type: string; text?: string;[key: string]: unknown }>;
   };
 };
 

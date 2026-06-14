@@ -12,7 +12,9 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      'orb-ui/adapters': fileURLToPath(new URL('./packages/orb-ui/adapters/index.ts', import.meta.url)),
+      'orb-ui': fileURLToPath(new URL('./packages/orb-ui/index.ts', import.meta.url)),
     },
   },
   // ! 去除日志，开发时可注释掉，构建打包时一定要打开注释

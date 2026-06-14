@@ -8,7 +8,7 @@ import { asc } from "drizzle-orm";
  * 智能体服务
  */
 class AgentService {
-  constructor() {}
+  constructor() { }
 
   /**
    * 获取智能体详情
@@ -26,6 +26,13 @@ class AgentService {
       .where(eq(agents.key, key))
       .limit(1);
     return result ?? null;
+  }
+
+  /**
+   * 获取语音识别智能体
+   */
+  async getAsrRecognitionAgent() {
+    return await this.getAgent(AgentKey.AsrRecognition);
   }
 
   /**

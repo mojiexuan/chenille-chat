@@ -12,7 +12,7 @@ import { Stream } from "openai/core/streaming";
 import { ChatCompletionCreateParams, ReasoningEffort as OpenAiReasoningEffort } from "openai/resources/index";
 import z from "zod/v4";
 import { AiModel } from "./base.model";
-import { AiProvider, ReasoningEffort } from "@/enumeration";
+import { AiProvider, MessageAttachmentType, ReasoningEffort } from "@/enumeration";
 
 /**
  * OpenAI 模型
@@ -231,6 +231,22 @@ class OpenAiModel extends AiModel {
             role: msg.message.role,
             content: msg.message.content,
             tool_call_id: msg.message.toolCallId,
+          } as OpenAI.Chat.Completions.ChatCompletionMessageParam;
+        }
+        if (msg.type === "attachment") {
+          return {
+            role: "user",
+            content: msg.content.map((c) => ({
+              type: c.type === MessageAttachmentType.Audio ? "input_audio" : c.type === MessageAttachmentType.Image ? "image_url" : c.type === MessageAttachmentType.File ? "file" : "text",
+              ...(
+                // !TODO 目前仅仅处理了音频附件
+                c.type === MessageAttachmentType.Audio ? {
+                  input_audio: {
+                    data: c.url || c.base64 || "",
+                  },
+                } : {}
+              )
+            })),
           } as OpenAI.Chat.Completions.ChatCompletionMessageParam;
         }
         throw new Error(`未知的消息类型: ${msg.type}`);

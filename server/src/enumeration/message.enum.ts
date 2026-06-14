@@ -6,4 +6,5 @@ export enum MessageAttachmentType {
     Video = "video",
     Audio = "audio",
     Link = "link",
+    File = "file",
 }
