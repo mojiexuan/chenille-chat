@@ -118,7 +118,7 @@ function handleRealTimePreview(data: PreviewData) {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 998;
+    z-index: 95;
     background: var(--ch-mask-active);
     padding: 16px;
     display: flex;

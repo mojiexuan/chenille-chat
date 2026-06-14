@@ -74,7 +74,7 @@ const confirmClick = (e: MouseEvent) => {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 1000;
+    z-index: 8888;
     background: var(--ch-mask-active);
     padding: 16px;
     display: flex;

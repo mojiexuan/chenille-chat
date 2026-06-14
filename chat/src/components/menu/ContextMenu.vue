@@ -190,7 +190,7 @@ const transformOrigin = computed(() => {
 
 <style scoped>
 .context-menu {
-    z-index: 9999;
+    z-index: 90;
     background: transparent;
     border-radius: 10px;
     min-width: 160px;
