@@ -881,6 +881,7 @@ function switchModelClick(modelId: number) {
 .home-model-select-menu {
   min-width: 160px;
   max-width: 236px;
+  max-height: 520px;
   background-color: var(--ch-bg-color-card);
   border-radius: 10px;
   box-shadow: 0 4px 24px 0 rgba(0, 0, 0, .06);
@@ -888,6 +889,8 @@ function switchModelClick(modelId: number) {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .home-model-select-menu-item {
