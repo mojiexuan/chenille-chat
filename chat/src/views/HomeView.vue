@@ -158,7 +158,8 @@
       <div class="home-input-area-box">
         <div class="home-input-area-box-editor">
           <div class="home-input-area-box-editor-wrapper" :data-message="editorMessage">
-            <textarea class="home-input-area-box-editor-wrapper-textarea" v-model="editorMessage"
+            <SpeechWaveform v-if="showSpeechRecognition" :volume="microphoneVolume" />
+            <textarea v-else class="home-input-area-box-editor-wrapper-textarea" v-model="editorMessage"
               placeholder="聊点什么？shift+enter换行" spellcheck="false" autocomplete="off" autocapitalize="off"
               enterkeyhint="send" @keydown="handleEditorKeydown"></textarea>
           </div>
@@ -197,7 +198,7 @@
                 </svg>
               </div>
               <!-- 语音识别按钮 -->
-              <div class="home-input-area-box-editor-end-right-button">
+              <div class="home-input-area-box-editor-end-right-button" @click="openSpeechRecognitionClick">
                 <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect x="17" y="4" width="14" height="27" rx="7" fill="none" stroke="#3c3c43" stroke-width="4"
                     stroke-linejoin="round" />
@@ -292,7 +293,7 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { ref, computed, shallowRef, nextTick, inject } from "vue";
+import { ref, computed, shallowRef, nextTick, inject, watch } from "vue";
 import { aiChatSse, getSessionTitleRequest, getGerundIndicator } from "@/request";
 import { useSessionStore, useUserStore, useModelStore } from "@/stores";
 import { copyTextToClipboard, pickDirectory } from "@/utils";
@@ -301,7 +302,9 @@ import MarkdownRenderer from "@/components/renderer/MarkdownRenderer.vue";
 import RotatingText from "@/component/RotatingText/RotatingText.vue";
 import VoiceCall from "@/components/home/VoiceCall.vue";
 import ContextMenu from '@/components/menu/ContextMenu.vue';
+import SpeechWaveform from "@/components/home/SpeechWaveform.vue";
 import { AI_CHAT_ACCEPTED_FILE_TYPES } from "@/constants";
+import { useMicrophoneVolume } from "@/composables";
 
 // 提示框
 const toast = useToast();
@@ -329,6 +332,10 @@ const showVoiceCall = ref(false);
 const modelSelectMenuVisible = ref(false);
 // 模型选择菜单锚点
 const modelSelectMenuAnchor = ref({ x: 0, y: 0 });
+// 是否显示语音识别
+const showSpeechRecognition = ref(false);
+// 麦克风音量
+const microphoneVolume = ref(0);
 
 /**
  * 编辑器键盘事件处理
@@ -517,6 +524,37 @@ function closeVoiceCallClick() {
 function openModelSelectMenuClick(e: MouseEvent) {
   modelSelectMenuAnchor.value = { x: e.clientX, y: e.clientY };
   modelSelectMenuVisible.value = !modelSelectMenuVisible.value;
+}
+
+/**
+ * 打开语音识别
+ */
+async function openSpeechRecognitionClick() {
+  showSpeechRecognition.value = !showSpeechRecognition.value;
+  const stream =
+    await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    });
+
+  const audioContext =
+    new AudioContext();
+
+  const analyser =
+    audioContext.createAnalyser();
+
+  analyser.fftSize = 256;
+
+  const source =
+    audioContext.createMediaStreamSource(
+      stream,
+    );
+
+  source.connect(analyser);
+
+  const { volume } = useMicrophoneVolume(analyser);
+  watch(volume, (v) => {
+    microphoneVolume.value = v;
+  });
 }
 
 /**
