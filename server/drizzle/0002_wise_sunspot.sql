@@ -1,1 +1,0 @@
-ALTER TABLE "c_sessions" ADD COLUMN "work_space" varchar(550);

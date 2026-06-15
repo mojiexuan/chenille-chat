@@ -46,7 +46,8 @@ export async function getModelListByProviderIdHandler(
       parsed.error.issues[0]?.message,
     );
   }
-  const providerId = Number(parsed.data.providerId);
-  const modelList = await modelService.getModelListByProviderId(providerId);
+  const modelList = await modelService.getModelListByProviderId(
+    parsed.data.providerId,
+  );
   return reply.success(modelList, "模型列表");
 }

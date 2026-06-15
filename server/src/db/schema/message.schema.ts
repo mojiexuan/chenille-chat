@@ -1,26 +1,28 @@
 import {
   pgTable,
-  serial,
-  integer,
   varchar,
   text,
   jsonb,
   timestamp,
   date,
   index,
+  integer,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { ulid } from "ulid";
 import { sessions } from "./session.schema";
 import { AiRole } from "@/enumeration";
 
 export const messages = pgTable(
   "c_messages",
   {
-    id: serial("id").primaryKey(),
-    sessionId: integer("session_id")
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => ulid()),
+    sessionId: text("session_id")
       .notNull()
       .references(() => sessions.id, { onDelete: "cascade" }),
-    parentId: integer("parent_id").references((): any => messages.id, {
+    parentId: text("parent_id").references((): any => messages.id, {
       onDelete: "set null",
     }),
     role: varchar("role", { length: 20 }).$type<AiRole>().notNull(), // "user" | "assistant" | "system"

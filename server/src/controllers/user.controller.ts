@@ -14,7 +14,7 @@ export async function meGetInfoHandler(
   reply: FastifyReply,
 ) {
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const user = await userService.getUserInfoById(userId);
@@ -34,7 +34,7 @@ export async function meUpdateAvatarHandler(
   reply: FastifyReply,
 ) {
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const file = await request.file();
@@ -62,7 +62,7 @@ export async function meUpdateUserInfoHandler(
     );
   }
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const set = await userService.updateProfile(userId, parsed.data);
@@ -72,9 +72,12 @@ export async function meUpdateUserInfoHandler(
 /**
  * 用户使用AI令牌
  */
-export async function meUsageAiTokenHandle(request: FastifyRequest, reply: FastifyReply) {
+export async function meUsageAiTokenHandle(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const usage = await userService.getUserUsageAiToken(userId);
@@ -84,9 +87,12 @@ export async function meUsageAiTokenHandle(request: FastifyRequest, reply: Fasti
 /**
  * 获取用户设置信息
  */
-export async function meUserSettingsHandler(request: FastifyRequest, reply: FastifyReply) {
+export async function meUserSettingsHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const settings = await userService.getUserSetting(userId);
@@ -96,7 +102,10 @@ export async function meUserSettingsHandler(request: FastifyRequest, reply: Fast
 /**
  * 更新用户设置
  */
-export async function meUpdateUserSettingsHandler(request: FastifyRequest, reply: FastifyReply) {
+export async function meUpdateUserSettingsHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
   const parsed = meUserSettingsDto.safeParse(request.body);
   if (!parsed.success) {
     throw new BizException(
@@ -105,7 +114,7 @@ export async function meUpdateUserSettingsHandler(request: FastifyRequest, reply
     );
   }
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const settings = await userService.updateUserSettings(userId, parsed.data);

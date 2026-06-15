@@ -22,9 +22,7 @@ const SMS_RATE_TTL = 60;
  * 认证服务
  */
 class AuthService {
-  constructor(
-    private redis: Redis,
-  ) { }
+  constructor(private redis: Redis) {}
 
   /**
    * 生成手机号验证码
@@ -97,7 +95,7 @@ class AuthService {
       .where(eq(users.phone, phone))
       .limit(1);
 
-    let userId: number;
+    let userId: string;
 
     if (!existingUser) {
       const newUser = await db.transaction(async (tx) => {
@@ -112,7 +110,7 @@ class AuthService {
         const username = String(100000000 + user.id);
         await tx.update(users).set({ username }).where(eq(users.id, user.id));
         return user;
-      })
+      });
       userId = newUser.id;
     } else {
       userId = existingUser.id;
@@ -129,8 +127,7 @@ class AuthService {
       ip,
       userAgent,
       token,
-    })
-      .catch((e) => logger.error(e, "记录登录日志失败"));
+    }).catch((e) => logger.error(e, "记录登录日志失败"));
 
     return token;
   }
@@ -146,7 +143,7 @@ class AuthService {
    * @param token 登录凭证
    */
   private async loginLog(params: {
-    userId: number;
+    userId: string;
     loginType: LoginType;
     status: LoginStatus;
     failReason?: string;

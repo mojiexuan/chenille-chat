@@ -19,16 +19,14 @@ import { sessionService, agentService, userService } from "@/services";
 import { logger, formatTime, getWeekDay } from "@/utils";
 
 class AiService {
-
-  constructor() {
-  }
+  constructor() {}
 
   /**
    * 聊天服务
    * @param params 聊天参数
    */
   async chat(params: {
-    userId: number;
+    userId: string;
     data: ChatSseDto;
     callback?: ChatCallback;
   }) {
@@ -41,10 +39,9 @@ class AiService {
     // 更新会话工作空间
     if (params.data.workSpace && session.workSpace !== params.data.workSpace) {
       session.workSpace = params.data.workSpace;
-      await sessionService.updateSession(
-        params.userId,
-        session.id,
-        { workSpace: params.data.workSpace });
+      await sessionService.updateSession(params.userId, session.id, {
+        workSpace: params.data.workSpace,
+      });
     }
 
     // 添加用户消息到会话
@@ -154,13 +151,20 @@ class AiService {
       content,
     );
     // 添加AI消息记录到会话
-    sessionService.addMessage(params.userId, session.id, AiRole.Assistant, content, reasoning, usage);
+    sessionService.addMessage(
+      params.userId,
+      session.id,
+      AiRole.Assistant,
+      content,
+      reasoning,
+      usage,
+    );
   }
 
   /**
    * 构建系统环境变量提示词
    */
-  private async buildEnvironmentPrompt(userId: number) {
+  private async buildEnvironmentPrompt(userId: string) {
     const user = await userService.getUserInfoById(userId);
     const env: SystemEnvironment = [];
     const loginLog = await userService.getNewLoginLog(userId);

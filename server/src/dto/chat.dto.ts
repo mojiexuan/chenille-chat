@@ -2,10 +2,13 @@ import z from "zod/v4";
 
 export const chatSseDto = z.object({
   message: z.string().trim().min(1, "消息不能为空"),
-  sessionId: z.coerce.number().optional(),
-  // provider: z.enum(["openai", "google", "anthropic"]).optional(),
-  modelId: z.coerce.number().optional(),
-  workSpace: z.string().min(1, "工作空间不能为空").max(500, "工作空间最多500个字符").optional(),
+  sessionId: z.string().trim().min(1, "会话ID不能为空").optional(),
+  modelId: z.string().trim().min(1, "模型ID不能为空").optional(),
+  workSpace: z
+    .string()
+    .min(1, "工作空间不能为空")
+    .max(500, "工作空间最多500个字符")
+    .optional(),
 });
 
 export type ChatSseDto = z.infer<typeof chatSseDto>;

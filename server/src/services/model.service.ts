@@ -24,7 +24,7 @@ class ModelService {
   /**
    * 根据提供提供方ID获取模型列表
    */
-  async getModelListByProviderId(providerId: number) {
+  async getModelListByProviderId(providerId: string) {
     return await db
       .select(modelSafeVo)
       .from(models)

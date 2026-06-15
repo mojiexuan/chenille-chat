@@ -12,14 +12,12 @@ import { MeUpdateUserInfoDto, MeUserSettingsDto } from "@/dto";
  * 用户服务
  */
 class UserService {
-
-  constructor() {
-  }
+  constructor() {}
 
   /**
    * 根据用户ID获取用户信息
    */
-  async getUserInfoById(userId: number) {
+  async getUserInfoById(userId: string) {
     const [user] = await db
       .select(userSafeInfo)
       .from(users)
@@ -35,7 +33,7 @@ class UserService {
   /**
    * 更新用户信息
    */
-  async updateProfile(userId: number, data: MeUpdateUserInfoDto) {
+  async updateProfile(userId: string, data: MeUpdateUserInfoDto) {
     const set: Record<string, unknown> = {};
     if (data.nickname !== undefined) {
       set.nickname = data.nickname;
@@ -53,7 +51,7 @@ class UserService {
   /**
    * 更新用户头像
    */
-  async updateAvatar(userId: number, avatar: MultipartFile) {
+  async updateAvatar(userId: string, avatar: MultipartFile) {
     const user = await this.getUserInfoById(userId);
     ossService.deleteFileFromOss(user.avatar);
     const { url, path } = await ossService.uploadFileToOss(avatar);
@@ -70,7 +68,7 @@ class UserService {
   /**
    * 获取用户最新登录日志
    */
-  async getNewLoginLog(userId: number) {
+  async getNewLoginLog(userId: string) {
     const [loginLog] = await db
       .select()
       .from(loginLogs)
@@ -83,16 +81,16 @@ class UserService {
   /**
    * 绑定微信账号
    */
-  async bindWeChat() { }
+  async bindWeChat() {}
 
   /**
    * 获取用户使用AI令牌
    */
-  async getUserUsageAiToken(userId: number) {
+  async getUserUsageAiToken(userId: string) {
     const [row] = await db
       .select({
         totalTokens: sum(aiTokenUsages.totalTokens),
-        cachedTokens: sum(aiTokenUsages.cachedTokens)
+        cachedTokens: sum(aiTokenUsages.cachedTokens),
       })
       .from(aiTokenUsages)
       .where(eq(aiTokenUsages.userId, userId));
@@ -102,7 +100,7 @@ class UserService {
     return {
       totalTokens: formatNumber(total),
       cachedTokens: formatNumber(cached),
-      cacheHitRate: hitRate
+      cacheHitRate: hitRate,
     };
   }
 
@@ -111,7 +109,7 @@ class UserService {
    * @param userId 用户ID
    * @returns 用户设置信息
    */
-  async getUserSetting(userId: number) {
+  async getUserSetting(userId: string) {
     let [row] = await db
       .select(userSettingsInfo)
       .from(userSettings)
@@ -120,7 +118,7 @@ class UserService {
     if (!row) {
       row = {
         isLocationEnabled: false,
-      }
+      };
     }
     return row;
   }
@@ -128,7 +126,7 @@ class UserService {
   /**
    * 更新用户设置
    */
-  async updateUserSettings(userId: number, data: MeUserSettingsDto) {
+  async updateUserSettings(userId: string, data: MeUserSettingsDto) {
     const set: Record<string, unknown> = {};
     if (data.isLocationEnabled !== undefined) {
       set.isLocationEnabled = data.isLocationEnabled;

@@ -27,7 +27,7 @@ export async function getSessionListHandler(
   }
   // 从请求中获取用户 ID
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const sessionList = await sessionService.getUserSessions(
@@ -54,7 +54,7 @@ export async function getSessionTitleHandler(
   }
   // 从请求中获取用户 ID
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (typeof userId !== "string") {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const title = await sessionService.generateUserSessionTitle(
@@ -80,7 +80,7 @@ export async function getSessionHandler(
   }
   // 从请求中获取用户 ID
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   const session = await sessionService.getSession(
@@ -104,7 +104,10 @@ export async function getSessionHandler(
 /**
  * 删除会话
  */
-export async function deleteSessionHandler(request: FastifyRequest, reply: FastifyReply,) {
+export async function deleteSessionHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
   const parsed = sessionRequestDto.safeParse(request.params);
   if (!parsed.success) {
     throw new BizException(
@@ -114,7 +117,7 @@ export async function deleteSessionHandler(request: FastifyRequest, reply: Fasti
   }
   // 从请求中获取用户 ID
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
   await sessionService.deleteSession(parsed.data.sessionId, userId);
@@ -124,7 +127,10 @@ export async function deleteSessionHandler(request: FastifyRequest, reply: Fasti
 /**
  * 更新会话工作空间和标题
  */
-export async function updateSessionHandler(request: FastifyRequest, reply: FastifyReply,) {
+export async function updateSessionHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
   const params = sessionRequestDto.safeParse(request.params);
   if (!params.success) {
     throw new BizException(
@@ -141,9 +147,13 @@ export async function updateSessionHandler(request: FastifyRequest, reply: Fasti
   }
   // 从请求中获取用户 ID
   const userId = request.userId;
-  if (typeof userId !== "number") {
+  if (!userId) {
     throw new BizException(BizCode.AUTH_UNAUTHORIZED);
   }
-  await sessionService.updateSession(userId, params.data.sessionId, parsed.data);
+  await sessionService.updateSession(
+    userId,
+    params.data.sessionId,
+    parsed.data,
+  );
   return reply.success(null, "更新会话成功");
 }

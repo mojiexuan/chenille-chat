@@ -8,7 +8,7 @@ import { asc } from "drizzle-orm";
  * 智能体服务
  */
 class AgentService {
-  constructor() { }
+  constructor() {}
 
   /**
    * 获取智能体详情
@@ -52,8 +52,8 @@ class AgentService {
   /**
    * 获取Ai 聊天默认模型的智能体
    */
-  async getAiChatDefaultModelAgent(modelId?: number) {
-    if (modelId && modelId > 0) {
+  async getAiChatDefaultModelAgent(modelId?: string) {
+    if (modelId) {
       const [result] = await db
         .select({
           model: models,

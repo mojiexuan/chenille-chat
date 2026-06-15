@@ -4,14 +4,14 @@ import z from "zod/v4";
  * 会话标题请求DTO
  */
 export const sessionTitleRequestDto = z.object({
-    sessionId: z.coerce.number().min(0, "空会话ID"),
+    sessionId: z.string().trim().min(1, "会话ID不能为空"),
 });
 
 /**
  * 会话请求DTO
  */
 export const sessionRequestDto = z.object({
-    sessionId: z.coerce.number().min(0, "空会话ID"),
+    sessionId: z.string().trim().min(1, "会话ID不能为空"),
 });
 
 /**

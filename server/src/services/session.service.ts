@@ -23,7 +23,7 @@ class SessionService {
    * @param userId 用户ID
    * @param title 会话标题
    */
-  async createSession(userId: number, title?: string) {
+  async createSession(userId: string, title?: string) {
     const [session] = await db
       .insert(sessions)
       .values({
@@ -39,7 +39,7 @@ class SessionService {
    * @param sessionId 会话ID
    * @param userId 用户ID
    */
-  async getSession(sessionId: number, userId: number) {
+  async getSession(sessionId: string, userId: string) {
     const [session] = await db
       .select()
       .from(sessions)
@@ -56,7 +56,7 @@ class SessionService {
    * @param sessionId 会话ID
    * @param userId 用户ID
    */
-  async deleteSession(sessionId: number, userId: number) {
+  async deleteSession(sessionId: string, userId: string) {
     await db
       .delete(sessions)
       .where(and(eq(sessions.id, sessionId), eq(sessions.userId, userId)));
@@ -68,7 +68,7 @@ class SessionService {
    * @param userId 用户ID
    * @param userId 用户ID
    */
-  async getOrCreateSession(sessionId: number | undefined, userId: number) {
+  async getOrCreateSession(sessionId: string | undefined, userId: string) {
     if (sessionId) {
       const existing = await this.getSession(sessionId, userId);
       if (existing) return existing;
@@ -84,8 +84,8 @@ class SessionService {
    * @param meta 消息元数据
    */
   async addMessage(
-    userId: number,
-    sessionId: number,
+    userId: string,
+    sessionId: string,
     role: AiRole,
     content: string,
     reasoning?: string | null,
@@ -127,7 +127,7 @@ class SessionService {
    * 获取消息
    * @param sessionId 会话ID
    */
-  async getMessages(sessionId: number) {
+  async getMessages(sessionId: string) {
     return db
       .select()
       .from(messages)
@@ -138,7 +138,7 @@ class SessionService {
   /**
    * 获取用户会话标题
    */
-  async getUserSessionTitle(userId: number, sessionId: number) {
+  async getUserSessionTitle(userId: string, sessionId: string) {
     const [session] = await db
       .select()
       .from(sessions)
@@ -156,7 +156,7 @@ class SessionService {
   /**
    * 生成用户会话标题
    */
-  async generateUserSessionTitle(userId: number, sessionId: number) {
+  async generateUserSessionTitle(userId: string, sessionId: string) {
     const sessionTitle = await this.getUserSessionTitle(userId, sessionId);
     if (sessionTitle) {
       return sessionTitle;
@@ -177,14 +177,18 @@ class SessionService {
    * @param sessionId 会话ID
    * @param title 会话标题
    */
-  async updateSessionTitle(sessionId: number, title: string) {
+  async updateSessionTitle(sessionId: string, title: string) {
     await db.update(sessions).set({ title }).where(eq(sessions.id, sessionId));
   }
 
   /**
    * 更新会话工作空间和标题
    */
-  async updateSession(userId: number, sessionId: number, updateSessionRequest: UpdateSessionRequestDto) {
+  async updateSession(
+    userId: string,
+    sessionId: string,
+    updateSessionRequest: UpdateSessionRequestDto,
+  ) {
     const set: Record<string, unknown> = {};
     if (updateSessionRequest.workSpace) {
       set.workSpace = updateSessionRequest.workSpace;
@@ -195,7 +199,8 @@ class SessionService {
     if (Object.keys(set).length === 0) {
       return;
     }
-    await db.update(sessions)
+    await db
+      .update(sessions)
       .set(set)
       .where(and(eq(sessions.id, sessionId), eq(sessions.userId, userId)));
     return set;
@@ -206,7 +211,7 @@ class SessionService {
    * @param userId 用户ID
    */
   async getUserSessions(
-    userId: number,
+    userId: string,
     page = 1,
     pageSize = 20,
   ): Promise<Pagination<typeof sessions.$inferSelect>> {
@@ -232,7 +237,9 @@ class SessionService {
     dbMessages: { role: string; content: string }[],
   ): Message[] {
     return dbMessages
-      .filter((msg) => msg.role === AiRole.User || msg.role === AiRole.Assistant)
+      .filter(
+        (msg) => msg.role === AiRole.User || msg.role === AiRole.Assistant,
+      )
       .map((msg) => {
         if (msg.role === AiRole.User) {
           return {

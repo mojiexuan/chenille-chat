@@ -5,7 +5,7 @@ import { ChatUsage } from "./model.type";
  * 消息回调
  */
 export type MessageCallback = {
-  sessionId?: number;
+  sessionId?: string;
   reasoning?: string;
   content?: string;
   usage?: ChatUsage;

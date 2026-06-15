@@ -1,11 +1,12 @@
-import { pgTable, serial, varchar, timestamp, text } from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, text } from "drizzle-orm/pg-core";
+import { ulid } from "ulid";
 import { UserGender, UserRole, UserStatus } from "@/enumeration";
 
 /**
  * 用户表
  */
 export const users = pgTable("c_users", {
-  id: serial("id").primaryKey(),
+  id: text("id").primaryKey().$defaultFn(() => ulid()),
   username: varchar("username", { length: 50 }).notNull().unique(),
   nickname: varchar("nickname", { length: 50 }).notNull(),
   email: varchar("email", { length: 255 }).unique(),

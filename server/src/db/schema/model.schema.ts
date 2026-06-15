@@ -1,12 +1,12 @@
 import {
   pgTable,
-  serial,
   integer,
   varchar,
   text,
   timestamp,
   boolean,
 } from "drizzle-orm/pg-core";
+import { ulid } from "ulid";
 import { modelProviders } from "./model.provider.schema";
 import { ReasoningEffort } from "@/enumeration";
 
@@ -14,8 +14,8 @@ import { ReasoningEffort } from "@/enumeration";
  * 模型表
  */
 export const models = pgTable("c_models", {
-  id: serial("id").primaryKey(),
-  providerId: integer("provider_id")
+  id: text("id").primaryKey().$defaultFn(() => ulid()),
+  providerId: text("provider_id")
     .notNull()
     .references(() => modelProviders.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 50 }).notNull(), // 显示名："GPT-5.5"

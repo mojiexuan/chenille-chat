@@ -1,7 +1,5 @@
 import {
   pgTable,
-  serial,
-  integer,
   varchar,
   text,
   timestamp,
@@ -10,14 +8,15 @@ import {
   doublePrecision,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { ulid } from "ulid";
 import { users } from "./user.schema";
 import { LoginType, LoginStatus } from "@/enumeration";
 
 export const loginLogs = pgTable(
   "c_login_logs",
   {
-    id: serial("id").primaryKey(),
-    userId: integer("user_id")
+    id: text("id").primaryKey().$defaultFn(() => ulid()),
+    userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     loginType: varchar("login_type", { length: 20 })
