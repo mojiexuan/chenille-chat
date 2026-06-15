@@ -1,6 +1,12 @@
 import type { FastifyInstance } from "fastify";
+import type { MultipartFile } from "@fastify/multipart";
 import fp from "fastify-plugin";
 import fastifyMultipart from "@fastify/multipart";
+import { AI_CHAT_ACCEPTED_FILE_TYPES } from "@/constants";
+import { validateFileExtension } from "@/utils/";
+
+
+const ALLOWED_EXTENSIONS: Set<string> = new Set(AI_CHAT_ACCEPTED_FILE_TYPES);
 
 /**
  * 处理multipart请求
@@ -17,6 +23,7 @@ async function multipartPluginFn(fastify: FastifyInstance) {
             parts: 100, // 最多100个部分
             headerPairs: 2000, // 最多2000个头对值
         },
+        onFile: (file: MultipartFile) => validateFileExtension(file, ALLOWED_EXTENSIONS),
     });
 }
 

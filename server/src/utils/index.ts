@@ -7,3 +7,4 @@ export * from "./random.util";
 export * from "./time.util";
 export * from "./ip.util";
 export * from "./token.util";
+export * from "./file.util";

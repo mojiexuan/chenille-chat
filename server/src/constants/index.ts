@@ -7,3 +7,4 @@ export * from "./toolNames";
 export * from "./oss";
 export * from "./path";
 export * from "./token";
+export * from "./upload";
