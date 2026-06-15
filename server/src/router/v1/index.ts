@@ -19,6 +19,7 @@ import {
   getAgentListHandler,
   deleteSessionHandler,
   updateSessionHandler,
+  asrRecognizeHandler,
 } from "@/controllers";
 import { verifyJwt, requireRole } from "@/plugins";
 import { UserRole } from "@/enumeration";
@@ -46,6 +47,7 @@ export async function v1Router(fastify: FastifyInstance) {
       scope.delete("/chat/session/:sessionId", deleteSessionHandler);
       scope.get("/chat/session/:sessionId", getSessionHandler);
       scope.get("/chat/model/list", getModelListHandler);
+      scope.post("/asr/recognize", asrRecognizeHandler);
     });
     // 管理员用户
     authScope.register(async (adminScope) => {
