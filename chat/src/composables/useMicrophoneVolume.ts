@@ -34,7 +34,7 @@ export function useMicrophoneVolume(
         );
     }
 
-    const timer = window.setInterval(
+    let timer: number | null = window.setInterval(
         () => {
             volume.value =
                 calculateVolume();
@@ -42,11 +42,17 @@ export function useMicrophoneVolume(
         1000 / fps,
     );
 
-    onUnmounted(() => {
-        clearInterval(timer);
-    });
+    function stop() {
+        if (timer !== null) {
+            clearInterval(timer);
+            timer = null;
+        }
+    }
+
+    onUnmounted(stop);
 
     return {
         volume,
+        stop,
     };
 }

@@ -157,8 +157,9 @@
     <div class="home-input-area">
       <div class="home-input-area-box">
         <div class="home-input-area-box-editor">
-          <div class="home-input-area-box-editor-wrapper" :data-message="editorMessage">
-            <SpeechWaveform v-if="showSpeechRecognition" :volume="microphoneVolume" />
+          <div class="home-input-area-box-editor-wrapper" :class="{ 'speech-active': showSpeechRecognition }"
+            :data-message="editorMessage">
+            <SpeechWaveform v-if="showSpeechRecognition" :volume="microphoneVolume" :height="44" />
             <textarea v-else class="home-input-area-box-editor-wrapper-textarea" v-model="editorMessage"
               placeholder="聊点什么？shift+enter换行" spellcheck="false" autocomplete="off" autocapitalize="off"
               enterkeyhint="send" @keydown="handleEditorKeydown"></textarea>
@@ -198,7 +199,7 @@
                 </svg>
               </div>
               <!-- 语音识别按钮 -->
-              <div class="home-input-area-box-editor-end-right-button" @click="openSpeechRecognitionClick">
+              <div class="home-input-area-box-editor-end-right-button" @click="toggleSpeechRecognitionClick">
                 <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect x="17" y="4" width="14" height="27" rx="7" fill="none" stroke="#3c3c43" stroke-width="4"
                     stroke-linejoin="round" />
@@ -293,7 +294,7 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { ref, computed, shallowRef, nextTick, inject, watch } from "vue";
+import { ref, computed, shallowRef, nextTick, inject, watch, onUnmounted } from "vue";
 import { aiChatSse, getSessionTitleRequest, getGerundIndicator } from "@/request";
 import { useSessionStore, useUserStore, useModelStore } from "@/stores";
 import { copyTextToClipboard, pickDirectory } from "@/utils";
@@ -336,6 +337,14 @@ const modelSelectMenuAnchor = ref({ x: 0, y: 0 });
 const showSpeechRecognition = ref(false);
 // 麦克风音量
 const microphoneVolume = ref(0);
+// 麦克风流
+let audioStream: MediaStream | null = null;
+// AudioContext，整个组件生命周期只创建一次
+let audioContext: AudioContext | null = null;
+// 停止音量采样的 setInterval
+let stopVolumeTimer: (() => void) | null = null;
+// 停止 volume → microphoneVolume 的响应式同步
+let stopVolumeWatch: (() => void) | null = null;
 
 /**
  * 编辑器键盘事件处理
@@ -527,32 +536,40 @@ function openModelSelectMenuClick(e: MouseEvent) {
 }
 
 /**
- * 打开语音识别
+ * 切换语音识别开关
  */
-async function openSpeechRecognitionClick() {
-  showSpeechRecognition.value = !showSpeechRecognition.value;
-  const stream =
-    await navigator.mediaDevices.getUserMedia({
-      audio: true,
-    });
+async function toggleSpeechRecognitionClick() {
+  // 已开启 关闭麦克风
+  if (showSpeechRecognition.value) {
+    showSpeechRecognition.value = false;
+    stopVolumeWatch?.();
+    audioStream?.getTracks().forEach((t) => t.stop());
+    audioStream = null;
+    microphoneVolume.value = 0;
+    return;
+  }
 
-  const audioContext =
-    new AudioContext();
-
-  const analyser =
-    audioContext.createAnalyser();
+  showSpeechRecognition.value = true;
+  // 获取麦克风权限
+  audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  // AudioContext 首次创建，后续复用
+  if (!audioContext) {
+    audioContext = new AudioContext();
+  }
+  // 创建音频分析节点
+  const analyser = audioContext.createAnalyser();
 
   analyser.fftSize = 256;
 
-  const source =
-    audioContext.createMediaStreamSource(
-      stream,
-    );
-
+  // 将麦克风流接入分析器
+  const source = audioContext.createMediaStreamSource(audioStream);
   source.connect(analyser);
 
-  const { volume } = useMicrophoneVolume(analyser);
-  watch(volume, (v) => {
+  // 启动音量定时采样 + 响应式同步到 microphoneVolume
+  const { volume, stop } = useMicrophoneVolume(analyser);
+
+  stopVolumeTimer = stop;
+  stopVolumeWatch = watch(volume, (v) => {
     microphoneVolume.value = v;
   });
 }
@@ -563,6 +580,17 @@ async function openSpeechRecognitionClick() {
 function switchModelClick(modelId: string) {
   modelStore.switchModel(modelId);
 }
+
+onUnmounted(() => {
+  // 停止 volume 响应式同步
+  stopVolumeWatch?.();
+  // 停止音量采样 setInterval
+  stopVolumeTimer?.();
+  // 释放麦克风硬件
+  audioStream?.getTracks().forEach((t) => t.stop());
+  // 释放 AudioContext
+  audioContext?.close();
+});
 </script>
 
 <style scoped>
@@ -809,6 +837,10 @@ function switchModelClick(modelId: string) {
   visibility: hidden;
   grid-area: 1 / 1;
   font: inherit;
+}
+
+.home-input-area-box-editor-wrapper.speech-active::after {
+  display: none;
 }
 
 .home-input-area-box-editor-wrapper::after,

@@ -30,7 +30,7 @@ const props = withDefaults(
     {
         height: 40,
         barWidth: 3,
-        gap: 2,
+        gap: 4,
         minBarHeight: 2,
         maxBarHeightRatio: 0.9,
         fps: 20,
@@ -65,8 +65,8 @@ watch(
     () => props.volume,
     (volume) => {
         smoothVolume =
-            smoothVolume * 0.82 +
-            volume * 0.18;
+            smoothVolume * 0.85 +
+            volume * 0.15;
     },
 );
 
@@ -77,12 +77,13 @@ function start() {
         if (!bars.value.length) {
             return;
         }
+        const boosted = Math.pow(Math.min(smoothVolume * 3, 1), 0.55);
         const maxHeight =
             props.height *
             props.maxBarHeightRatio;
         const nextHeight =
             props.minBarHeight +
-            smoothVolume *
+            boosted *
             (maxHeight -
                 props.minBarHeight);
         const nextBars = [...bars.value];
