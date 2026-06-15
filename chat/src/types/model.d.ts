@@ -5,8 +5,8 @@
  * 模型
  */
 export interface Model {
-    id: number;
-    providerId: number;
+    id: string;
+    providerId: string;
     name: string;
     description: string;
     canThinking: boolean;

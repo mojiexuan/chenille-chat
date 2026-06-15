@@ -3,8 +3,8 @@
  */
 export interface AiChatParams {
   message: string;
-  sessionId?: number;
-  modelId?: number;
+  sessionId?: string;
+  modelId?: string;
   workSpace?: string;
 }
 
@@ -25,7 +25,7 @@ export interface ChatUsage {
  */
 export interface ChatSseMessage {
   /** 会话 ID */
-  sessionId?: number;
+  sessionId?: string;
   /** 思考过程 */
   reasoning?: string;
   /** 回复内容 */

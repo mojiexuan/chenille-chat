@@ -379,8 +379,8 @@ function sendClick() {
   editorMessage.value = "";
 
   sessionStore.addCurrentSessionMessage(
-    { id: Date.now(), role: "user", content: message, isStreaming: false },
-    { id: Date.now() + 1, role: "assistant", content: "", isStreaming: true },
+    { id: Date.now().toString(), role: "user", content: message, isStreaming: false },
+    { id: (Date.now() + 1).toString(), role: "assistant", content: "", isStreaming: true },
   );
 
   const assistantIndex = sessionStore.currentSession.messages.length - 1;
@@ -401,7 +401,7 @@ function sendClick() {
     {
       message,
       ...(sessionStore.isCurrentSessionWorkSpaceStatus === "ready" ? { workSpace: sessionStore.currentSession.workSpace } : {}),
-      modelId: modelStore.currentModel?.id || 0,
+      modelId: modelStore.currentModel?.id || void 0,
     },
     (msg) => {
       if (msg.error) {
@@ -560,7 +560,7 @@ async function openSpeechRecognitionClick() {
 /**
  * 切换模型
  */
-function switchModelClick(modelId: number) {
+function switchModelClick(modelId: string) {
   modelStore.switchModel(modelId);
 }
 </script>

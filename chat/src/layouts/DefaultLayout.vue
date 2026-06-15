@@ -238,7 +238,7 @@ const sessionMenuVisible = ref(false);
 const sessionMenuAnchor = ref({ x: 0, y: 0 });
 
 // 会话右键菜单目标会话ID
-const sessionMenuTarget = ref<number | null>(null);
+const sessionMenuTarget = ref<string | null>(null);
 
 // 内容区域滚动容器
 const contentMainRef = ref<HTMLElement>();
@@ -308,7 +308,7 @@ function navigateToSetting() {
 /**
  * 点击会话
  */
-function sessionItemClick(sessionId: number) {
+function sessionItemClick(sessionId: string) {
     sessionStore.switchCurrentSession(sessionId);
     if (route.name !== "Home") {
         router.replace({ name: 'Home' });
@@ -318,7 +318,7 @@ function sessionItemClick(sessionId: number) {
 /**
  * 点击会话更多
  */
-function sessionMoreClick(e: MouseEvent, sessionId: number) {
+function sessionMoreClick(e: MouseEvent, sessionId: string) {
     sessionMenuTarget.value = sessionId;
     sessionMenuAnchor.value = { x: e.clientX, y: e.clientY };
     sessionMenuVisible.value = !sessionMenuVisible.value;

@@ -19,7 +19,7 @@ export const getSessionList = (params: PaginationRequest) => {
  * 调用 AI 聊天接口
  */
 export const aiChatSse = (
-  sessionId: number | undefined,
+  sessionId: string | undefined,
   params: Omit<AiChatParams, "sessionId">,
   onMessage: (msg: ChatSseMessage) => void,
   onComplete?: () => void,

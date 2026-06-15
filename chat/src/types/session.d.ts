@@ -2,7 +2,7 @@
  * 会话项类型
  */
 export interface SessionItem {
-    id: number;
+    id: string;
     title: string;
     workSpace?: string;
 }
@@ -11,7 +11,7 @@ export interface SessionItem {
  * 会话类型
  */
 export interface Session extends SessionItem {
-    id?: number;
+    id?: string;
     messages: MessageStreaming[];
 }
 
@@ -19,7 +19,7 @@ export interface Session extends SessionItem {
  * 消息类型
  */
 export interface Message {
-    id: number;
+    id: string;
     role: 'user' | 'assistant';
     content: string;
     reasoning?: string;

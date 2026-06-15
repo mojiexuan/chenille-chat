@@ -2,7 +2,7 @@ import type { Model } from '@/types'
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { getModelListRequest } from '@/request'
-import { get, set, del } from 'idb-keyval'
+import { get, set } from 'idb-keyval'
 import { IndexedKeyEnum } from '@/enumeration'
 
 /**
@@ -13,8 +13,8 @@ import { IndexedKeyEnum } from '@/enumeration'
 export const useModelStore = defineStore('model', () => {
     const models = ref<Model[]>([
         {
-            id: 0,
-            providerId: 0,
+            id: "0",
+            providerId: "0",
             name: "Auto",
             description: "自动选择模型",
             canThinking: true,
@@ -41,7 +41,7 @@ export const useModelStore = defineStore('model', () => {
      * 切换模型
      * @param modelId 模型id
      */
-    function switchModel(modelId: number) {
+    function switchModel(modelId: string) {
         models.value.forEach((item) => {
             item.isDefault = item.id === modelId;
         });
@@ -55,8 +55,8 @@ export const useModelStore = defineStore('model', () => {
         getModelListRequest()
             .then((res) => {
                 models.value = [{
-                    id: 0,
-                    providerId: 0,
+                    id: "0",
+                    providerId: "0",
                     name: "Auto",
                     description: "自动选择模型",
                     canThinking: true,
@@ -72,14 +72,10 @@ export const useModelStore = defineStore('model', () => {
                 }, ...res];
                 get(IndexedKeyEnum.USER_SELECTED_MODEL)
                     .then((data) => {
-                        let selectedModelId = Number(data || 0) || 0;
-                        if (selectedModelId < 0) {
-                            selectedModelId = 0;
-                        }
-                        switchModel(selectedModelId);
+                        switchModel(data || "0");
                     })
                     .catch(() => {
-                        switchModel(0);
+                        switchModel("0");
                     })
             })
     }

@@ -119,7 +119,7 @@ export const useSessionStore = defineStore("session", () => {
      * @author 陈佳宝
      * @date 2026-05-31
      */
-    function updateCurrentSessionId(id: number): void {
+    function updateCurrentSessionId(id: string): void {
         currentSession.value.id = id;
     }
 
@@ -186,7 +186,7 @@ export const useSessionStore = defineStore("session", () => {
      * @author 陈佳宝
      * @date 2026-05-31
      */
-    function switchCurrentSession(sessionId: number) {
+    function switchCurrentSession(sessionId: string) {
         if (currentSession.value.id === sessionId) {
             return;
         }
@@ -213,7 +213,7 @@ export const useSessionStore = defineStore("session", () => {
      * @author 陈佳宝
      * @date 2026-05-31
      */
-    async function deleteSession(sessionId: number) {
+    async function deleteSession(sessionId: string) {
         await deleteSessionRequest(sessionId);
         // 如果当前会话是删除的会话，重置当前会话
         if (currentSession.value.id === sessionId) {

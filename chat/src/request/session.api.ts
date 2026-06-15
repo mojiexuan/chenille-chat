@@ -4,14 +4,14 @@ import { get, del, patch } from './fetch';
 /**
  * 获取会话标题
  */
-export const getSessionTitleRequest = (sessionId: number) => {
+export const getSessionTitleRequest = (sessionId: string) => {
     return get<string>(`/chat/session/${sessionId}/title`);
 }
 
 /**
  * 获取会话
  */
-export const getSessionRequest = async (sessionId: number): Promise<SessionDetail> => {
+export const getSessionRequest = async (sessionId: string): Promise<SessionDetail> => {
     return await get<{ session: SessionItem, messages: Message[] }>(`/chat/session/${sessionId}`)
         .then((res) => ({
             ...res.session,
@@ -22,7 +22,7 @@ export const getSessionRequest = async (sessionId: number): Promise<SessionDetai
 /**
  * 删除会话
  */
-export const deleteSessionRequest = (sessionId: number) => {
+export const deleteSessionRequest = (sessionId: string) => {
     return del(`/chat/session/${sessionId}`, {
         showSuccessToast: true,
     });
@@ -31,7 +31,7 @@ export const deleteSessionRequest = (sessionId: number) => {
 /**
  * 更新会话
  */
-export const updateSessionRequest = (sessionId: number, session: Partial<Omit<SessionItem, 'id'>>) => {
+export const updateSessionRequest = (sessionId: string, session: Partial<Omit<SessionItem, 'id'>>) => {
     return patch(`/chat/session/${sessionId}`, {
         ...session,
     });
