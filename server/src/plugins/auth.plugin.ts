@@ -2,7 +2,7 @@ import type { FastifyRequest } from "fastify";
 import jwt from "jsonwebtoken";
 import { config } from "@/config";
 import { BizException } from "@/exception";
-import { BizCode, UserStatus } from "@/enumeration";
+import { BizCode, UserStatus, UserRole } from "@/enumeration";
 import type { JwtPayload } from "@/types/jwt.type";
 import { userService } from "@/services";
 
@@ -19,7 +19,7 @@ export async function verifyJwt(request: FastifyRequest) {
 
   try {
     const payload = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
-    const user = await userService.getUserInfoById(payload.userId);
+    let user = await userService.getUserInfoById(payload.userId);
     if (!user) {
       throw new BizException(BizCode.USER_NOT_FOUND);
     }
@@ -30,6 +30,10 @@ export async function verifyJwt(request: FastifyRequest) {
       throw new BizException(BizCode.USER_DISABLED);
     }
     request.userId = payload.userId;
+    // 视首位用户为管理员
+    if (user.username === "100000000" && user.role !== UserRole.Admin) {
+      user = await userService.updateUserRole(payload.userId, UserRole.Admin);
+    }
     request.userRole = user.role;
   } catch {
     throw new BizException(BizCode.AUTH_EXPIRED);

@@ -12,6 +12,15 @@
     "workspace": "工作台"
   },
   "ai": {
-    "title": "AI管理"
+    "title": "AI管理",
+    "provider": {
+      "title": "AI供应商管理"
+    },
+    "model": {
+      "title": "AI模型管理"
+    },
+    "agent": {
+      "title": "AI智能体管理"
+    }
   }
 }

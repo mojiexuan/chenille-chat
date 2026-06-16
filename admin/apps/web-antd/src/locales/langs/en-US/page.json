@@ -12,6 +12,15 @@
     "workspace": "Workspace"
   },
   "ai": {
-    "title": "AI Management"
+    "title": "AI Management",
+    "provider": {
+      "title": "AI Provider Management"
+    },
+    "model": {
+      "title": "AI Model Management"
+    },
+    "agent": {
+      "title": "AI Agent Management"
+    }
   }
 }

@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { modelService } from "@/services";
-import { modelByProviderIdDto } from "@/dto";
+import { modelByProviderIdDto, modelProviderAddOrUpdateDto } from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 
@@ -50,4 +50,24 @@ export async function getModelListByProviderIdHandler(
     parsed.data.providerId,
   );
   return reply.success(modelList, "模型列表");
+}
+
+/**
+ * 添加或更新模型提供方
+ * @param request 请求
+ * @param reply 响应
+ */
+export async function addOrUpdateModelProviderHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const parsed = modelProviderAddOrUpdateDto.safeParse(request.body);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  await modelService.addOrUpdateModelProvider(parsed.data);
+  return reply.success(null, "添加或更新模型提供方成功");
 }

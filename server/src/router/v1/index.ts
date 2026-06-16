@@ -20,6 +20,7 @@ import {
   deleteSessionHandler,
   updateSessionHandler,
   asrRecognizeHandler,
+  addOrUpdateModelProviderHandler,
 } from "@/controllers";
 import { verifyJwt, requireRole } from "@/plugins";
 import { UserRole } from "@/enumeration";
@@ -61,6 +62,7 @@ export async function v1Router(fastify: FastifyInstance) {
         getModelListByProviderIdHandler,
       );
       adminScope.get("/admin/agent/list", getAgentListHandler);
+      adminScope.patch("/admin/provider", addOrUpdateModelProviderHandler);
     });
   });
 }

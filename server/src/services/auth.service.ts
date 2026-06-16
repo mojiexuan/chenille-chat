@@ -22,7 +22,7 @@ const SMS_RATE_TTL = 60;
  * 认证服务
  */
 class AuthService {
-  constructor(private redis: Redis) {}
+  constructor(private redis: Redis) { }
 
   /**
    * 生成手机号验证码
@@ -97,6 +97,7 @@ class AuthService {
 
     let userId: string;
 
+    // 注册新用户
     if (!existingUser) {
       const newUser = await db.transaction(async (tx) => {
         const [user] = await tx

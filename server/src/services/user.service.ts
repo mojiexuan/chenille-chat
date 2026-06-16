@@ -2,7 +2,7 @@ import { db, users, loginLogs, aiTokenUsages, userSettings } from "@/db";
 import { eq, desc, sum } from "drizzle-orm";
 import { userSafeInfo, userSettingsInfo } from "@/vo";
 import { BizException } from "@/exception";
-import { BizCode } from "@/enumeration";
+import { BizCode, UserRole } from "@/enumeration";
 import { ossService } from "@/services";
 import { logger, formatNumber } from "@/utils";
 import type { MultipartFile } from "@fastify/multipart";
@@ -12,7 +12,7 @@ import { MeUpdateUserInfoDto, MeUserSettingsDto } from "@/dto";
  * 用户服务
  */
 class UserService {
-  constructor() {}
+  constructor() { }
 
   /**
    * 根据用户ID获取用户信息
@@ -49,6 +49,14 @@ class UserService {
   }
 
   /**
+   * 更新用户角色
+   */
+  async updateUserRole(userId: string, role: UserRole) {
+    const [user] = await db.update(users).set({ role }).where(eq(users.id, userId)).returning();
+    return user;
+  }
+
+  /**
    * 更新用户头像
    */
   async updateAvatar(userId: string, avatar: MultipartFile) {
@@ -81,7 +89,7 @@ class UserService {
   /**
    * 绑定微信账号
    */
-  async bindWeChat() {}
+  async bindWeChat() { }
 
   /**
    * 获取用户使用AI令牌

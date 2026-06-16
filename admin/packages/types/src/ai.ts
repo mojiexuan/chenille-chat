@@ -2,7 +2,7 @@
  * 模型
  */
 export interface Model {
-    id: number,
+    id: string,
     providerId: number,
     name: string,
     description: string,
@@ -22,7 +22,7 @@ export interface Model {
  * 模型提供方
  */
 export interface ModelProvider {
-    id: number,
+    id: string,
     provider: string,
     name: string,
     apiKey: string,
@@ -34,7 +34,7 @@ export interface ModelProvider {
  * 智能体
  */
 export interface Agent {
-    id: number,
+    id: string,
     name: string,
     key: string,
     description: string,
