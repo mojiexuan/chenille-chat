@@ -1,5 +1,5 @@
 {
-  "id": "cb44cbe5-7658-4f4d-a693-2d206362fd29",
+  "id": "90da7d7b-e364-4776-b727-8d818d2df8a3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -216,7 +216,8 @@
           "name": "username",
           "type": "varchar(50)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "nextval('c_users_username_seq')::text"
         },
         "nickname": {
           "name": "nickname",
@@ -1195,7 +1196,18 @@
   },
   "enums": {},
   "schemas": {},
-  "sequences": {},
+  "sequences": {
+    "public.c_users_username_seq": {
+      "name": "c_users_username_seq",
+      "schema": "public",
+      "increment": "1",
+      "startWith": "100000000",
+      "minValue": "1",
+      "maxValue": "9223372036854775807",
+      "cache": "1",
+      "cycle": false
+    }
+  },
   "roles": {},
   "policies": {},
   "views": {},

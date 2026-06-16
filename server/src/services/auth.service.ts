@@ -103,12 +103,9 @@ class AuthService {
           .insert(users)
           .values({
             phone,
-            username: phone,
             nickname: randomStr(4, CharType.Upper),
           })
           .returning({ id: users.id });
-        const username = String(100000000 + user.id);
-        await tx.update(users).set({ username }).where(eq(users.id, user.id));
         return user;
       });
       userId = newUser.id;

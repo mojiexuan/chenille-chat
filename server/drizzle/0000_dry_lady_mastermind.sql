@@ -1,3 +1,4 @@
+CREATE SEQUENCE "public"."c_users_username_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 100000000 CACHE 1;--> statement-breakpoint
 CREATE TABLE "c_agents" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" varchar(50) NOT NULL,
@@ -24,7 +25,7 @@ CREATE TABLE "c_ai_token_usages" (
 --> statement-breakpoint
 CREATE TABLE "c_users" (
 	"id" text PRIMARY KEY NOT NULL,
-	"username" varchar(50) NOT NULL,
+	"username" varchar(50) DEFAULT nextval('c_users_username_seq')::text NOT NULL,
 	"nickname" varchar(50) NOT NULL,
 	"email" varchar(255),
 	"phone" varchar(20) NOT NULL,

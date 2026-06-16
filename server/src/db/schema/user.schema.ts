@@ -1,13 +1,24 @@
-import { pgTable, varchar, timestamp, text } from "drizzle-orm/pg-core";
+import { pgTable, pgSequence, varchar, timestamp, text } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { ulid } from "ulid";
 import { UserGender, UserRole, UserStatus } from "@/enumeration";
+
+/**
+ * 用户名自增序列，起始 100000000
+ */
+export const usernameSeq = pgSequence("c_users_username_seq", {
+  startWith: 100000000,
+});
 
 /**
  * 用户表
  */
 export const users = pgTable("c_users", {
   id: text("id").primaryKey().$defaultFn(() => ulid()),
-  username: varchar("username", { length: 50 }).notNull().unique(),
+  username: varchar("username", { length: 50 })
+    .notNull()
+    .unique()
+    .default(sql`nextval('c_users_username_seq')::text`),
   nickname: varchar("nickname", { length: 50 }).notNull(),
   email: varchar("email", { length: 255 }).unique(),
   phone: varchar("phone", { length: 20 }).notNull().unique(),
