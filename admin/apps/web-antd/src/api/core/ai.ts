@@ -31,7 +31,7 @@ export namespace AiApi {
  * 获取模型提供方列表
  */
 export async function getModelProviderApi() {
-    return requestClient.get<AiApi.ModelProviderResult>('/admin/chat/model/provider/list');
+    return requestClient.get<AiApi.ModelProviderResult>('/admin/providers');
 }
 
 /**

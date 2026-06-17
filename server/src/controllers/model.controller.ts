@@ -9,12 +9,37 @@ import { BizCode } from "@/enumeration";
  * @param request 请求
  * @param reply 响应
  */
-export async function getModelListHandler(
+export async function getActiveModelListHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
   const modelList = await modelService.getActiveModelList();
   return reply.success(modelList, "模型列表");
+}
+
+/**
+ * 获取模型列表
+ * @param request 请求
+ * @param reply 响应
+ */
+export async function getModelListHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const modelList = await modelService.getModelList();
+  return reply.success(modelList, "模型列表");
+}
+
+/**
+ * 添加或更新模型
+ * @param request 请求
+ * @param reply 响应
+ */
+export async function addOrUpdateModelHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+
 }
 
 /**
@@ -28,28 +53,6 @@ export async function getModelProviderListHandler(
 ) {
   const modelList = await modelService.getModelProviderList();
   return reply.success(modelList, "模型提供方列表");
-}
-
-/**
- * 获取模型列表，按提供方ID排序
- * @param request 请求
- * @param reply 响应
- */
-export async function getModelListByProviderIdHandler(
-  request: FastifyRequest,
-  reply: FastifyReply,
-) {
-  const parsed = modelByProviderIdDto.safeParse(request.params);
-  if (!parsed.success) {
-    throw new BizException(
-      BizCode.PARAM_INVALID,
-      parsed.error.issues[0]?.message,
-    );
-  }
-  const modelList = await modelService.getModelListByProviderId(
-    parsed.data.providerId,
-  );
-  return reply.success(modelList, "模型列表");
 }
 
 /**

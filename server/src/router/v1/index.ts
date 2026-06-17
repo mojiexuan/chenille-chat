@@ -13,9 +13,9 @@ import {
   getSessionListHandler,
   getSessionTitleHandler,
   getSessionHandler,
-  getModelListHandler,
+  getActiveModelListHandler,
   getModelProviderListHandler,
-  getModelListByProviderIdHandler,
+  getModelListHandler,
   getAgentListHandler,
   deleteSessionHandler,
   updateSessionHandler,
@@ -48,24 +48,24 @@ export async function v1Router(fastify: FastifyInstance) {
       scope.patch("/chat/session/:sessionId", updateSessionHandler);
       scope.delete("/chat/session/:sessionId", deleteSessionHandler);
       scope.get("/chat/session/:sessionId", getSessionHandler);
-      scope.get("/chat/model/list", getModelListHandler);
+      scope.get("/chat/model/list", getActiveModelListHandler);
       scope.post("/asr/recognize", asrRecognizeHandler);
     });
     // 管理员用户
     authScope.register(async (adminScope) => {
       adminScope.addHook("preHandler", requireRole(UserRole.Admin));
       adminScope.get(
-        "/admin/chat/model/provider/list",
+        "/admin/providers",
         getModelProviderListHandler,
-      );
-      adminScope.get(
-        "/admin/chat/model/:providerId/list",
-        getModelListByProviderIdHandler,
       );
       adminScope.get("/admin/agent/list", getAgentListHandler);
       adminScope.put("/admin/provider", addOrUpdateModelProviderHandler);
       adminScope.patch("/admin/provider", addOrUpdateModelProviderHandler);
       adminScope.delete("/admin/provider/:providerId", deleteModelProviderHandler);
+      adminScope.get(
+        "/admin/models",
+        getModelListHandler,
+      );
     });
   });
 }

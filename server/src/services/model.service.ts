@@ -13,7 +13,6 @@ class ModelService {
     return await db
       .select(modelSafeVo)
       .from(models)
-      .where(eq(models.isActive, true))
       .orderBy(desc(models.sortOrder));
   }
 
@@ -21,17 +20,10 @@ class ModelService {
    * 获取所有活跃模型列表
    */
   async getActiveModelList() {
-    return (await this.getModelList()).filter((item) => item.isActive === true);
-  }
-
-  /**
-   * 根据提供提供方ID获取模型列表
-   */
-  async getModelListByProviderId(providerId: string) {
     return await db
       .select(modelSafeVo)
       .from(models)
-      .where(eq(models.providerId, providerId))
+      .where(eq(models.isActive, true))
       .orderBy(desc(models.sortOrder));
   }
 

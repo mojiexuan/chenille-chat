@@ -20,5 +20,18 @@ export const modelProviderAddOrUpdateDto = z.object({
   isActive: z.boolean().optional(),
 });
 
+/**
+ * 模型添加或更新参数
+ */
+// export const modelAddOrUpdateDto = z.object({
+//   id: z.string().trim().min(1, "ID不能为空").optional(),
+//   providerId: z.string().trim().min(1, "提供者ID不能为空"),
+//   name: z.string().trim().min(1, "名称不能为空").max(30, "名称不能超过30个字符"),
+//   modelName: z.string().trim().min(1, "模型名称不能为空").max(30, "模型名称不能超过30个字符"),
+//   description: z.string().trim().min(1, "描述不能为空").max(260, "描述不能超过260个字符").optional(),
+//   reasoningEffort: z.string().trim().min(1, "推理努力不能为空").max(30, "推理努力不能超过30个字符").optional(),
+//   isActive: z.boolean().optional(),
+// });
+
 export type ModelByProviderIdDto = z.infer<typeof modelByProviderIdDto>;
 export type ModelProviderAddOrUpdateDto = z.infer<typeof modelProviderAddOrUpdateDto>;
