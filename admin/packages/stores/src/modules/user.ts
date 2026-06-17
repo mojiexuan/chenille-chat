@@ -9,7 +9,7 @@ interface BasicUserInfo {
   /**
    * 用户昵称
    */
-  nickname: string;
+  realName: string;
   /**
    * 用户角色
    */
@@ -22,10 +22,6 @@ interface BasicUserInfo {
    * 用户名
    */
   username: string;
-  /**
-   * 手机号
-   */
-  phone: string;
 }
 
 interface AccessState {

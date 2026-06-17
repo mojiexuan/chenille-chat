@@ -25,9 +25,9 @@ export namespace AuthApi {
 /**
  * 登录
  */
-export async function loginApi(data: AuthApi.PhoneLoginParams): Promise<AuthApi.LoginResult> {
+export async function loginApi(data: AuthApi.PhoneLoginParams) {
   const token = await requestClient.post<string>('/auth/phone/login', data);
-  return { accessToken: token };
+  return { accessToken: token } as AuthApi.LoginResult;
 }
 
 /**
@@ -43,7 +43,7 @@ export async function refreshTokenApi() {
  * 退出登录
  */
 export async function logoutApi() {
-  return;
+  return null;
 }
 
 /**
@@ -57,5 +57,5 @@ export async function getAccessCodesApi() {
  * 获取手机号验证码
  */
 export const phoneCodeRequest = (phone: AuthApi.PhoneCodeParams) => {
-  return requestClient.post<void>('/auth/phone/code', phone);
+  return requestClient.post('/auth/phone/code', phone);
 }

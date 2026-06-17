@@ -15,7 +15,7 @@ interface BasicUserInfo {
   /**
    * 用户昵称
    */
-  nickname: string;
+  realName: string;
   /**
    * 用户角色
    */
@@ -30,6 +30,12 @@ interface BasicUserInfo {
   username: string;
 }
 
-type ClassType = Array<object | string> | object | string;
+type ClassType =
+  | Array<ClassType>
+  | boolean
+  | null
+  | object
+  | string
+  | undefined;
 
 export type { BasicOption, BasicUserInfo, ClassType, SelectOption, TabOption };

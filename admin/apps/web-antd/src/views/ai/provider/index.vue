@@ -1,30 +1,12 @@
-<template>
-    <div class="vp-raw w-full">
-        <!-- 抽屉 -->
-        <Drawer>
-            <!-- 表单 -->
-            <Form />
-        </Drawer>
-        <!-- 表格 -->
-        <Grid>
-            <template #toolbar-tools>
-                <VbenButton @click="handleAddClick">
-                    添加模型供应商
-                </VbenButton>
-            </template>
-        </Grid>
-    </div>
-</template>
-
 <script setup lang="ts" name="Provider">
 import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { AiApi } from '#/api';
+import type { AiApi, ModelApi } from '#/api';
 
-import { getModelProviderApi, addOrUpdateModelProvider } from '#/api';
-
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { useVbenDrawer, VbenButton } from '@vben/common-ui';
+
 import { useVbenForm, z } from '#/adapter/form';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { addOrUpdateModelProvider, getModelProviderApi } from '#/api';
 
 /**
  * 模型供应商表格配置
@@ -172,9 +154,35 @@ const handleAddClick = () => {
 function onSubmit() {
     formApi.validateAndSubmitForm()
         .then((values) => {
-            console.log(values);
+            drawerApi.lock();
+            addOrUpdateModelProvider(values as ModelApi.AddOrUpdateModelProviderParams)
+                .then(() => {
+                    gridApi.reload();
+                })
+                .finally(() => {
+                    drawerApi.unlock();
+                    drawerApi.close();
+                })
         })
 }
 </script>
+
+<template>
+    <div class="vp-raw w-full">
+        <!-- 抽屉 -->
+        <Drawer>
+            <!-- 表单 -->
+            <Form />
+        </Drawer>
+        <!-- 表格 -->
+        <Grid>
+            <template #toolbar-tools>
+                <VbenButton @click="handleAddClick">
+                    添加模型供应商
+                </VbenButton>
+            </template>
+        </Grid>
+    </div>
+</template>
 
 <style scoped></style>

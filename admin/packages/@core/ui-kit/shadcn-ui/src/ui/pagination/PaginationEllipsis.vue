@@ -1,22 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import type { PaginationEllipsisProps } from 'reka-ui';
+
+import type { HTMLAttributes } from 'vue';
 
 import { cn } from '@vben-core/shared/utils';
 
-import { MoreHorizontal } from 'lucide-vue-next';
-import { PaginationEllipsis, type PaginationEllipsisProps } from 'radix-vue';
+import { MoreHorizontal } from '@lucide/vue';
+import { reactiveOmit } from '@vueuse/core';
+import { PaginationEllipsis } from 'reka-ui';
 
-const props = defineProps<{ class?: any } & PaginationEllipsisProps>();
+const props = defineProps<
+  PaginationEllipsisProps & { class?: HTMLAttributes['class'] }
+>();
 
-const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
-
-  return delegated;
-});
+const delegatedProps = reactiveOmit(props, 'class');
 </script>
 
 <template>
   <PaginationEllipsis
+    data-slot="pagination-ellipsis"
     v-bind="delegatedProps"
     :class="cn('flex size-8 items-center justify-center', props.class)"
   >

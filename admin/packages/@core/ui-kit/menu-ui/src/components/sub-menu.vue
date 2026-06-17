@@ -54,7 +54,7 @@ const opened = computed(() => {
   return rootMenu?.openedMenus.includes(props.path);
 });
 const isTopLevelMenuSubmenu = computed(
-  () => parentMenu.value?.type.name === 'Menu',
+  () => parentMenu.value?.type.name === 'MenuUI',
 );
 const mode = computed(() => rootMenu?.props.mode ?? 'vertical');
 const rounded = computed(() => rootMenu?.props.rounded);
@@ -208,6 +208,9 @@ onBeforeUnmount(() => {
           nsMenu.e('popup-container'),
           is(rootMenu.theme, true),
           opened ? '' : 'hidden',
+          'overflow-auto',
+          'max-h-[calc(var(--reka-hover-card-content-available-height)-20px)]',
+          mode === 'horizontal' ? 'is-horizontal' : '',
         ]"
         :content-props="contentProps"
         :open="true"
