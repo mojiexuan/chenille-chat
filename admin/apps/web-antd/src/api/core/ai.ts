@@ -1,10 +1,11 @@
+import type { Agent, Model, ModelProvider } from '@vben/types';
+
 import { requestClient } from '#/api/request';
-import type { Model, ModelProvider, Agent } from '@vben/types';
 
 export namespace AiApi {
     /** AI接口参数 */
     export interface ModelListParams {
-        providerId: number;
+        providerId: string;
     }
 
     /** AI接口返回值 */

@@ -62,6 +62,7 @@ export async function v1Router(fastify: FastifyInstance) {
         getModelListByProviderIdHandler,
       );
       adminScope.get("/admin/agent/list", getAgentListHandler);
+      adminScope.put("/admin/provider", addOrUpdateModelProviderHandler);
       adminScope.patch("/admin/provider", addOrUpdateModelProviderHandler);
     });
   });

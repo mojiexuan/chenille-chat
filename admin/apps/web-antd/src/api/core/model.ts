@@ -18,7 +18,7 @@ export namespace ModelApi {
  * @param data 参数
  */
 export async function addOrUpdateModelProvider(data: ModelApi.AddOrUpdateModelProviderParams, providerId?: string) {
-    return requestClient.post("/admin/provider", {
+    return requestClient.put("/admin/provider", {
         ...data,
         ...(providerId ? { providerId } : {}),
     });

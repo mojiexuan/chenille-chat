@@ -1,8 +1,12 @@
 <script setup lang="ts" name="Provider">
+import type { ModelProvider } from '@vben/types';
+
 import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { AiApi, ModelApi } from '#/api';
+import type { ModelApi } from '#/api';
 
 import { useVbenDrawer, VbenButton } from '@vben/common-ui';
+
+import { Button, Tag } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -11,14 +15,21 @@ import { addOrUpdateModelProvider, getModelProviderApi } from '#/api';
 /**
  * 模型供应商表格配置
  */
-const gridOptions: VxeGridProps<AiApi.ModelProviderResult> = {
+const gridOptions: VxeGridProps<ModelProvider> = {
     columns: [
         { title: '序号', type: 'seq', width: 50 },
         { field: 'provider', title: '品牌' },
         { field: 'name', title: '名称' },
         { field: 'apiKey', title: 'API Key' },
         { field: 'baseUrl', title: 'Base URL' },
-        { field: 'isActive', title: '状态' },
+        { field: 'isActive', title: '状态', slots: { default: 'is-active' } },
+        {
+            field: 'action',
+            slots: { default: 'action' },
+            fixed: 'right',
+            title: '操作',
+            width: 120,
+        },
     ],
     exportConfig: {},
     // height: 'auto', // 如果设置为 auto，则必须确保存在父节点且不允许存在相邻元素，否则会出现高度闪动问题
@@ -26,7 +37,11 @@ const gridOptions: VxeGridProps<AiApi.ModelProviderResult> = {
     proxyConfig: {
         ajax: {
             query: async () => {
-                return await getModelProviderApi();
+                const items = await getModelProviderApi();
+                return {
+                    total: items.length,
+                    items,
+                }
             },
         },
     },
@@ -165,6 +180,15 @@ function onSubmit() {
                 })
         })
 }
+
+/**
+ * 编辑模型供应商
+ */
+const handleEditClick = (row: ModelProvider) => {
+    drawerApi.setState({ title: "编辑模型供应商" });
+    formApi.setValues(row);
+    drawerApi.open();
+}
 </script>
 
 <template>
@@ -180,6 +204,12 @@ function onSubmit() {
                 <VbenButton @click="handleAddClick">
                     添加模型供应商
                 </VbenButton>
+            </template>
+            <template #is-active="{ row }">
+                <Tag :color="row.isActive ? 'success' : 'default'">{{ row.isActive ? '已启用' : '已禁用' }}</Tag>
+            </template>
+            <template #action="{ row }">
+                <Button type="link" @click="handleEditClick(row)">编辑</Button>
             </template>
         </Grid>
     </div>
