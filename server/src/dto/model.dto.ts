@@ -12,7 +12,7 @@ export const modelByProviderIdDto = z.object({
  * 模型提供方添加或更新参数
  */
 export const modelProviderAddOrUpdateDto = z.object({
-  providerId: z.string().trim().min(1, "提供者ID不能为空").optional(),
+  id: z.string().trim().min(1, "ID不能为空").optional(),
   provider: z.enum(AiProvider).optional(),
   name: z.string().trim().min(1, "名称不能为空").max(30, "名称不能超过30个字符").optional(),
   apiKey: z.string().trim().min(1, "API Key不能为空").max(260, "API Key不能超过260个字符").optional(),

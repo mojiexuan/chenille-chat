@@ -2,15 +2,15 @@
 import type { ModelProvider } from '@vben/types';
 
 import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { ModelApi } from '#/api';
+import type { AiApi } from '#/api';
 
 import { useVbenDrawer, VbenButton } from '@vben/common-ui';
 
-import { Button, Tag } from 'ant-design-vue';
+import { Button, Modal, Tag } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { addOrUpdateModelProvider, getModelProviderApi } from '#/api';
+import { addOrUpdateModelProviderApi, deleteModelProviderApi, getModelProviderApi } from '#/api';
 
 /**
  * 模型供应商表格配置
@@ -28,7 +28,7 @@ const gridOptions: VxeGridProps<ModelProvider> = {
             slots: { default: 'action' },
             fixed: 'right',
             title: '操作',
-            width: 120,
+            width: 200,
         },
     ],
     exportConfig: {},
@@ -169,15 +169,18 @@ const handleAddClick = () => {
 function onSubmit() {
     formApi.validateAndSubmitForm()
         .then((values) => {
-            drawerApi.lock();
-            addOrUpdateModelProvider(values as ModelApi.AddOrUpdateModelProviderParams)
-                .then(() => {
-                    gridApi.reload();
-                })
-                .finally(() => {
-                    drawerApi.unlock();
-                    drawerApi.close();
-                })
+            if (values) {
+                drawerApi.lock();
+                addOrUpdateModelProviderApi(values as AiApi.AddOrUpdateModelProviderParams)
+                    .then(() => {
+                        gridApi.reload();
+                    })
+                    .finally(() => {
+                        drawerApi.unlock();
+                        drawerApi.close();
+                        formApi.resetForm();
+                    })
+            }
         })
 }
 
@@ -186,8 +189,30 @@ function onSubmit() {
  */
 const handleEditClick = (row: ModelProvider) => {
     drawerApi.setState({ title: "编辑模型供应商" });
-    formApi.setValues(row);
+    formApi.setValues(row, false);
     drawerApi.open();
+}
+
+/**
+ * 删除模型供应商
+ */
+const handleDeleteClick = (row: ModelProvider) => {
+    Modal.confirm({
+        title: '确认删除吗？',
+        okText: '确认',
+        okType: 'danger',
+        onOk: () => {
+            gridApi.setLoading(true);
+            deleteModelProviderApi(row.id)
+                .then(() => {
+                    gridApi.setLoading(false);
+                    gridApi.reload();
+                })
+                .catch(() => {
+                    gridApi.setLoading(false);
+                })
+        }
+    })
 }
 </script>
 
@@ -210,6 +235,7 @@ const handleEditClick = (row: ModelProvider) => {
             </template>
             <template #action="{ row }">
                 <Button type="link" @click="handleEditClick(row)">编辑</Button>
+                <Button danger type="link" @click="handleDeleteClick(row)">删除</Button>
             </template>
         </Grid>
     </div>

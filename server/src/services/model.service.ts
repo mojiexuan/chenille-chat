@@ -67,11 +67,18 @@ class ModelService {
     if (Object.keys(set).length === 0) {
       return;
     }
-    if (data.providerId) {
-      await db.update(modelProviders).set(set).where(eq(modelProviders.id, data.providerId));
+    if (data.id) {
+      await db.update(modelProviders).set(set).where(eq(modelProviders.id, data.id));
       return;
     }
     await db.insert(modelProviders).values(set as typeof modelProviders.$inferInsert);
+  }
+
+  /**
+   * 删除模型提供方
+   */
+  async deleteModelProvider(providerId: string) {
+    await db.delete(modelProviders).where(eq(modelProviders.id, providerId));
   }
 
 }

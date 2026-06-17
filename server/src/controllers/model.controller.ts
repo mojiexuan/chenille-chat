@@ -71,3 +71,23 @@ export async function addOrUpdateModelProviderHandler(
   await modelService.addOrUpdateModelProvider(parsed.data);
   return reply.success(null, "添加或更新模型提供方成功");
 }
+
+/**
+ * 删除模型提供方
+ * @param request 请求
+ * @param reply 响应
+ */
+export async function deleteModelProviderHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const parsed = modelByProviderIdDto.safeParse(request.params);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  await modelService.deleteModelProvider(parsed.data.providerId);
+  return reply.success(null, "删除模型提供方成功");
+}

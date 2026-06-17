@@ -14,6 +14,17 @@ export namespace AiApi {
     export type ModelProviderResult = ModelProvider[];
 
     export type AgentResult = Agent[];
+
+    /**
+     * 添加或更新模型提供方参数
+     */
+    export interface AddOrUpdateModelProviderParams {
+        provider: string,
+        name: string,
+        apiKey: string,
+        baseUrl: string,
+        isActive: boolean,
+    }
 }
 
 /**
@@ -21,6 +32,22 @@ export namespace AiApi {
  */
 export async function getModelProviderApi() {
     return requestClient.get<AiApi.ModelProviderResult>('/admin/chat/model/provider/list');
+}
+
+/**
+ * 添加或更新模型提供方
+ * @param data 参数
+ */
+export async function addOrUpdateModelProviderApi(data: AiApi.AddOrUpdateModelProviderParams) {
+    return requestClient.put("/admin/provider", data);
+}
+
+/**
+ * 删除模型提供方
+ * @param id 模型提供方ID
+ */
+export async function deleteModelProviderApi(id: string) {
+    return requestClient.delete(`/admin/provider/${id}`);
 }
 
 /**
