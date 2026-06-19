@@ -1,5 +1,5 @@
 import { db, models, modelProviders } from "@/db";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, and } from "drizzle-orm";
 import { modelSafeVo, modelProviderVo } from "@/vo";
 import { ModelProviderAddOrUpdateDto, ModelAddOrUpdateDto } from "@/dto";
 import { BizException } from "@/exception";
@@ -23,7 +23,7 @@ class ModelService {
     return await db
       .select(modelSafeVo)
       .from(models)
-      .where(eq(models.isActive, true))
+      .where(and(eq(models.isActive, true), eq(models.canInputText, true), eq(models.canOutputText, true)))
       .orderBy(desc(models.sortOrder));
   }
 
