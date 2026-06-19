@@ -94,7 +94,7 @@
   border-radius: 8px;
   margin: 16px 0;
   position: relative;
-  padding: 20px 0;
+  background-color: var(--ch-feature-card-bg);
 }
 
 .markdown-renderer pre,

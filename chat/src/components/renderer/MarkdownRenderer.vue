@@ -1,8 +1,9 @@
 <template>
-    <div class="markdown-renderer" v-html="renderedHtml"></div>
+    <div ref="rootRef" class="markdown-renderer" v-html="renderedHtml"></div>
 </template>
 
 <script setup lang="ts" name="MarkdownRenderer">
+// https://mdit-plugins.github.io/zh/
 import MarkdownItAsync from 'markdown-it-async';
 import type {
     MarkdownItAsync as MarkdownIt,
@@ -42,7 +43,15 @@ import { ruby as markdownitruby } from "@mdit/plugin-ruby";
 import { spoiler as markdownitspoiler } from "@mdit/plugin-spoiler";
 import { tasklist as markdownittasklist } from "@mdit/plugin-tasklist";
 import type { MarkdownItContainerTokenType } from "@/types";
-import { watch, ref, nextTick } from 'vue';
+import { watch, ref, nextTick, onMounted } from 'vue';
+import { copyTextToClipboard, debounce } from '@/utils';
+import { useToast } from '@/composables';
+
+// 组件根元素
+const rootRef = ref<HTMLElement>();
+
+// 初始化toast
+const toast = useToast();
 
 /**
  * 定义组件属性
@@ -106,7 +115,7 @@ const addCustomContainer = (
     });
 };
 
-const md = MarkdownItAsync("commonmark", {
+const md = MarkdownItAsync("default", {
     html: true, // 可以识别html
     xhtmlOut: true,
     breaks: true, // 回车换行
@@ -115,7 +124,7 @@ const md = MarkdownItAsync("commonmark", {
     typographer: true, // 优化排版，标点
     quotes: "“”‘’",
     highlight: async function (code, lang) {
-        return await codeToHtml(code, {
+        const codeHtml = await codeToHtml(code, {
             lang,
             themes: {
                 dark: "min-dark",
@@ -135,6 +144,7 @@ const md = MarkdownItAsync("commonmark", {
                 transformerRemoveNotationEscape(),
             ],
         });
+        return getPre(lang, code, codeHtml);
     }
 })
     .use(markdownitsub) // 下标
@@ -228,6 +238,18 @@ const renderedHtml = ref("");
 let pendingContent: string | null = null;
 let rafId: number | null = null;
 
+// 复制图标
+const copySvg = `<svg t="1747030748345" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="15893" width="20" height="20" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M798.72 960H225.28a79.36 79.36 0 0 1-79.36-79.36V204.8a79.36 79.36 0 0 1 79.36-79.36h143.36a38.4 38.4 0 0 1 0 76.8H225.28a2.56 2.56 0 0 0-2.56 2.56v675.84a2.56 2.56 0 0 0 2.56 2.56h573.44a2.56 2.56 0 0 0 2.56-2.56V204.8a2.56 2.56 0 0 0-2.56-2.56h-143.36a38.4 38.4 0 0 1 0-76.8h143.36A79.36 79.36 0 0 1 878.08 204.8v675.84a79.36 79.36 0 0 1-79.36 79.36z" p-id="15894" fill="#808080"></path><path d="M368.64 64h286.72A38.4 38.4 0 0 1 693.76 102.4v122.88a38.4 38.4 0 0 1-38.4 38.4H368.64a38.4 38.4 0 0 1-38.4-38.4V102.4a38.4 38.4 0 0 1 38.4-38.4z m248.32 76.8h-209.92v46.08h209.92z" p-id="15895" fill="#808080"></path><path d="M665.6 468.48H378.88a38.4 38.4 0 1 1 0-76.8H665.6a38.4 38.4 0 0 1 0 76.8z" p-id="15896" fill="#808080"></path><path d="M665.6 632.32H378.88a38.4 38.4 0 1 1 0-76.8H665.6a38.4 38.4 0 0 1 0 76.8z" p-id="15897" fill="#808080"></path><path d="M665.6 796.16H378.88a38.4 38.4 0 1 1 0-76.8H665.6a38.4 38.4 0 0 1 0 76.8z" p-id="15898" fill="#808080"></path></svg>`;
+
+/**
+ * pre拼接
+ * @param lang 语言
+ * @param code 处理后的html代码串,getPre不会处理，只做拼接
+ */
+const getPre = (lang: string, code: string, codeHtml: string) => {
+    return `<div><button class="article-content-pre-copy">${copySvg}<span style="display: none;white-space: pre-wrap;word-break: break-word;">${code}</span></button><span class="article-content-pre-lang">${lang}</span><div class="language language-${lang}">${codeHtml}</div></div>`;
+}
+
 /**
  * 渲染markdown内容
  */
@@ -246,7 +268,6 @@ function doRender(content: string) {
  * 节流渲染
  */
 function scheduleRender(newContent: string) {
-    console.log("scheduleRender", newContent);
     pendingContent = newContent;
     if (rafId !== null) return;
     rafId = requestAnimationFrame(() => {
@@ -258,6 +279,36 @@ function scheduleRender(newContent: string) {
     });
 }
 watch(() => props.content, scheduleRender, { immediate: true });
+
+/**
+ * 复制代码
+ */
+const debounceCopyClick = debounce(async (e: PointerEvent) => {
+    const btn = (e.target as Element).closest('.article-content-pre-copy');
+    if (!btn) {
+        return;
+    }
+    const code = (btn.querySelector('span')?.textContent ?? '').trimEnd();
+    const ok = await copyTextToClipboard(code);
+    if (ok) {
+        toast.success('复制成功');
+    } else {
+        toast.error('复制失败');
+    }
+}, 2000, {
+    leading: true,
+    trailing: false,
+});
+
+/**
+ * 组件挂载时初始化
+ */
+onMounted(() => {
+    const root = rootRef.value;
+    if (root) {
+        root.addEventListener('click', debounceCopyClick)
+    };
+})
 </script>
 
 <style>

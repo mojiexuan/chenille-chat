@@ -41,5 +41,7 @@ export const aiChatSse = (
  * 获取动词指示器
  */
 export const getGerundIndicatorRequest = (content: string) => {
-  return post<string[]>(`/chat/gerund`, { params: { content } });
+  return post<string[]>(`/chat/gerund`, { content }, {
+    showErrorToast: false,
+  });
 };
