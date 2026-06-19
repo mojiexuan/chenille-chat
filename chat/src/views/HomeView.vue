@@ -166,78 +166,99 @@
           </div>
           <!-- 功能区域 -->
           <div class="home-input-area-box-editor-end">
-            <!-- 左侧 -->
-            <div class="home-input-area-box-editor-end-left">
-              <!-- 文件选择 -->
-              <div class="home-input-area-box-editor-end-left-button" @click="fileSelectClick">
-                <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M24.0605 10L24.0239 38" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                  <path d="M10 24L38 24" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg>
+            <div class="home-input-area-box-editor-end-track"
+              :style="{ transform: `translateY(-${activeToolbarPanel * 34}px)` }">
+              <!-- 上 -->
+              <div class="home-input-area-box-editor-end-track-top"></div>
+              <!-- 中 -->
+              <div class="home-input-area-box-editor-end-track-middle">
+                <!-- 左侧 -->
+                <div class="home-input-area-box-editor-end-track-middle-left">
+                  <!-- 文件选择 -->
+                  <div class="home-input-area-box-editor-end-track-middle-left-button" @click="fileSelectClick">
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M24.0605 10L24.0239 38" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                      <path d="M10 24L38 24" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </div>
+                  <!-- 打开语音通话页面 -->
+                  <div class="home-input-area-box-editor-end-track-middle-left-button" @click="openVoiceCallClick">
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M24 3.99976V43.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
+                      <path d="M34 11.9998V35.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
+                      <path d="M4 17.9998V29.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
+                      <path d="M44 17.9998V29.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
+                      <path d="M14 11.9998V35.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                </div>
+                <!-- 右侧 -->
+                <div class="home-input-area-box-editor-end-track-middle-right">
+                  <!-- 模型选择 -->
+                  <div class="home-input-area-box-editor-end-track-middle-right-model-select"
+                    @click="openModelSelectMenuClick">
+                    <span>{{ modelStore.currentModel?.name || "Auto" }}</span>
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M36 18L24 30L12 18" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </div>
+                  <!-- 语音识别按钮 -->
+                  <div class="home-input-area-box-editor-end-track-middle-right-button"
+                    @click="toggleSpeechRecognitionClick">
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="17" y="4" width="14" height="27" rx="7" fill="none" stroke="#3c3c43" stroke-width="4"
+                        stroke-linejoin="round" />
+                      <path d="M9 23C9 31.2843 15.7157 38 24 38C32.2843 38 39 31.2843 39 23" stroke="#3c3c43"
+                        stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M24 38V44" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </div>
+                  <!-- 发送暂停按钮 -->
+                  <a class="home-input-area-box-editor-end-track-middle-right-button home-input-area-box-editor-end-track-middle-right-send-button"
+                    :class="{ active: isSendButtonActive }" @click="sendClick">
+                    <svg v-if="sessionStore.isReplying" width="20" height="20" viewBox="0 0 48 48" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M34 12H14C12.8954 12 12 12.8954 12 14V34C12 35.1046 12.8954 36 14 36H34C35.1046 36 36 35.1046 36 34V14C36 12.8954 35.1046 12 34 12Z"
+                        fill="#ffffff" stroke="#ffffff" stroke-width="4" />
+                    </svg>
+                    <svg v-else width="20" height="20" viewBox="0 0 48 48" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path d="M24.0083 12.1006V36.0001" stroke="#ffffff" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                      <path d="M12 24L24 12L36 24" stroke="#ffffff" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </a>
+                </div>
               </div>
-              <!-- 打开语音通话页面 -->
-              <div class="home-input-area-box-editor-end-left-button" @click="openVoiceCallClick">
-                <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M24 3.99976V43.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
-                  <path d="M34 11.9998V35.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
-                  <path d="M4 17.9998V29.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
-                  <path d="M44 17.9998V29.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
-                  <path d="M14 11.9998V35.9998" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" />
-                </svg>
+              <!-- 下 -->
+              <div class="home-input-area-box-editor-end-track-bottom">
+                <!-- 左侧 -->
+                <div class="home-input-area-box-editor-end-track-bottom-left" @click="cancelSpeechRecognitionClick">
+                  <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 14L34 34" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                    <path d="M14 34L34 14" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <!-- 中间 -->
+                <div class="home-input-area-box-editor-end-track-bottom-middle">
+                  <span>{{ speechCountdown }}</span>s
+                </div>
+                <!-- 右侧 -->
+                <div class="home-input-area-box-editor-end-track-bottom-right" @click="submitSpeechRecognitionClick">
+                  <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 24L20 34L40 14" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <!-- 右侧 -->
-            <div class="home-input-area-box-editor-end-right">
-              <!-- 模型选择 -->
-              <div class="home-input-area-box-editor-end-right-model-select" @click="openModelSelectMenuClick">
-                <span>{{ modelStore.currentModel?.name || "Auto" }}</span>
-                <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M36 18L24 30L12 18" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg>
-              </div>
-              <!-- 语音识别按钮 -->
-              <div class="home-input-area-box-editor-end-right-button" @click="toggleSpeechRecognitionClick">
-                <svg v-if="showSpeechRecognition" width="20" height="20" viewBox="0 0 48 48" fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M31 24V11C31 7.13401 27.866 4 24 4C20.134 4 17 7.13401 17 11V24C17 27.866 20.134 31 24 31C27.866 31 31 27.866 31 24Z"
-                    stroke="#fd6b6d" stroke-width="4" stroke-linejoin="round" />
-                  <path
-                    d="M9 23C9 31.2843 15.7157 38 24 38C25.7532 38 27.4361 37.6992 29 37.1465M39 23C39 25.1333 38.5547 27.1626 37.7519 29"
-                    stroke="#fd6b6d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M24 38V44" stroke="#fd6b6d" stroke-width="4" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                  <path d="M42 42L6 6" stroke="#fd6b6d" stroke-width="4" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg>
-                <svg v-else width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="17" y="4" width="14" height="27" rx="7" fill="none" stroke="#3c3c43" stroke-width="4"
-                    stroke-linejoin="round" />
-                  <path d="M9 23C9 31.2843 15.7157 38 24 38C32.2843 38 39 31.2843 39 23" stroke="#3c3c43"
-                    stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M24 38V44" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg>
-              </div>
-              <!-- 发送暂停按钮 -->
-              <a class="home-input-area-box-editor-end-right-button home-input-area-box-editor-end-right-send-button"
-                :class="{ active: isSendButtonActive }" @click="sendClick">
-                <svg v-if="sessionStore.isReplying" width="20" height="20" viewBox="0 0 48 48" fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M34 12H14C12.8954 12 12 12.8954 12 14V34C12 35.1046 12.8954 36 14 36H34C35.1046 36 36 35.1046 36 34V14C36 12.8954 35.1046 12 34 12Z"
-                    fill="#ffffff" stroke="#ffffff" stroke-width="4" />
-                </svg>
-                <svg v-else width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M24.0083 12.1006V36.0001" stroke="#ffffff" stroke-width="4" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                  <path d="M12 24L24 12L36 24" stroke="#ffffff" stroke-width="4" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg>
-              </a>
             </div>
           </div>
         </div>
@@ -348,6 +369,13 @@ const modelSelectMenuVisible = ref(false);
 const modelSelectMenuAnchor = ref({ x: 0, y: 0 });
 // 是否显示语音识别
 const showSpeechRecognition = ref(false);
+// 录音倒计时（秒）
+const speechCountdown = ref(0);
+const MAX_RECORD_SECONDS = 60;
+// 倒计时定时器
+let countdownTimer: ReturnType<typeof setInterval> | null = null;
+// 工具栏当前面板 0=上 1=中(默认) 2=下
+const activeToolbarPanel = ref<0 | 1 | 2>(1);
 // 麦克风音量
 const microphoneVolume = ref(0);
 // 麦克风流
@@ -553,22 +581,48 @@ function openModelSelectMenuClick(e: MouseEvent) {
 }
 
 /**
+ * 取消语音识别
+ */
+function cancelSpeechRecognitionClick() {
+  stopSpeechRecognition(false);
+}
+
+/**
+ * 停止语音识别
+ */
+function stopSpeechRecognition(submit: boolean) {
+  switchToolbarPanel(1);
+  showSpeechRecognition.value = false;
+  stopVolumeWatch?.();
+  // 清除倒计时定时器
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+  // 停止录音
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    if (!submit) {
+      // 清除录音结束事件处理函数
+      mediaRecorder.onstop = null;
+    }
+    mediaRecorder.stop();
+  }
+  audioStream?.getTracks().forEach((t) => t.stop());
+  audioStream = null;
+  microphoneVolume.value = 0;
+}
+
+/**
  * 切换语音识别开关
  */
 async function toggleSpeechRecognitionClick() {
   // 已开启 关闭麦克风
   if (showSpeechRecognition.value) {
-    showSpeechRecognition.value = false;
-    stopVolumeWatch?.();
-    // 停止录音
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-    }
-    audioStream?.getTracks().forEach((t) => t.stop());
-    audioStream = null;
-    microphoneVolume.value = 0;
+    cancelSpeechRecognitionClick();
     return;
   }
+
+  switchToolbarPanel(2);
 
   showSpeechRecognition.value = true;
   // 获取麦克风权限
@@ -596,6 +650,16 @@ async function toggleSpeechRecognitionClick() {
 
   // 启动录音收集
   audioChunks.length = 0;
+  // 录音倒计时
+  speechCountdown.value = MAX_RECORD_SECONDS;
+  countdownTimer = setInterval(() => {
+    speechCountdown.value--;
+    if (speechCountdown.value <= 0) {
+      speechCountdown.value = 0;
+      submitSpeechRecognitionClick();
+    }
+  }, 1000);
+  // 启动录音
   mediaRecorder = new MediaRecorder(audioStream, {
     mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
       ? "audio/webm;codecs=opus"
@@ -614,6 +678,21 @@ async function toggleSpeechRecognitionClick() {
 }
 
 /**
+ * 提交语音识别
+ */
+function submitSpeechRecognitionClick() {
+  stopSpeechRecognition(true);
+}
+
+/**
+ * 切换工具栏面板
+ * @param panel 0=上 1=中(默认) 2=下
+ */
+function switchToolbarPanel(panel: 0 | 1 | 2) {
+  activeToolbarPanel.value = panel;
+}
+
+/**
  * 切换模型
  */
 function switchModelClick(modelId: string) {
@@ -621,6 +700,10 @@ function switchModelClick(modelId: string) {
 }
 
 onUnmounted(() => {
+  // 停止倒计时
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+  }
   // 停止 volume 响应式同步
   stopVolumeWatch?.();
   // 停止音量采样 setInterval
@@ -903,19 +986,35 @@ onUnmounted(() => {
 }
 
 .home-input-area-box-editor-end {
+  overflow: hidden;
+  height: 34px;
+}
+
+.home-input-area-box-editor-end-track {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-input-area-box-editor-end-track-top {
+  display: flex;
+  align-items: center;
+  height: 34px;
+}
+
+.home-input-area-box-editor-end-track-middle {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 34px;
 }
 
-.home-input-area-box-editor-end-left {
+.home-input-area-box-editor-end-track-middle-left {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
 }
 
-.home-input-area-box-editor-end-left-button {
+.home-input-area-box-editor-end-track-middle-left-button {
   width: 34px;
   height: 34px;
   display: flex;
@@ -924,14 +1023,14 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.home-input-area-box-editor-end-right {
+.home-input-area-box-editor-end-track-middle-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
 }
 
-.home-input-area-box-editor-end-right-model-select {
+.home-input-area-box-editor-end-track-middle-right-model-select {
   height: 34px;
   padding: 0 8px;
   border-radius: 8px;
@@ -943,11 +1042,11 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.home-input-area-box-editor-end-right-model-select:hover {
+.home-input-area-box-editor-end-track-middle-right-model-select:hover {
   background-color: var(--ch-feature-card-bg);
 }
 
-.home-input-area-box-editor-end-right-button {
+.home-input-area-box-editor-end-track-middle-right-button {
   width: 34px;
   height: 34px;
   display: flex;
@@ -956,19 +1055,50 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.home-input-area-box-editor-end-right-send-button {
+.home-input-area-box-editor-end-track-middle-right-send-button {
   border-radius: 50%;
   background-color: var(--ch-main-color);
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.home-input-area-box-editor-end-right-send-button:hover {
+.home-input-area-box-editor-end-track-middle-right-send-button:hover {
   background-color: var(--ch-main-hover-color);
 }
 
-.home-input-area-box-editor-end-right-send-button.active {
+.home-input-area-box-editor-end-track-middle-right-send-button.active {
   opacity: 1;
+  cursor: pointer;
+}
+
+.home-input-area-box-editor-end-track-bottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 34px;
+  user-select: none;
+}
+
+.home-input-area-box-editor-end-track-bottom-left {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.home-input-area-box-editor-end-track-bottom-middle {
+  flex: 1;
+  text-align: center;
+}
+
+.home-input-area-box-editor-end-track-bottom-right {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
 
