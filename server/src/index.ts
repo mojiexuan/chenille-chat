@@ -6,9 +6,10 @@ import {
   redisClientPlugin,
   dbClientPlugin,
   multipartPlugin,
+  websocketPlugin,
 } from "@/plugins";
 import { logger } from "@/utils";
-import { v1Router } from "@/router/v1";
+import { v1Router, v2Router, wsRouter } from "@/router";
 import { runMigrate, runSeed } from "@/db";
 import FastifyStatic from "@fastify/static";
 import { UPLOADS_PATH, ensurePaths } from "@/constants/path";
@@ -31,6 +32,8 @@ async function main() {
   ensurePaths();
   // 注册multipart插件
   app.register(multipartPlugin);
+  // 注册WebSocket插件
+  app.register(websocketPlugin);
   // 注册错误处理插件
   app.register(errorHandlerPlugin);
   // 注册响应插件
@@ -46,6 +49,12 @@ async function main() {
   });
   // 注册V1控制器插件
   app.register(v1Router, { prefix: "/api/v1" });
+  // 注册V2控制器插件
+  app.register(v2Router, { prefix: "/api/v2" });
+  // 注册WebSocket控制器插件
+  app.register(wsRouter, {
+    prefix: "/ws",
+  });
 
   app.listen({ port: Number(config.APP_PORT) }, (err) => {
     if (err) throw err;

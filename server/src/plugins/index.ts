@@ -5,3 +5,4 @@ export * from "./db.plugin";
 export * from "./multipart.plugin";
 export * from "./role.plugin";
 export * from "./auth.plugin";
+export * from "./websocket.plugin";
