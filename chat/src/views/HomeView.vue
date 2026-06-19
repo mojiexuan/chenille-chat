@@ -223,7 +223,10 @@
                   <!-- 语音识别按钮 -->
                   <div class="home-input-area-box-editor-end-track-middle-right-button"
                     @click="toggleSpeechRecognitionClick">
-                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <img v-if="speechRecognitionLoading" width="20" height="20" src="../assets/images/loading.svg"
+                      alt="语音识别中">
+                    <svg v-else width="20" height="20" viewBox="0 0 48 48" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
                       <rect x="17" y="4" width="14" height="27" rx="7" fill="none" stroke="#3c3c43" stroke-width="4"
                         stroke-linejoin="round" />
                       <path d="M9 23C9 31.2843 15.7157 38 24 38C32.2843 38 39 31.2843 39 23" stroke="#3c3c43"
@@ -384,6 +387,8 @@ const modelSelectMenuVisible = ref(false);
 const modelSelectMenuAnchor = ref({ x: 0, y: 0 });
 // 是否显示语音识别
 const showSpeechRecognition = ref(false);
+// 是否正在识别语音
+const speechRecognitionLoading = ref(false);
 // 录音倒计时（秒）
 const speechCountdown = ref(0);
 const MAX_RECORD_SECONDS = 60;
@@ -631,6 +636,7 @@ function stopSpeechRecognition(submit: boolean) {
  * 切换语音识别开关
  */
 async function toggleSpeechRecognitionClick() {
+  if (speechRecognitionLoading.value) return;
   // 已开启 关闭麦克风
   if (showSpeechRecognition.value) {
     cancelSpeechRecognitionClick();
@@ -683,11 +689,18 @@ async function toggleSpeechRecognitionClick() {
   mediaRecorder.ondataavailable = (e) => {
     if (e.data.size > 0) audioChunks.push(e.data);
   };
-  mediaRecorder.onstop = async () => {
+  mediaRecorder.onstop = () => {
     if (audioChunks.length === 0) return;
     const blob = new Blob(audioChunks, { type: mediaRecorder!.mimeType });
-    const result = await asrRecognizeRequest(blob, "recording.webm");
-    editorMessage.value += result;
+    speechRecognitionLoading.value = true;
+    asrRecognizeRequest(blob, "recording.webm")
+      .then((result) => {
+        speechRecognitionLoading.value = false;
+        editorMessage.value += result;
+      })
+      .catch(() => {
+        speechRecognitionLoading.value = false;
+      });
   };
   mediaRecorder.start();
 }
