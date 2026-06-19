@@ -47,7 +47,7 @@ export const modelAddOrUpdateDto = z.object({
   canOutputVideo: z.boolean().optional(),
   isDefault: z.boolean().optional(),
   isActive: z.boolean().optional(),
-  sortOrder: z.number().int().min(0).max(100).optional(),
+  sortOrder: z.coerce.number().int().min(0).max(100).optional(),
 });
 
 export type ProviderIdDto = z.infer<typeof providerIdDto>;

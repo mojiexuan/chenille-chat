@@ -49,6 +49,16 @@ export namespace AiApi {
         isDefault: boolean,
         sortOrder: number,
     }
+
+    /**
+     * 添加或更新智能体参数
+     */
+    export interface AddOrUpdateAgentParams {
+        id?: string,
+        name?: string,
+        description?: string,
+        modelId?: string,
+    }
 }
 
 /**
@@ -101,5 +111,13 @@ export async function deleteModelApi(id: string) {
  * 获取智能体列表
  */
 export async function getAgentListApi() {
-    return requestClient.get<AiApi.AgentResult>('/admin/agent/list');
+    return requestClient.get<AiApi.AgentResult>('/admin/agents');
+}
+
+/**
+ * 添加或更新智能体
+ * @param data 参数
+ */
+export async function addOrUpdateAgentApi(data: AiApi.AddOrUpdateAgentParams) {
+    return requestClient.put("/admin/agent", data);
 }

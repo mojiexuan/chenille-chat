@@ -2,13 +2,16 @@ import { db, agents, models, modelProviders } from "@/db";
 import { eq } from "drizzle-orm";
 import { AgentKey } from "@/enumeration";
 import { agentSafeVo } from "@/vo";
+import { AgentAddOrUpdateDto } from "@/dto";
 import { asc } from "drizzle-orm";
+import { BizException } from "@/exception";
+import { BizCode } from "@/enumeration";
 
 /**
  * 智能体服务
  */
 class AgentService {
-  constructor() {}
+  constructor() { }
 
   /**
    * 获取智能体详情
@@ -80,6 +83,43 @@ class AgentService {
       .leftJoin(models, eq(agents.modelId, models.id))
       .orderBy(asc(agents.id));
   }
+
+  /**
+   * 添加或更新智能体
+   */
+  async addOrUpdateAgent(agent: AgentAddOrUpdateDto) {
+    const set: Partial<typeof agents.$inferInsert> = {};
+    if (agent.modelId) {
+      const [model] = await db
+        .select({ id: models.id })
+        .from(models)
+        .where(eq(models.id, agent.modelId))
+        .limit(1);
+      if (!model) {
+        throw new BizException(BizCode.MODEL_NOT_FOUND);
+      }
+      set.modelId = model.id;
+    }
+    if (agent.name) {
+      set.name = agent.name;
+    }
+    if (agent.description) {
+      set.description = agent.description;
+    }
+    if (agent.id) {
+      await db.update(agents).set(set).where(eq(agents.id, agent.id));
+      return;
+    }
+    await db.insert(agents).values(set as typeof agents.$inferInsert);
+  }
+
+  /**
+   * 删除智能体
+   */
+  async deleteAgent(agentId: string) {
+    await db.delete(agents).where(eq(agents.id, agentId));
+  }
+
 }
 
 export const agentService = new AgentService();

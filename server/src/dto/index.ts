@@ -4,3 +4,4 @@ export * from "./pagination.dto";
 export * from "./session.dto";
 export * from "./user.dto";
 export * from "./model.dto";
+export * from "./agent.dto";

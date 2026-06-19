@@ -52,4 +52,5 @@ export class BizCode {
   static readonly ASR_AGENT_NOT_CONFIGURED = new BizCode(40060, 500, "语音识别代理未配置");
   static readonly ASR_ERROR = new BizCode(40061, 500, "语音识别失败");
   static readonly MODEL_PROVIDER_NOT_FOUND = new BizCode(40070, 400, "模型提供方不存在");
+  static readonly MODEL_NOT_FOUND = new BizCode(40080, 400, "模型不存在");
 }

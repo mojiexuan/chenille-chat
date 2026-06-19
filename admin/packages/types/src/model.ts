@@ -42,6 +42,7 @@ interface Agent {
     name: string;
     key: string;
     description: string;
+    modelId: string;
 }
 
 export type { Agent, Model, ModelProvider, ReasoningEffort }

@@ -12,7 +12,7 @@ import type {
  * 获取会话列表
  */
 export const getSessionList = (params: PaginationRequest) => {
-  return get<PaginationResponse<SessionItem>>("/chat/session/list", { params });
+  return get<PaginationResponse<SessionItem>>("/chat/sessions", { params });
 };
 
 /**

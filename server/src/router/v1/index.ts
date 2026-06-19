@@ -21,6 +21,8 @@ import {
   addOrUpdateModelHandler,
   deleteModelHandler,
   getAgentListHandler,
+  addOrUpdateAgentHandler,
+  // deleteAgentHandler,
   deleteSessionHandler,
   updateSessionHandler,
   asrRecognizeHandler,
@@ -45,12 +47,12 @@ export async function v1Router(fastify: FastifyInstance) {
       scope.patch("/user/me/settings", meUpdateUserSettingsHandler);
       scope.post("/chat/sse", chatSseHandler);
       scope.post("/chat/gerund", chatGerundIndicatorHandler);
-      scope.get("/chat/session/list", getSessionListHandler);
+      scope.get("/chat/sessions", getSessionListHandler);
       scope.get("/chat/session/:sessionId/title", getSessionTitleHandler);
       scope.patch("/chat/session/:sessionId", updateSessionHandler);
       scope.delete("/chat/session/:sessionId", deleteSessionHandler);
       scope.get("/chat/session/:sessionId", getSessionHandler);
-      scope.get("/chat/model/list", getActiveModelListHandler);
+      scope.get("/chat/models", getActiveModelListHandler);
       scope.post("/asr/recognize", asrRecognizeHandler);
     });
     // 管理员用户
@@ -60,7 +62,10 @@ export async function v1Router(fastify: FastifyInstance) {
         "/admin/providers",
         getModelProviderListHandler,
       );
-      adminScope.get("/admin/agent/list", getAgentListHandler);
+      adminScope.get("/admin/agents", getAgentListHandler);
+      adminScope.put("/admin/agent", addOrUpdateAgentHandler);
+      adminScope.patch("/admin/agent", addOrUpdateAgentHandler);
+      // adminScope.delete("/admin/agent/:agentId", deleteAgentHandler); 暂不需要支持删除智能体
       adminScope.put("/admin/provider", addOrUpdateModelProviderHandler);
       adminScope.patch("/admin/provider", addOrUpdateModelProviderHandler);
       adminScope.delete("/admin/provider/:providerId", deleteModelProviderHandler);
