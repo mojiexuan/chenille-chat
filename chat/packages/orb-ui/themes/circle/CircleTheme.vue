@@ -210,7 +210,7 @@ function runEffect() {
       const scaleDone = Math.abs(currentScaleRef.current - 1) < SETTLE_SCALE_EPSILON
       const glowDone = currentGlowRef.current < 0.1
       const colorDone = currentColorRef.current.every(
-        (channel, i) => Math.abs(channel - tRgb[i]) < 1,
+        (channel, i) => Math.abs(channel - tRgb[i]!) < 1,
       )
 
       if (scaleDone && glowDone && colorDone) {

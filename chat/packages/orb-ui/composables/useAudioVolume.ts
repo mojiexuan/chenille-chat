@@ -59,7 +59,7 @@ export function createMicMonitor(): MicMonitor {
         if (!analyser) return
         analyser.getByteFrequencyData(dataArray)
         let sum = 0
-        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i] * dataArray[i]
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i]! * dataArray[i]!
         const rms = Math.sqrt(sum / dataArray.length) / 255
         const rate = rms > ema ? 0.7 : 0.3
         ema += (rms - ema) * rate
@@ -190,7 +190,7 @@ export function useAudioVolume(): UseAudioVolumeReturn {
       if (!analyser) return
       analyser.getByteFrequencyData(dataArray)
       let sum = 0
-      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i] * dataArray[i]
+      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i]! * dataArray[i]!
       const rms = Math.sqrt(sum / dataArray.length) / 255
       // EMA: fast attack (0.7), slow release (0.3) — matches the Orb's mic monitor
       const rate = rms > ema ? 0.7 : 0.3

@@ -54,7 +54,7 @@ const smoothed = { current: new Array(BAR_COUNT).fill(0) as number[] }
 const volumeRef = { current: props.volume }
 const hoveredRef = { current: false }
 const hoverBoostRef = { current: 0 }
-const currentColorRef = { current: hexToRgb(STATE_COLORS.idle) as [number, number, number] }
+const currentColorRef = { current: hexToRgb(STATE_COLORS.idle!) as [number, number, number] }
 
 // State transition: blend targets over BLEND_MS so bar heights don't jump
 const BLEND_MS = 300
@@ -145,9 +145,9 @@ function startAnimation() {
       const el = barRefs.value[i]
       if (!el) continue
       // Diamond shape on idle, uniform boost on other states
-      const weight = state === 'idle' ? diamondWeights[i] : 1
+      const weight = state === 'idle' ? diamondWeights[i]! : 1
       const boost = hoverBoostRef.current * weight
-      el.style.height = `${Math.min(heights[i] + boost, maxHl)}px`
+      el.style.height = `${Math.min(heights[i]! + boost, maxHl)}px`
       el.style.background = lerpedColor
       el.style.animation = 'none'
     }
@@ -172,17 +172,17 @@ function startAnimation() {
           const elapsed = Date.now() - blendStartRef.current
           const progress = Math.min(elapsed / BLEND_MS, 1)
           const ease = 1 - (1 - progress) * (1 - progress)
-          targetH = frozenHeightsRef.current[i] + (targetH - frozenHeightsRef.current[i]) * ease
+          targetH = frozenHeightsRef.current[i]! + (targetH - frozenHeightsRef.current[i]!) * ease
           if (progress >= 1) blendStartRef.current = null
         }
 
         // Uniform lerp — speaking uses lower rate since bars show steps more visibly
         const rate = state === 'listening' ? 0.45 : 1.0
 
-        smoothed.current[i] += (targetH - smoothed.current[i]) * rate
+        smoothed.current[i]! += (targetH - smoothed.current[i]!) * rate
       }
 
-      setBars(smoothed.current, color)
+      setBars(smoothed.current, color!)
       rafRef.current = requestAnimationFrame(animate)
     }
     rafRef.current = requestAnimationFrame(animate)
@@ -201,9 +201,9 @@ function startAnimation() {
         const wave = cycle < 0.5 ? Math.sin((cycle / 0.5) * Math.PI) : 0
         const targetH = minHl + (maxHl * 0.4 - minHl) * wave
         // Lerp from current height into wave for smooth transition from hover
-        smoothed.current[i] += (targetH - smoothed.current[i]) * 0.15
+        smoothed.current[i]! += (targetH - smoothed.current[i]!) * 0.15
       }
-      setBars(smoothed.current, color)
+      setBars(smoothed.current, color!)
       rafRef.current = requestAnimationFrame(animate)
     }
     rafRef.current = requestAnimationFrame(animate)
@@ -215,9 +215,9 @@ function startAnimation() {
   const animateStatic = () => {
     updateHoverBoost()
     for (let i = 0; i < BAR_COUNT; i++) {
-      smoothed.current[i] += (minHl - smoothed.current[i]) * 0.16
+      smoothed.current[i]! += (minHl - smoothed.current[i]!) * 0.16
     }
-    setBars(smoothed.current, color)
+    setBars(smoothed.current, color!)
     rafRef.current = requestAnimationFrame(animateStatic)
   }
   rafRef.current = requestAnimationFrame(animateStatic)
@@ -291,45 +291,18 @@ const buttonStyle = computed<CSSProperties>(() => ({
 </script>
 
 <template>
-  <button
-    v-if="interactive"
-    v-bind="attrs"
-    type="button"
-    :class="className"
-    :disabled="disabled"
-    :style="buttonStyle"
-    @click="disabled ? undefined : onClick?.()"
-  >
-    <span
-      ref="hoverRef"
-      :style="innerStyle"
-      @mouseenter="onMouseEnter"
-      @mouseleave="onMouseLeave"
-      @touchend="onTouchEnd"
-    >
-      <span
-        v-for="i in BAR_COUNT"
-        :key="i - 1"
-        :ref="(el) => setBarRef(el, i - 1)"
-        :style="barStyle()"
-      />
+  <button v-if="interactive" v-bind="attrs" type="button" :class="className" :disabled="disabled" :style="buttonStyle"
+    @click="disabled ? undefined : onClick?.()">
+    <span ref="hoverRef" :style="innerStyle" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave"
+      @touchend="onTouchEnd">
+      <span v-for="i in BAR_COUNT" :key="i - 1" :ref="(el) => setBarRef(el, i - 1)" :style="barStyle()" />
     </span>
   </button>
 
   <div v-else v-bind="attrs" :class="className" :style="rootStyle">
-    <span
-      ref="hoverRef"
-      :style="innerStyle"
-      @mouseenter="onMouseEnter"
-      @mouseleave="onMouseLeave"
-      @touchend="onTouchEnd"
-    >
-      <span
-        v-for="i in BAR_COUNT"
-        :key="i - 1"
-        :ref="(el) => setBarRef(el, i - 1)"
-        :style="barStyle()"
-      />
+    <span ref="hoverRef" :style="innerStyle" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave"
+      @touchend="onTouchEnd">
+      <span v-for="i in BAR_COUNT" :key="i - 1" :ref="(el) => setBarRef(el, i - 1)" :style="barStyle()" />
     </span>
   </div>
 </template>
