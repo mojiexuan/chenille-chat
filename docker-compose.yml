@@ -1,0 +1,83 @@
+name: chenille-chat
+
+services:
+  postgres:
+    container_name: chenille_chat_server_postgres
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+      TZ: Asia/Shanghai
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - ./volumes/postgres/backup:/db_back
+      - ./volumes/postgres/data:/var/lib/postgresql/data
+    networks:
+      - chenille_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: chenille_chat_server_redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - ./volumes/redis/data:/data
+      - ./volumes/redis/logs:/var/log/redis
+    environment:
+      TZ: Asia/Shanghai
+    networks:
+      - chenille_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  server:
+    build: ./server
+    container_name: chenille_chat_server
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-5000}:${APP_PORT:-5000}"
+    env_file:
+      - ./server/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - chenille_network
+
+  chat:
+    build: ./chat
+    container_name: chenille_chat_chat
+    restart: unless-stopped
+    ports:
+      - "5001:80"
+    networks:
+      - chenille_network
+
+  admin:
+    build: ./admin
+    container_name: chenille_chat_admin
+    restart: unless-stopped
+    ports:
+      - "5002:80"
+    networks:
+      - chenille_network
+
+networks:
+  chenille_network:
+    driver: bridge
