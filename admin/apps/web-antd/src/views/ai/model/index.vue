@@ -1,8 +1,10 @@
 <script setup lang="ts" name="Provider">
-import type { ModelProvider } from '@vben/types';
+import type { Model, ModelProvider } from '@vben/types';
 
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { AiApi } from '#/api';
+
+import { computed, onMounted, ref } from 'vue';
 
 import { useVbenDrawer, VbenButton } from '@vben/common-ui';
 
@@ -10,19 +12,25 @@ import { Button, Modal, Tag } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { addOrUpdateModelProviderApi, deleteModelProviderApi, getModelProviderApi } from '#/api';
+import { addOrUpdateModelApi, deleteModelApi, getModelListApi, getModelProviderApi } from '#/api';
+
+// 模型列表
+const modelProviderList = ref<ModelProvider[]>([]);
 
 /**
- * 模型供应商表格配置
+ * 模型表格配置
  */
-const gridOptions: VxeGridProps<ModelProvider> = {
+const gridOptions: VxeGridProps<Model> = {
     columns: [
         { title: '序号', type: 'seq', width: 50 },
-        { field: 'provider', title: '品牌' },
+        { field: 'providerId', title: '供应商', formatter: ({ cellValue }) => modelProviderList.value.find((p) => p.id === cellValue)?.name ?? "未知供应商" },
         { field: 'name', title: '名称' },
-        { field: 'apiKey', title: 'API Key' },
-        { field: 'baseUrl', title: 'Base URL' },
+        { field: 'modelName', title: '模型ID' },
+        { field: 'description', title: '描述' },
+        { field: 'reasoningEffort', title: '推理' },
         { field: 'isActive', title: '状态', slots: { default: 'is-active' } },
+        { field: 'isDefault', title: '默认', slots: { default: 'is-default' } },
+        { field: 'sortOrder', title: '排序' },
         {
             field: 'action',
             slots: { default: 'action' },
@@ -37,7 +45,7 @@ const gridOptions: VxeGridProps<ModelProvider> = {
     proxyConfig: {
         ajax: {
             query: async () => {
-                const items = await getModelProviderApi();
+                const items = await getModelListApi();
                 return {
                     total: items.length,
                     items,
@@ -55,13 +63,13 @@ const gridOptions: VxeGridProps<ModelProvider> = {
 };
 
 /**
- * 模型供应商表格实例
+ * 模型表格实例
  */
 const [Grid, gridApi] = useVbenVxeGrid({
     gridOptions,
 });
 /**
- * 模型供应商抽屉实例
+ * 模型抽屉实例
  */
 const [Drawer, drawerApi] = useVbenDrawer({
     closeOnClickModal: false,
@@ -69,7 +77,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
     onConfirm: onSubmit,
 });
 /**
- * 模型供应商抽屉表单实例
+ * 模型抽屉表单实例
  */
 const [Form, formApi] = useVbenForm({
     // 所有表单项共用，可单独在表单内覆盖
@@ -89,38 +97,22 @@ const [Form, formApi] = useVbenForm({
             componentProps: {
                 allowClear: true,
                 filterOption: true,
-                options: [
-                    {
-                        label: 'Deepseek',
-                        value: 'deepseek',
-                    },
-                    {
-                        label: 'OpenAI',
-                        value: 'openai',
-                    },
-                    {
-                        label: 'Google',
-                        value: 'google',
-                    },
-                    {
-                        label: 'Anthropic',
-                        value: 'anthropic',
-                    },
-                ],
+                options: computed(() => modelProviderList.value.map((item) => ({
+                    label: item.name,
+                    value: item.id,
+                }))),
                 placeholder: '请选择',
                 showSearch: true,
             },
-            defaultValue: "deepseek",
-            fieldName: 'provider',
-            label: '品牌',
+            fieldName: 'providerId',
+            label: '供应商',
             rules: 'selectRequired',
         },
         {
             component: 'Input',
             componentProps: {
-                placeholder: '请输入供应商名称',
+                placeholder: 'Deepseek-V4-Pro',
             },
-            defaultValue: 'Deepseek',
             fieldName: 'name',
             label: '名称',
             rules: z.string().min(1, { message: '最少输入1个字符' }).max(30, { message: '最多输入50个字符' }),
@@ -128,21 +120,98 @@ const [Form, formApi] = useVbenForm({
         {
             component: 'Input',
             componentProps: {
-                placeholder: '请输入API Key',
+                placeholder: 'deepseek-v4-pro',
             },
-            fieldName: 'apiKey',
-            label: 'API Key',
-            rules: z.string().min(1, { message: '最少输入1个字符' }).max(260, { message: '最多输入260个字符' }),
+            fieldName: 'modelName',
+            label: '模型ID',
+            help: '发起请求时使用的模型ID',
+            rules: z.string().min(1, { message: '最少输入1个字符' }).max(100, { message: '最多输入100个字符' }),
         },
         {
             component: 'Input',
             componentProps: {
-                placeholder: '请输入Base URL',
+                placeholder: '请输入描述',
             },
-            defaultValue: 'https://api.deepseek.com',
-            fieldName: 'baseUrl',
-            label: 'Base URL',
+            fieldName: 'description',
+            label: '描述',
             rules: z.string().min(1, { message: '最少输入1个字符' }).max(260, { message: '最多输入260个字符' }),
+        },
+        {
+            component: 'Select',
+            componentProps: {
+                allowClear: true,
+                filterOption: true,
+                options: [
+                    { label: '高', value: 'high' },
+                    { label: '低', value: 'low' },
+                    { label: '中', value: 'medium' },
+                    { label: '最小', value: 'minimal' },
+                    { label: '无', value: 'none' },
+                    { label: '超高', value: 'xhigh' },
+                ],
+                placeholder: '请选择',
+                showSearch: true,
+            },
+            defaultValue: 'high',
+            fieldName: 'reasoningEffort',
+            label: '推理',
+            rules: 'selectRequired',
+        },
+        {
+            component: 'Switch',
+            defaultValue: true,
+            fieldName: 'canInputText',
+            label: '输入文本',
+            wrapperClass: 'w-12'
+        },
+        {
+            component: 'Switch',
+            defaultValue: true,
+            fieldName: 'canOutputText',
+            label: '输出文本',
+            wrapperClass: 'w-12'
+        },
+        {
+            component: 'Switch',
+            defaultValue: false,
+            fieldName: 'canInputImage',
+            label: '输入图片',
+            wrapperClass: 'w-12'
+        },
+        {
+            component: 'Switch',
+            defaultValue: false,
+            fieldName: 'canOutputImage',
+            label: '输出图片',
+            wrapperClass: 'w-12'
+        },
+        {
+            component: 'Switch',
+            defaultValue: false,
+            fieldName: 'canInputAudio',
+            label: '输入音频',
+            wrapperClass: 'w-12'
+        },
+        {
+            component: 'Switch',
+            defaultValue: false,
+            fieldName: 'canOutputAudio',
+            label: '输出音频',
+            wrapperClass: 'w-12'
+        },
+        {
+            component: 'Switch',
+            defaultValue: false,
+            fieldName: 'canInputVideo',
+            label: '输入视频',
+            wrapperClass: 'w-12'
+        },
+        {
+            component: 'Switch',
+            defaultValue: false,
+            fieldName: 'canOutputVideo',
+            label: '输出视频',
+            wrapperClass: 'w-12'
         },
         {
             component: 'Switch',
@@ -151,15 +220,32 @@ const [Form, formApi] = useVbenForm({
             label: '是否启用',
             wrapperClass: 'w-12'
         },
+        {
+            component: 'Switch',
+            defaultValue: false,
+            fieldName: 'isDefault',
+            label: '是否默认',
+            wrapperClass: 'w-12'
+        },
+        {
+            component: 'InputNumber',
+            componentProps: {
+                min: 0,
+                max: 100,
+            },
+            defaultValue: 0,
+            fieldName: 'sortOrder',
+            label: '排序',
+        },
     ],
     wrapperClass: 'grid-cols-1',
 });
 
 /**
- * 添加模型供应商
+ * 添加模型
  */
 const handleAddClick = () => {
-    drawerApi.setState({ title: "添加模型供应商" });
+    drawerApi.setState({ title: "添加模型" });
     drawerApi.open();
 }
 
@@ -171,7 +257,7 @@ function onSubmit() {
         .then((values) => {
             if (values) {
                 drawerApi.lock();
-                addOrUpdateModelProviderApi(values as AiApi.AddOrUpdateModelProviderParams)
+                addOrUpdateModelApi(values as AiApi.AddOrUpdateModelParams)
                     .then(() => {
                         gridApi.reload();
                     })
@@ -185,25 +271,25 @@ function onSubmit() {
 }
 
 /**
- * 编辑模型供应商
+ * 编辑模型
  */
-const handleEditClick = (row: ModelProvider) => {
-    drawerApi.setState({ title: "编辑模型供应商" });
+const handleEditClick = (row: Model) => {
+    drawerApi.setState({ title: "编辑模型" });
     formApi.setValues(row, false);
     drawerApi.open();
 }
 
 /**
- * 删除模型供应商
+ * 删除模型
  */
-const handleDeleteClick = (row: ModelProvider) => {
+const handleDeleteClick = (row: Model) => {
     Modal.confirm({
         title: '确认删除吗？',
         okText: '确认',
         okType: 'danger',
         onOk: () => {
             gridApi.setLoading(true);
-            deleteModelProviderApi(row.id)
+            deleteModelApi(row.id)
                 .then(() => {
                     gridApi.setLoading(false);
                     gridApi.reload();
@@ -214,6 +300,13 @@ const handleDeleteClick = (row: ModelProvider) => {
         }
     })
 }
+
+onMounted(() => {
+    // 初始化模型列表
+    getModelProviderApi().then((res) => {
+        modelProviderList.value = res || [];
+    })
+})
 </script>
 
 <template>
@@ -227,11 +320,16 @@ const handleDeleteClick = (row: ModelProvider) => {
         <Grid>
             <template #toolbar-tools>
                 <VbenButton @click="handleAddClick">
-                    添加模型供应商
+                    添加模型
                 </VbenButton>
             </template>
             <template #is-active="{ row }">
                 <Tag :color="row.isActive ? 'success' : 'default'">{{ row.isActive ? '已启用' : '已禁用' }}</Tag>
+            </template>
+            <template #is-default="{ row }">
+                <Tag :bordered="false" :color="row.isDefault ? 'success' : 'default'">
+                    {{ row.isDefault ? '默认' : '-' }}
+                </Tag>
             </template>
             <template #action="{ row }">
                 <Button type="link" @click="handleEditClick(row)">编辑</Button>

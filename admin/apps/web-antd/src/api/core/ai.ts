@@ -1,4 +1,4 @@
-import type { Agent, Model, ModelProvider } from '@vben/types';
+import type { Agent, Model, ModelProvider, ReasoningEffort } from '@vben/types';
 
 import { requestClient } from '#/api/request';
 
@@ -19,11 +19,35 @@ export namespace AiApi {
      * 添加或更新模型提供方参数
      */
     export interface AddOrUpdateModelProviderParams {
+        id?: string,
         provider: string,
         name: string,
         apiKey: string,
         baseUrl: string,
         isActive: boolean,
+    }
+
+    /**
+     * 添加或更新模型参数
+     */
+    export interface AddOrUpdateModelParams {
+        id?: string,
+        providerId: string,
+        name: string,
+        modelName: string,
+        description: string,
+        reasoningEffort: ReasoningEffort,
+        canInputText: boolean,
+        canOutputText: boolean,
+        canInputImage: boolean,
+        canOutputImage: boolean,
+        canInputVideo: boolean,
+        canOutputVideo: boolean,
+        canInputAudio: boolean,
+        canOutputAudio: boolean,
+        isActive: boolean,
+        isDefault: boolean,
+        sortOrder: number,
     }
 }
 
@@ -53,8 +77,24 @@ export async function deleteModelProviderApi(id: string) {
 /**
  * 获取模型列表
  */
-export async function getModelListByProviderIdApi(params: AiApi.ModelListParams) {
-    return requestClient.get<AiApi.ModelListResult>(`/admin/chat/model/${params.providerId}/list`);
+export async function getModelListApi() {
+    return requestClient.get<AiApi.ModelListResult>(`/admin/models`);
+}
+
+/**
+ * 添加或更新模型
+ * @param data 参数
+ */
+export async function addOrUpdateModelApi(data: AiApi.AddOrUpdateModelParams) {
+    return requestClient.put("/admin/model", data);
+}
+
+/**
+ * 删除模型
+ * @param id 模型ID
+ */
+export async function deleteModelApi(id: string) {
+    return requestClient.delete(`/admin/model/${id}`);
 }
 
 /**

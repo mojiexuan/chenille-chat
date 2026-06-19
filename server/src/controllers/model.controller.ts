@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { modelService } from "@/services";
-import { modelByProviderIdDto, modelProviderAddOrUpdateDto } from "@/dto";
+import { providerIdDto, modelProviderAddOrUpdateDto, modelIdDto, modelAddOrUpdateDto } from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 
@@ -39,7 +39,35 @@ export async function addOrUpdateModelHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
+  const parsed = modelAddOrUpdateDto.safeParse(request.body);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  await modelService.addOrUpdateModel(parsed.data);
+  return reply.success(null, "添加或更新模型成功");
+}
 
+/**
+ * 删除模型
+ * @param request 请求
+ * @param reply 响应
+ */
+export async function deleteModelHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const parsed = modelIdDto.safeParse(request.params);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  await modelService.deleteModel(parsed.data.modelId);
+  return reply.success(null, "删除模型成功");
 }
 
 /**
@@ -84,7 +112,7 @@ export async function deleteModelProviderHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const parsed = modelByProviderIdDto.safeParse(request.params);
+  const parsed = providerIdDto.safeParse(request.params);
   if (!parsed.success) {
     throw new BizException(
       BizCode.PARAM_INVALID,

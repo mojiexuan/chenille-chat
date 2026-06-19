@@ -6,6 +6,7 @@ import { models, modelProviders } from "@/db";
 export const modelSafeVo = {
   id: models.id,
   providerId: models.providerId,
+  modelName: models.modelName,
   name: models.name,
   description: models.description,
   reasoningEffort: models.reasoningEffort,

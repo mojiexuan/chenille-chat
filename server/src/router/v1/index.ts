@@ -13,15 +13,17 @@ import {
   getSessionListHandler,
   getSessionTitleHandler,
   getSessionHandler,
-  getActiveModelListHandler,
   getModelProviderListHandler,
+  addOrUpdateModelProviderHandler,
+  deleteModelProviderHandler,
   getModelListHandler,
+  getActiveModelListHandler,
+  addOrUpdateModelHandler,
+  deleteModelHandler,
   getAgentListHandler,
   deleteSessionHandler,
   updateSessionHandler,
   asrRecognizeHandler,
-  addOrUpdateModelProviderHandler,
-  deleteModelProviderHandler,
 } from "@/controllers";
 import { verifyJwt, requireRole } from "@/plugins";
 import { UserRole } from "@/enumeration";
@@ -66,6 +68,9 @@ export async function v1Router(fastify: FastifyInstance) {
         "/admin/models",
         getModelListHandler,
       );
+      adminScope.put("/admin/model", addOrUpdateModelHandler);
+      adminScope.patch("/admin/model", addOrUpdateModelHandler);
+      adminScope.delete("/admin/model/:modelId", deleteModelHandler);
     });
   });
 }

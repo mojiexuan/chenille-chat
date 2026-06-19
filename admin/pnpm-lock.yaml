@@ -1533,6 +1533,12 @@ importers:
         specifier: 'catalog:'
         version: 2.1.0(axios@1.18.0)
 
+  packages/enumeration:
+    dependencies:
+      '@vben-core/shared':
+        specifier: workspace:*
+        version: link:../@core/base/shared
+
   packages/icons:
     dependencies:
       '@vben-core/icons':
