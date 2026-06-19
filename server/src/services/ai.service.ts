@@ -19,7 +19,7 @@ import { sessionService, agentService, userService } from "@/services";
 import { logger, formatTime, getWeekDay } from "@/utils";
 
 class AiService {
-  constructor() {}
+  constructor() { }
 
   /**
    * 聊天服务
@@ -166,12 +166,19 @@ class AiService {
    */
   private async buildEnvironmentPrompt(userId: string) {
     const user = await userService.getUserInfoById(userId);
+    const userSettings = await userService.getUserSetting(userId);
     const env: SystemEnvironment = [];
     const loginLog = await userService.getNewLoginLog(userId);
-    if (loginLog && loginLog.country && loginLog.city) {
+    // 如果用户启用了位置信息，且登录日志中包含国家和城市，则添加位置信息
+    if (userSettings.isLocationEnabled && loginLog && loginLog.country && loginLog.city) {
       env.push({
         key: "当前用户大致位置",
         value: loginLog.country + loginLog.city,
+      });
+    } else {
+      env.push({
+        key: "当前用户大致位置",
+        value: "未知",
       });
     }
     env.push({
@@ -179,11 +186,11 @@ class AiService {
       value: user.nickname,
     });
     env.push({
-      key: "当前用户所在时区时间",
+      key: "当前北京时间，你可能需要根据用户所在位置估算时间",
       value: formatTime(),
     });
     env.push({
-      key: "当前用户所在时区时间对应周",
+      key: "当前北京时间对应周，你可能需要根据用户所在位置估算时间对应周",
       value: getWeekDay(),
     });
     return env;
