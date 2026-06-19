@@ -174,12 +174,27 @@
               <div class="home-input-area-box-editor-end-track-middle">
                 <!-- 左侧 -->
                 <div class="home-input-area-box-editor-end-track-middle-left">
-                  <!-- 文件选择 -->
+                  <!-- 附件选择 -->
                   <div class="home-input-area-box-editor-end-track-middle-left-button" @click="fileSelectClick">
                     <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M24.0605 10L24.0239 38" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                      <path
+                        d="M24.7073 9.56521L9.85801 24.4145C6.34329 27.9292 6.34329 33.6277 9.85801 37.1424V37.1424C13.3727 40.6571 19.0712 40.6571 22.5859 37.1424L40.2636 19.4647C42.6067 17.1216 42.6067 13.3226 40.2636 10.9794V10.9794C37.9205 8.63628 34.1215 8.63628 31.7783 10.9794L14.1007 28.6571C12.9291 29.8287 12.9291 31.7282 14.1007 32.8997V32.8997C15.2722 34.0713 17.1717 34.0713 18.3433 32.8997L33.1925 18.0505"
+                        stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </div>
+                  <!-- 图片上传 -->
+                  <div class="home-input-area-box-editor-end-track-middle-left-button">
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M44 24C44 22.8954 43.1046 22 42 22C40.8954 22 40 22.8954 40 24H44ZM24 8C25.1046 8 26 7.10457 26 6C26 4.89543 25.1046 4 24 4V8ZM39 40H9V44H39V40ZM8 39V9H4V39H8ZM40 24V39H44V24H40ZM9 8H24V4H9V8ZM9 40C8.44772 40 8 39.5523 8 39H4C4 41.7614 6.23857 44 9 44V40ZM39 44C41.7614 44 44 41.7614 44 39H40C40 39.5523 39.5523 40 39 40V44ZM8 9C8 8.44772 8.44771 8 9 8V4C6.23858 4 4 6.23857 4 9H8Z"
+                        fill="#3c3c43" />
+                      <path d="M6 35L16.6931 25.198C17.4389 24.5143 18.5779 24.4953 19.3461 25.1538L32 36"
+                        stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M28 31L32.7735 26.2265C33.4772 25.5228 34.5914 25.4436 35.3877 26.0408L42 31"
+                        stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M37 18L37 6" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
                         stroke-linejoin="round" />
-                      <path d="M10 24L38 24" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                      <path d="M32 11L37 6L42 11" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
                         stroke-linejoin="round" />
                     </svg>
                   </div>
