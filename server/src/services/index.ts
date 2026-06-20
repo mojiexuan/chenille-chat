@@ -10,3 +10,4 @@ export * from "./model.service";
 export * from "./email.service";
 export * from "./asr.service";
 export * from "./document.service";
+export * from "./ws.service";

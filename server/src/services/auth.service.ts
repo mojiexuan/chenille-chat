@@ -22,7 +22,24 @@ const SMS_RATE_TTL = 60;
  * 认证服务
  */
 class AuthService {
-  constructor(private redis: Redis) { }
+
+  private _redis: Redis | null = null;
+
+  init(redis: Redis): AuthService {
+    this._redis = redis;
+    return this;
+  }
+
+  /**
+   * 获取 Redis 实例
+   */
+  private get redis(): Redis {
+    if (!this._redis) {
+      logger.error("AuthService 未初始化，请先调用 init(redis)，redis 可从 FastifyRequest.server 对象中获取");
+      throw new BizException(BizCode.FAIL);
+    }
+    return this._redis;
+  }
 
   /**
    * 生成手机号验证码
@@ -167,4 +184,4 @@ class AuthService {
   }
 }
 
-export const authService = (redis: Redis) => new AuthService(redis);
+export const authService = new AuthService();
