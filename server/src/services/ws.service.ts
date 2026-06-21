@@ -1,12 +1,11 @@
-import type { Redis } from "ioredis";
-import { logger, randomStr } from "@/utils";
-import { BizException } from "@/exception";
-import { BizCode, WsClientAction, WsServerAction } from "@/enumeration";
+import { randomStr } from "@/utils";
+import { WsClientAction, WsServerAction } from "@/enumeration";
 import { CharType } from "@/enumeration";
 import {
     REDIS_WS_TICKET_PREFIX,
     REDIS_WS_ONLINE_PREFIX,
 } from "@/constants";
+import { redis } from "@/db";
 import type { WsClientMessage, WsServerMessage } from "@/types";
 import type { WebSocket } from "@fastify/websocket";
 
@@ -14,28 +13,10 @@ import type { WebSocket } from "@fastify/websocket";
  * WebSocket 服务
  */
 class WsService {
-    // Redis 实例
-    private _redis: Redis | null = null;
     // 连接映射表
     private connections: Map<string, Set<WebSocket>> = new Map();
     // 操作处理函数
     private handlers = new Map<string, (socket: WebSocket, userId: string, msg: WsClientMessage) => void>();
-
-    init(redis: Redis): WsService {
-        this._redis = redis;
-        return this;
-    }
-
-    /**
-     * 获取 Redis 实例
-     */
-    private get redis(): Redis {
-        if (!this._redis) {
-            logger.error("WsService 未初始化，请先调用 init(redis)，redis 可从 FastifyRequest.server 对象中获取");
-            throw new BizException(BizCode.FAIL);
-        }
-        return this._redis;
-    }
 
     /**
      * 生成 WebSocket Ticket
@@ -43,7 +24,7 @@ class WsService {
      */
     async generateTicket(userId: string): Promise<string> {
         const ticket = randomStr(16, CharType.Upper);
-        await this.redis.set(`${REDIS_WS_TICKET_PREFIX}${ticket}`, userId, "EX", 30);
+        await redis.set(`${REDIS_WS_TICKET_PREFIX}${ticket}`, userId, "EX", 30);
         return ticket;
     }
 
@@ -54,9 +35,9 @@ class WsService {
      */
     async validateTicket(ticket: string): Promise<string | null> {
         const key = `${REDIS_WS_TICKET_PREFIX}${ticket}`;
-        const userId = await this.redis.get(key);
+        const userId = await redis.get(key);
         if (userId) {
-            this.redis.del(key);
+            redis.del(key);
         }
         return userId;
     }
@@ -71,7 +52,7 @@ class WsService {
             this.connections.set(userId, new Set());
         }
         this.connections.get(userId)!.add(socket);
-        this.redis.set(
+        redis.set(
             `${REDIS_WS_ONLINE_PREFIX}${userId}`,
             "1",
             "EX",
@@ -91,7 +72,7 @@ class WsService {
         sockets.delete(socket);
         if (sockets.size === 0) {
             this.connections.delete(userId);
-            this.redis.del(`${REDIS_WS_ONLINE_PREFIX}${userId}`);
+            redis.del(`${REDIS_WS_ONLINE_PREFIX}${userId}`);
             // 用户下线
         }
     }

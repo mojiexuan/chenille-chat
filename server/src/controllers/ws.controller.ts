@@ -15,8 +15,7 @@ export async function getWebSocketTicketHandler(
     if (!userId) {
         throw new BizException(BizCode.AUTH_UNAUTHORIZED);
     }
-    const { redis } = request.server;
-    const ticket = await wsService.init(redis).generateTicket(userId);
+    const ticket = await wsService.generateTicket(userId);
     return reply.success(ticket, "Ticket 生成成功");
 }
 

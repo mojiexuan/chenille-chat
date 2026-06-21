@@ -14,6 +14,7 @@ import { eq } from "drizzle-orm";
 import { config } from "@/config";
 import type { JwtPayload } from "@/types";
 import { logger } from "@/utils";
+import { redis } from "@/db";
 
 const SMS_CODE_TTL = 300;
 const SMS_RATE_TTL = 60;
@@ -22,24 +23,6 @@ const SMS_RATE_TTL = 60;
  * 认证服务
  */
 class AuthService {
-
-  private _redis: Redis | null = null;
-
-  init(redis: Redis): AuthService {
-    this._redis = redis;
-    return this;
-  }
-
-  /**
-   * 获取 Redis 实例
-   */
-  private get redis(): Redis {
-    if (!this._redis) {
-      logger.error("AuthService 未初始化，请先调用 init(redis)，redis 可从 FastifyRequest.server 对象中获取");
-      throw new BizException(BizCode.FAIL);
-    }
-    return this._redis;
-  }
 
   /**
    * 生成手机号验证码
@@ -55,17 +38,17 @@ class AuthService {
    */
   async sendPhoneLoginCode(phone: string) {
     const rateKey = `${REDIS_SMS_PHONE_LOGIN_RATE_PREFIX}${phone}`;
-    if (await this.redis.get(rateKey)) {
+    if (await redis.get(rateKey)) {
       throw new BizException(BizCode.SMS_RATE_LIMIT);
     }
     const code = this.generatePhoneLoginCode();
-    await this.redis.set(
+    await redis.set(
       `${REDIS_SMS_PHONE_LOGIN_CODE_PREFIX}${phone}`,
       code,
       "EX",
       SMS_CODE_TTL,
     );
-    await this.redis.set(rateKey, "1", "EX", SMS_RATE_TTL);
+    await redis.set(rateKey, "1", "EX", SMS_RATE_TTL);
     const success = await smsService.sendSmsCode(phone, code);
     if (!success) {
       throw new BizException(BizCode.SMS_SEND_FAIL);
@@ -83,7 +66,7 @@ class AuthService {
     ip?: string,
     userAgent?: string,
   ) {
-    const storedCode = await this.redis.get(
+    const storedCode = await redis.get(
       `${REDIS_SMS_PHONE_LOGIN_CODE_PREFIX}${phone}`,
     );
     if (!storedCode || storedCode !== code) {
@@ -105,7 +88,7 @@ class AuthService {
       throw new BizException(BizCode.SMS_CODE_INVALID);
     }
 
-    await this.redis.del(`${REDIS_SMS_PHONE_LOGIN_CODE_PREFIX}${phone}`);
+    await redis.del(`${REDIS_SMS_PHONE_LOGIN_CODE_PREFIX}${phone}`);
     const [existingUser] = await db
       .select()
       .from(users)
