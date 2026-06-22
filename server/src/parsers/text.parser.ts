@@ -6,6 +6,9 @@ import { ParsedDocument } from "@/types";
  */
 class TextParser implements Parser {
 
+    /**
+     * 支持的文件扩展名
+     */
     private readonly extensions = new Set([
         "txt",
 
@@ -55,12 +58,19 @@ class TextParser implements Parser {
         "sql",
     ]);
 
+    /**
+     * 检查解析器是否支持解析文件类型
+     */
     supports(file: File) {
         const ext =
             file.name.split(".").pop()?.toLowerCase();
         return !!ext && this.extensions.has(ext);
     }
 
+    /**
+     * 解析文件
+     * @param file 文件
+     */
     async parse(file: File): Promise<ParsedDocument> {
         const content =
             await file.text();
