@@ -6,6 +6,7 @@ export interface AiChatParams {
   sessionId?: string;
   modelId?: string;
   workSpace?: string;
+  regenerate?: boolean;
 }
 
 /**

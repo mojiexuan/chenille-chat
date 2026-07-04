@@ -2,7 +2,7 @@
   <div class="home">
     <div class="home-container" :class="{ 'home-container-empty': sessionStore.currentSession.messages.length === 0 }">
       <!-- 消息列表 -->
-      <MessageItem />
+      <MessageItem @regenerate="(e) => sendClick(e, true)" />
       <!-- 等待动画 -->
       <div v-if="sessionStore.isReplying" class="home-container-replying">
         <img class="home-container-replying-image" src="../assets/images/replying.svg" alt="思考中" />
@@ -286,7 +286,7 @@ function handleEditorKeydown(e: KeyboardEvent) {
 /**
  * 发送按钮点击事件处理
  */
-function sendClick() {
+function sendClick(_event?: MouseEvent, regenerate = false) {
   if (!isSendButtonActive.value) {
     return;
   }
@@ -323,6 +323,7 @@ function sendClick() {
       message,
       ...(sessionStore.isCurrentSessionWorkSpaceStatus === "ready" ? { workSpace: sessionStore.currentSession.workSpace } : {}),
       modelId: modelStore.currentModel?.id || void 0,
+      regenerate,
     },
     (msg) => {
       if (msg.error) {
