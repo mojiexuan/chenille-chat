@@ -218,8 +218,10 @@ import VoiceCall from "@/components/home/VoiceCall.vue";
 import ContextMenu from '@/components/menu/ContextMenu.vue';
 import SpeechWaveform from "@/components/home/SpeechWaveform.vue";
 import { AI_CHAT_ACCEPTED_FILE_TYPES } from "@/constants";
-import { useMicrophoneVolume } from "@/composables";
+import { useMicrophoneVolume, useToast } from "@/composables";
 
+// 通知
+const toast = useToast();
 // 会话store
 const sessionStore = useSessionStore();
 // 用户store
@@ -422,6 +424,12 @@ function fileSelectClick() {
   input.onchange = () => {
     const files =
       Array.from(input.files ?? []);
+    if (files.length <= 0) {
+      toast.warning("未选择文件");
+      return;
+    } else {
+
+    }
   }
   input.click();
 }

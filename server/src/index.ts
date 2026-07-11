@@ -1,3 +1,4 @@
+import 'tsconfig-paths/register';
 import Fastify from "fastify";
 import { config } from "@/config";
 import {
