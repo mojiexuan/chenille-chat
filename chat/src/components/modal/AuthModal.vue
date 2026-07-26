@@ -16,7 +16,7 @@
                 </div>
                 <div class="auth-modal-content-form-container">
                     <h2 class="auth-modal-content-title">手机验证码登录</h2>
-                    <section class="auth-modal-content-form">
+                    <section class="auth-modal-content-form" @keyup.enter="phoneLogin">
                         <div class="auth-modal-content-form-item">
                             <span class="auth-modal-content-form-item-prefix">+86</span>
                             <input v-model="userPhone" @change="userPhoneChange" type="text" placeholder="请输入手机号"
