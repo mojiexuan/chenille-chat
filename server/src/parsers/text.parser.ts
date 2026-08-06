@@ -7,9 +7,14 @@ import { ParsedDocument } from "@/types";
 class TextParser implements Parser {
 
     /**
+     * 最大解析文件大小
+     */
+    readonly maxSize = 1024 * 1024 * 1;
+
+    /**
      * 支持的文件扩展名
      */
-    private readonly extensions = new Set([
+    readonly extensions = new Set([
         "txt",
 
         "md",
@@ -62,6 +67,9 @@ class TextParser implements Parser {
      * 检查解析器是否支持解析文件类型
      */
     supports(file: File) {
+        if (file.size > this.maxSize) {
+            return false;
+        }
         const ext =
             file.name.split(".").pop()?.toLowerCase();
         return !!ext && this.extensions.has(ext);

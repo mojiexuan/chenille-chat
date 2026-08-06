@@ -52,6 +52,11 @@ async function seedAgents() {
             key: AgentKey.AsrRecognition,
             description: "将音频转换为文本",
         },
+        {
+            name: "视觉识别",
+            key: AgentKey.VisionRecognition,
+            description: "将图片/文档/视频转换为文本",
+        },
     ];
 
     for (const item of seedData) {

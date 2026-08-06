@@ -32,6 +32,13 @@ class AgentService {
   }
 
   /**
+   * 获取视觉识别智能体
+   */
+  async getVisionRecognitionAgent() {
+    return await this.getAgent(AgentKey.VisionRecognition);
+  }
+
+  /**
    * 获取语音识别智能体
    */
   async getAsrRecognitionAgent() {

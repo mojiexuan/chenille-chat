@@ -51,6 +51,7 @@ export class BizCode {
   static readonly USER_UPDATE_FAIL = new BizCode(40051, 500, "用户更新失败");
   static readonly ASR_AGENT_NOT_CONFIGURED = new BizCode(40060, 500, "语音识别代理未配置");
   static readonly ASR_ERROR = new BizCode(40061, 500, "语音识别失败");
+  static readonly VISION_AGENT_NOT_CONFIGURED = new BizCode(40062, 500, "视觉识别代理未配置");
   static readonly MODEL_PROVIDER_NOT_FOUND = new BizCode(40070, 400, "模型提供方不存在");
   static readonly MODEL_NOT_FOUND = new BizCode(40080, 400, "模型不存在");
 }

@@ -10,4 +10,6 @@ export enum AgentKey {
   GenerateGerundIndicator = "generate:gerund:indicator",
   // 语音识别
   AsrRecognition = "asr:recognition",
+  // 视觉识别
+  VisionRecognition = "vision:recognition",
 }
