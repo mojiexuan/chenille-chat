@@ -1,7 +1,7 @@
 import { BizCode } from "@/enumeration";
 import { BizException } from "@/exception";
 import { Parser } from "@/parsers";
-import { ParsedDocument } from "@/types";
+import { ParsedDocument,MemoryBasedFile } from "@/types";
 
 /**
  * 语音解析器
@@ -25,7 +25,7 @@ class AudioParser implements Parser {
     /**
      * 检查解析器是否支持解析文件类型
      */
-    supports(file: File) {
+    supports(file: MemoryBasedFile) {
         if (file.size > this.maxSize) {
             return false;
         }
@@ -38,7 +38,7 @@ class AudioParser implements Parser {
      * 解析文件
      * @param file 文件
      */
-    async parse(file: File): Promise<ParsedDocument> {
+    async parse(file: MemoryBasedFile): Promise<ParsedDocument> {
         throw new BizException(BizCode.FAIL, "TODO: Audio Parser")
     }
 }

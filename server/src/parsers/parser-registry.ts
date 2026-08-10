@@ -1,6 +1,8 @@
+import type { MultipartFile } from "@fastify/multipart";
 import { BizException } from "@/exception";
 import { Parser } from "./parser";
 import { BizCode } from "@/enumeration";
+import { convertFileToMemoryBasedFile } from "@/utils";
 
 /**
  * 解析器注册器
@@ -18,17 +20,21 @@ class ParserRegistry {
     }
 
     /**
-     * 查找解析器
+     * 解析文件
      * @param file 文件
-     * @returns 解析器
      */
-    findParser(file: File): Parser {
-        const parser = this.parsers.find(p => p.supports(file))
+    async parse(file: MultipartFile){
+        // 将 MultipartFile 转换为 MemoryBasedFile
+        const parsedFile = await convertFileToMemoryBasedFile(file);
+        // 查找解析器
+        const parser = this.parsers.find(p => p.supports(parsedFile));
         if (!parser) {
             throw new BizException(BizCode.FILE_INVALID_TYPE);
         }
-        return parser;
+        // 解析文件
+        return parser.parse(parsedFile);
     }
+
 }
 
 export const parserRegistry = new ParserRegistry();

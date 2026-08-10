@@ -1,5 +1,5 @@
 import { Parser } from "./parser";
-import { ParsedDocument } from "@/types";
+import { ParsedDocument,MemoryBasedFile } from "@/types";
 
 /**
  * 文本解析器
@@ -66,7 +66,7 @@ class TextParser implements Parser {
     /**
      * 检查解析器是否支持解析文件类型
      */
-    supports(file: File) {
+    supports(file: MemoryBasedFile) {
         if (file.size > this.maxSize) {
             return false;
         }
@@ -79,13 +79,13 @@ class TextParser implements Parser {
      * 解析文件
      * @param file 文件
      */
-    async parse(file: File): Promise<ParsedDocument> {
+    async parse(file: MemoryBasedFile): Promise<ParsedDocument> {
         const content =
-            await file.text();
+            await file.buffer.toString();
         return {
             type: "text",
             fileName: file.name,
-            mimeType: file.type,
+            mimeType: file.mimetype,
             size: file.size,
             content,
         };

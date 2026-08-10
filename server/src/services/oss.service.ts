@@ -42,10 +42,10 @@ class OssService {
   }
 
   /**
-   * 上传文件到OSS
+   * 上传文件到OSS，从Buffer区上传
    */
-  async uploadFileToOss(file: MultipartFile) {
-    // 自定义请求头
+  async uploadFileToOssWithBuffer(buffer: Buffer, fileName: string) {
+        // 自定义请求头
     const headers = {
       // 指定Object的存储类型
       "x-oss-storage-class": "Standard",
@@ -55,10 +55,9 @@ class OssService {
       "x-oss-forbid-overwrite": "false",
     };
     const { datePath, compact } = getTimeComponents();
-    const ext = path.extname(file.filename) || ".png";
+    const ext = path.extname(fileName) || ".png";
     const objectName = `${OSS_KEY_PREFIX}/${datePath}/${compact}_${randomStr(6, CharType.Upper)}${ext}`;
     try {
-      const buffer = await file.toBuffer();
       const result = await this.ossClient.put(objectName, buffer, { headers });
       return {
         url: result.url,
@@ -68,6 +67,14 @@ class OssService {
       logger.error(err, "上传文件到OSS失败");
       throw new BizException(BizCode.FILE_UPLOAD_FAIL);
     }
+  }
+
+  /**
+   * 上传文件到OSS
+   */
+  async uploadFileToOss(file: MultipartFile) {
+    const buffer = await file.toBuffer();
+    return await this.uploadFileToOssWithBuffer(buffer, file.filename);
   }
 
   /**

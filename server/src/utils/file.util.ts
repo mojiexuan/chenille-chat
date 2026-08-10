@@ -2,6 +2,7 @@ import type { MultipartFile } from "@fastify/multipart";
 import path from "path";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
+import { MemoryBasedFile } from "@/types";
 
 /**
  * 验证文件扩展名是否在允许的范围内
@@ -32,4 +33,17 @@ export async function validateFile(
         throw new BizException(BizCode.FILE_TOO_LARGE);
     }
     return buffer;
+}
+
+/**
+ * 将 MultipartFile 转换为 MemoryBasedFile
+ */
+export async function convertFileToMemoryBasedFile(file: MultipartFile): Promise<MemoryBasedFile> {
+    const buffer = await file.toBuffer();
+    return {
+        name: file.filename,
+        mimetype: file.mimetype,
+        size: buffer.length,
+        buffer,
+    };
 }

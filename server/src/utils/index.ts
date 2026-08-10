@@ -8,3 +8,4 @@ export * from "./time.util";
 export * from "./ip.util";
 export * from "./token.util";
 export * from "./file.util";
+export * from "./image.util";

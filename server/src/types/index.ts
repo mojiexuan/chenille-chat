@@ -17,3 +17,5 @@ export type * from "./pagination.type";
 export type * from "./ip.type";
 export type * from "./document.type";
 export type * from "./ws.type";
+export type * from "./image.type";
+export type * from "./file.type";
