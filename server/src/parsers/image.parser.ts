@@ -5,6 +5,7 @@ import { ParsedDocument, MemoryBasedFile } from "@/types";
 import { agentService, ossService } from "@/services";
 import { createAiModel } from "@/models";
 import { compressToTargetSize } from "@/utils";
+import { logger } from "@/utils";
 
 // 图片解析提示词
 const IMAGE_PARSE_PROMPT = `你是一个图片内容提取助手。请仔细观察图片，按以下步骤输出，供下游 AI 检索使用，不要寒暄。
@@ -84,6 +85,7 @@ class ImageParser implements Parser {
      * @param file 文件
      */
     async parse(file: MemoryBasedFile): Promise<ParsedDocument> {
+        // 获取视觉识别代理
         const agent = await agentService.getVisionRecognitionAgent();
         if (!agent) {
             throw new BizException(BizCode.VISION_AGENT_NOT_CONFIGURED);
@@ -128,8 +130,11 @@ class ImageParser implements Parser {
                 size: file.size,
                 content: result.message.content,
             }
-        } catch {
-            throw new BizException(BizCode.FAIL, "TODO: Image Parser")
+        } catch (error) {
+            logger.error(error, "图片解析失败");
+            throw new BizException(BizCode.VISION_ERROR);
+        } finally {
+            ossService.deleteFileFromOss(url);
         }
     }
 }
