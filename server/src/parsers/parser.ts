@@ -9,6 +9,10 @@ export abstract class Parser {
      * 最大解析文件大小
      */
     abstract maxSize: number;
+    /**
+     * 最大解析文件数量
+     */
+    abstract maxCount: number;
     
     /**
      * 支持的文件扩展名
@@ -19,6 +23,11 @@ export abstract class Parser {
      * 检查解析器是否支持解析文件类型
      */
     supports(files: MemoryBasedFile[]): boolean {
+        // 检查文件数量是否超过最大数量
+        if (files.length > this.maxCount) {
+            return false;
+        }
+        // 检查文件大小是否超过最大大小
         return files.every(file => {
             if (file.size > this.maxSize) {
                 return false;

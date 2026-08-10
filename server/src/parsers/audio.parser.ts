@@ -12,6 +12,10 @@ class AudioParser extends Parser {
      * 最大解析文件大小
      */
     readonly maxSize = 1024 * 1024 * 10;
+    /**
+     * 最大解析文件数量
+     */
+    readonly maxCount = 10;
 
     /**
      * 支持的文件扩展名

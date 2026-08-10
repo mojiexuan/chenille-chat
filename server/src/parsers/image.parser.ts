@@ -73,7 +73,11 @@ class ImageParser extends Parser {
     /**
      * 最大解析文件大小，单位字节
      */
-    readonly maxSize = 1024 * 1024 * 10;
+    readonly maxSize = 1024 * 1024 * 0.1;
+    /**
+     * 最大解析文件数量
+     */
+    readonly maxCount = 10;
 
     /**
      * 支持的文件扩展名
