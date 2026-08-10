@@ -6,7 +6,7 @@ import { ParsedDocument,MemoryBasedFile } from "@/types";
 /**
  * 语音解析器
  */
-class AudioParser implements Parser {
+class AudioParser extends Parser {
 
     /**
      * 最大解析文件大小
@@ -23,22 +23,10 @@ class AudioParser implements Parser {
     ]);
 
     /**
-     * 检查解析器是否支持解析文件类型
-     */
-    supports(file: MemoryBasedFile) {
-        if (file.size > this.maxSize) {
-            return false;
-        }
-        const ext =
-            file.name.split(".").pop()?.toLowerCase();
-        return !!ext && this.extensions.has(ext);
-    }
-
-    /**
      * 解析文件
-     * @param file 文件
+     * @param files 文件列表
      */
-    async parse(file: MemoryBasedFile): Promise<ParsedDocument> {
+    async parse(files: MemoryBasedFile[]): Promise<ParsedDocument[]> {
         throw new BizException(BizCode.FAIL, "TODO: Audio Parser")
     }
 }

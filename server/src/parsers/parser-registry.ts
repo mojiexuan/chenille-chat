@@ -21,18 +21,18 @@ class ParserRegistry {
 
     /**
      * 解析文件
-     * @param file 文件
+     * @param files 文件列表
      */
-    async parse(file: MultipartFile){
+    async parse(files: MultipartFile[]){
         // 将 MultipartFile 转换为 MemoryBasedFile
-        const parsedFile = await convertFileToMemoryBasedFile(file);
+        const parsedFiles = await Promise.all(files.map(convertFileToMemoryBasedFile));
         // 查找解析器
-        const parser = this.parsers.find(p => p.supports(parsedFile));
+        const parser = this.parsers.find(p => p.supports(parsedFiles));
         if (!parser) {
             throw new BizException(BizCode.FILE_INVALID_TYPE);
         }
         // 解析文件
-        return parser.parse(parsedFile);
+        return parser.parse(parsedFiles);
     }
 
 }

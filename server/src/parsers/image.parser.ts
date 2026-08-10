@@ -4,16 +4,50 @@ import { Parser } from "@/parsers";
 import { ParsedDocument, MemoryBasedFile } from "@/types";
 import { agentService, ossService } from "@/services";
 import { createAiModel } from "@/models";
-import { compressToTargetSize } from "@/utils";
+import { compressToTargetSize, parseWithSchema } from "@/utils";
 import { logger } from "@/utils";
+import z from "zod/v4";
+
+/**
+ * 单张图片解析结果契约
+ */
+const imageParseResultSchema = z.object({
+    index: z.number().int().nonnegative("图片序号必须为非负整数"),
+    type: z.string().min(1, "图片类型不能为空"),
+    summary: z.string().min(1, "图片总述不能为空"),
+    content: z.string().min(1, "图片详细内容不能为空"),
+    keywords: z.array(z.string().min(1)).min(1, "至少提供一个关键词"),
+});
+
+/**
+ * 单张图片解析结果
+ */
+type ImageParseResult = z.infer<typeof imageParseResultSchema>;
+
+/**
+ * 批量图片解析结果契约
+ */
+const imageParseResultListSchema = z.array(imageParseResultSchema);
 
 // 图片解析提示词
-const IMAGE_PARSE_PROMPT = `你是一个图片内容提取助手。请仔细观察图片，按以下步骤输出，供下游 AI 检索使用，不要寒暄。
+const IMAGE_PARSE_PROMPT = `你是一个图片内容提取助手。我会按顺序给你 N 张图片，请对每张图片独立描述，输出严格的 JSON 数组。
 
 ## 任务
 
 1. 判断图片类型（截图 / 文档 / 图表 / 证件 / 照片 / UI / 其他）
-2. 根据类型提取关键信息，输出为 Markdown
+2. 根据类型提取关键信息
+
+## 输出要求（只输出 JSON，不要任何额外文字、Markdown、代码块）
+
+数组长度必须等于图片数量，每个元素：
+
+{
+  "index": <整数，从 0 开始按顺序填>,
+  "type": "截图 / 文档 / 图表 / 证件 / 照片 / UI / 其他",
+  "summary": "<一句话总述，30字以内>",
+  "content": "<按类型用 Markdown 结构化呈现的详细内容>",
+  "keywords": ["关键词1", "关键词2", "..."]  // 5-10 个
+}
 
 ## 提取要求
 
@@ -23,36 +57,18 @@ const IMAGE_PARSE_PROMPT = `你是一个图片内容提取助手。请仔细观�
 - 证件/票据：提取字段名和值，用 key: value 形式列出
 - 照片/实物：描述主体、场景、显著物体、颜色、状态
 
-## 输出格式
-
-### 图片类型
-
-<类型>
-
-### 内容描述
-
-<一句话总述>
-
-### 详细内容
-
-<按类型用 Markdown 结构化呈现>
-
-### 关键词
-
-<5-10 个逗号分隔的关键词，便于检索>
-
 ## 约束
 
 - 只描述图中实际可见的内容，不要推测、脑补或补充外部知识
 - 文字转录要忠实原文，不要"修正"或"润色"
-- 如果图片模糊或无法识别，明确说明"部分内容无法识别"，不要编造
+- 如果图片模糊或无法识别，在 summary 里写"部分内容无法识别"
 - 不要输出与图片无关的解释
 `;
 
 /**
  * 图片解析器
  */
-class ImageParser implements Parser {
+class ImageParser extends Parser {
 
     /**
      * 最大解析文件大小，单位字节
@@ -69,22 +85,10 @@ class ImageParser implements Parser {
     ]);
 
     /**
-     * 检查解析器是否支持解析文件类型
-     */
-    supports(file: MemoryBasedFile) {
-        if (file.size > this.maxSize) {
-            return false;
-        }
-        const ext =
-            file.name.split(".").pop()?.toLowerCase();
-        return !!ext && this.extensions.has(ext);
-    }
-
-    /**
      * 解析文件
-     * @param file 文件
+     * @param files 文件列表
      */
-    async parse(file: MemoryBasedFile): Promise<ParsedDocument> {
+    async parse(files: MemoryBasedFile[]): Promise<ParsedDocument[]> {
         // 获取视觉识别代理
         const agent = await agentService.getVisionRecognitionAgent();
         if (!agent) {
@@ -96,45 +100,59 @@ class ImageParser implements Parser {
             model: agent.model.modelName,
             baseURL: agent.provider.baseUrl,
         });
-        let url = "";
+        let urls: string[] = [];
         try {
-            // 将图片压缩到10MB以下
-            const { buffer } = await compressToTargetSize(file.buffer, this.maxSize);
-            // 上传压缩后的图片到OSS
-            const r = await ossService.uploadFileToOssWithBuffer(buffer, file.name);
-            url = r.url;
+            urls = await Promise.all(files.map(async (file) => {
+                // 上传压缩后的图片到OSS
+                return (await ossService.uploadFileToOssWithBuffer(
+                    (await compressToTargetSize(file.buffer, this.maxSize)).buffer,// 将图片压缩到10MB以下
+                    file.name))
+                    .url;
+            }));
             const result = await aiModel.generate({
                 messages: [
-                    {
-                        type: "attachment",
+                    ...urls.map(url => ({
+                        type: "attachment" as const,
                         content: [
                             {
                                 type: MessageAttachmentType.Image,
-                                url: url,
+                                url,
                             }
                         ]
-                    },
+                    })),
                     {
-                        type: "user",
+                        type: "user" as const,
                         message: {
-                            role: "user",
+                            role: "user" as const,
                             content: IMAGE_PARSE_PROMPT
                         }
                     }
                 ]
             });
-            return {
-                type: "image",
-                fileName: file.name,
-                mimeType: file.mimetype,
-                size: file.size,
-                content: result.message.content,
+            // 解析图片解析结果
+            const parsed = parseWithSchema(imageParseResultListSchema, result.message.content);
+
+            if (parsed === null || parsed.length !== files.length) {
+                logger.error(`图片解析失败: ${result.message.content}`);
+                throw new BizException(BizCode.VISION_ERROR);
             }
+            return parsed.map((item, index) => ({
+                fileName: files[index].name,
+                mimeType: files[index].mimetype,
+                size: files[index].size,
+                type: "image" as const,
+                content: item.content,
+                metadata: {
+                    imageType: item.type,
+                    summary: item.summary,
+                    keywords: item.keywords,
+                }
+            }));
         } catch (error) {
             logger.error(error, "图片解析失败");
             throw new BizException(BizCode.VISION_ERROR);
         } finally {
-            ossService.deleteFileFromOss(url);
+            urls.forEach(url => ossService.deleteFileFromOss(url));
         }
     }
 }
