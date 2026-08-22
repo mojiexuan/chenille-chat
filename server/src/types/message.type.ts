@@ -1,4 +1,4 @@
-import { ChatToolCall } from "./model.type";
+import { ToolCall } from "./tool.type";
 import { MessageAttachmentType } from "@/enumeration";
 import { ExactlyOne } from "./type";
 
@@ -59,7 +59,7 @@ export type AssistantMessage = MessageBase & {
   message: {
     role: "assistant";
     content: string;
-    toolCalls?: ChatToolCall[];
+    toolCalls?: ToolCall[];
   };
 };
 
@@ -86,6 +86,9 @@ export type SystemMessage = MessageBase & {
   message?: string;
 };
 
+/**
+ * 工具消息
+ */
 export type ToolMessage = MessageBase & {
   type: "tool";
   message: {

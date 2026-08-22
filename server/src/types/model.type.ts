@@ -100,12 +100,6 @@ export interface ChatUsage {
 //   execute: (args: z.infer<TSchema>) => Promise<TResult>;
 // }
 
-export interface ChatToolCall {
-  id: string;
-  name: string;
-  arguments?: string; // 原始 JSON 字符串
-}
-
 // export interface MCPClient {
 //   call<T = unknown>(req: {
 //     server: string;

@@ -35,10 +35,10 @@ class Session {
 
   /**
    * 添加消息
-   * @param message 消息
+   * @param messages 消息列表
    */
-  addMessage(message: Message): void {
-    this.data.messages.push(message);
+  addMessage(...messages: Message[]): void {
+    this.data.messages.push(...messages);
   }
 
   /**

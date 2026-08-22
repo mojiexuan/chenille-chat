@@ -5,13 +5,13 @@
 //   UserMessage,
 // } from "./message.type";
 import { TOOL_DEFAULTS } from "@/tools";
-import type { AnyObject } from "./object.type";
 import { z } from "zod/v4";
 import {
   AssistantMessage,
   AttachmentMessage,
   SystemMessage,
   UserMessage,
+  ToolMessage
 } from "./message.type";
 
 export type Tool<
@@ -147,10 +147,26 @@ export type AnyToolDef = ToolDef<any, any, any>;
 
 export type BuiltTool<D> = Omit<D, DefaultableToolKeys> & {
   [K in DefaultableToolKeys]-?: K extends keyof D
-    ? undefined extends D[K]
-      ? ToolDefaults[K]
-      : D[K]
-    : ToolDefaults[K];
+  ? undefined extends D[K]
+  ? ToolDefaults[K]
+  : D[K]
+  : ToolDefaults[K];
 };
 
 export type ToolDefaults = typeof TOOL_DEFAULTS;
+
+/**
+ * 工具调用
+ */
+export interface ToolCall {
+  id: string;
+  name: string;
+  arguments?: string; // 原始 JSON 字符串
+}
+
+/**
+ * 工具调用准备
+ */
+export type PreparedToolCall =
+  | { ok: true; tool: Tool; toolCall: ToolCall; args: unknown }
+  | { ok: false; error: ToolMessage };
