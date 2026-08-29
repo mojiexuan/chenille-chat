@@ -1,5 +1,6 @@
 import 'tsconfig-paths/register';
 import Fastify from "fastify";
+import FastifyCookie from "@fastify/cookie";
 import { config } from "@/config";
 import {
   responsePlugin,
@@ -31,6 +32,10 @@ async function main() {
   app.log = logger;
   // 确保必要路径存在
   ensurePaths();
+  // 注册cookie插件
+  app.register(FastifyCookie,{
+    secret:config.JWT_SECRET,
+  });
   // 注册multipart插件
   app.register(multipartPlugin);
   // 注册WebSocket插件

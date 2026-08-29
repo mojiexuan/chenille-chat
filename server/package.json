@@ -37,6 +37,7 @@
     "@alicloud/dypnsapi20170525": "^2.0.0",
     "@alicloud/openapi-client": "^0.4.15",
     "@anthropic-ai/sdk": "^0.91.1",
+    "@fastify/cookie": "^11.1.2",
     "@fastify/cors": "^11.0.0",
     "@fastify/multipart": "^10.0.0",
     "@fastify/static": "^9.1.3",

@@ -11,11 +11,18 @@ import { userService } from "@/services";
  */
 export async function verifyJwt(request: FastifyRequest) {
   const header = request.headers.authorization;
-  if (!header || !header.startsWith("Bearer ")) {
-    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  let token: string | undefined;
+
+  // 从header中获取token
+  if (header?.startsWith("Bearer ")) {
+    token = header.slice(7);
+  } else {
+    token = request.cookies?.access_token;
   }
 
-  const token = header.slice(7);
+  if (!token) {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
 
   try {
     const payload = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
