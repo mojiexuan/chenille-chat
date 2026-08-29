@@ -3,6 +3,8 @@ import { authService } from "@/services";
 import { sendPhoneCodeDto, phoneCodeAuthDto } from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
+import { config } from "@/config";
+import { expiresInToSeconds } from "@/utils";
 
 /**
  * 发送手机号验证码
@@ -30,6 +32,15 @@ export async function phoneCodeLoginHandler(request: FastifyRequest, reply: Fast
     }
     const ip = request.ip;
     const userAgent = request.headers["user-agent"];
+    // 验证手机号验证码
     const token = await authService.phoneCodeLogin(parsed.data.phone, parsed.data.code, ip, userAgent);
+    // 登录成功后，将 JWT 存储到 Cookie 中
+    reply.setCookie("access_token", token, {
+        httpOnly: true,                                         // 关键：前端 JS 读不到
+        secure: config.NODE_ENV === "production",               // 生产强制 HTTPS
+        sameSite: "lax",                                        // 挡跨站写请求 CSRF
+        path: "/",
+        maxAge: expiresInToSeconds(config.JWT_EXPIRES_IN),      // 与 JWT 有效期一致
+    });
     return reply.success(token, "登录成功");
 }

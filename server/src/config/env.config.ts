@@ -50,22 +50,27 @@ const cache = new Map<string, string>();
  */
 export const config: Config = new Proxy(schema, {
   get(_target, prop: string) {
+    // 从缓存中获取
     if (cache.has(prop)) {
       return cache.get(prop)!;
     }
 
+    // 从 process.env 中获取
     const value = process.env[prop];
+    // 如果 process.env 中有值，缓存并返回
     if (value !== void 0) {
       cache.set(prop, value);
       return value;
     }
 
+    // 如果 process.env 中没有值，从 schema 中获取默认值
     const defaultValue = schema[prop as keyof typeof schema];
     if (defaultValue !== void 0) {
       cache.set(prop, defaultValue);
       return defaultValue;
     }
 
+    // 如果 schema 中也没有默认值，退出程序
     if (prop in schema) {
       console.error(`[ENV] 缺少必需的环境变量： ${prop}`);
       process.exit(1);

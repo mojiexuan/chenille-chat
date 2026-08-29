@@ -1,7 +1,6 @@
 import { smsService } from "@/services";
-import type { Redis } from "ioredis";
 import { CharType } from "@/enumeration";
-import { randomStr, ipToLocation } from "@/utils";
+import { randomStr, ipToLocation, expiresInToSeconds } from "@/utils";
 import jwt from "jsonwebtoken";
 import {
   REDIS_SMS_PHONE_LOGIN_CODE_PREFIX,
@@ -115,7 +114,7 @@ class AuthService {
     }
 
     const token = jwt.sign({ userId } as JwtPayload, config.JWT_SECRET, {
-      expiresIn: Number(config.JWT_EXPIRES_IN),
+      expiresIn: expiresInToSeconds(config.JWT_EXPIRES_IN),
     });
     this.loginLog({
       userId,
