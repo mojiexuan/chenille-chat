@@ -15,6 +15,7 @@
     "format": "oxfmt src/"
   },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^5.2.0",
     "@mdit/plugin-alert": "^0.23.2",
     "@mdit/plugin-figure": "^0.23.2",
     "@mdit/plugin-img-lazyload": "^0.23.2",
