@@ -31,6 +31,8 @@ export class BizCode {
     401,
     "登录已过期，请重新登录",
   );
+  static readonly RATE_LIMIT = new BizCode(40029, 429, "请求过于频繁，请稍后再试");
+
   static readonly AI_CHAT_ERROR = new BizCode(
     40030,
     500,
