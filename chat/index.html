@@ -1,66 +1,77 @@
 <!doctype html>
 <html lang="zh-CN" dir="ltr" data-theme="light">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, shrink-to-fit=no, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <meta name="author" content="陈佳宝, mail@chenjiabao.com" />
-    <title>Chenille Chat</title>
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="revised" content="2026-6-11" />
-    <link rel="preload" href="./src/assets/images/promotion.png" as="image" />
-  </head>
-  <body>
-    <noscript>
-      <p>
-        当前页面需要在开启 JavaScript 的现代浏览器中运行。请启用 JavaScript
-        后刷新，或使用最新版本的 Chrome / Edge / Safari 访问。
-      </p>
-    </noscript>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-    <script>
-      !(function (c, b, d, a) {
-        c[a] || (c[a] = {});
-        c[a] = {
-          endpoint:
-            "https://proj-xtrace-a45f4b3b2dd6128b9f0828726d469-cn-hangzhou.cn-hangzhou.log.aliyuncs.com/rum/web/v2?workspace=default-cms-1602778325276373-cn-hangzhou&service_id=fs4y74cxxx@0a8bb6b0f9e054537a556",
-          // 设置环境信息，参考值：'prod' | 'gray' | 'pre' | 'daily' | 'local'
-          env: "prod",
-          // 设置路由模式， 参考值：'history' | 'hash'
-          spaMode: "history",
-          collectors: {
-            // 页面性能指标监听开关，默认开启
-            perf: true,
-            // WebVitals指标监听开关，默认开启
-            webVitals: true,
-            // Ajax监听开关，默认开启
-            api: true,
-            // 静态资源开关，默认开启
-            staticResource: true,
-            // JS错误监听开关，默认开启
-            jsError: true,
-            // 控制台错误监听开关，默认开启
-            consoleError: true,
-            // 用户行为监听开关，默认开启
-            action: true,
-          },
-          // 链路追踪配置开关，默认关闭
-          tracing: true,
-        };
-        with (b)
-          with (body)
-            with (insertBefore(createElement("script"), firstChild))
-              setAttribute("crossorigin", "", (src = d));
-      })(
-        window,
-        document,
-        "https://sdk.rum.aliyuncs.com/v2/browser-sdk.js",
-        "__rum",
-      );
-    </script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/favicon.ico" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, shrink-to-fit=no, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="author" content="陈佳宝, mail@chenjiabao.com" />
+  <title>Chenille Chat</title>
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="revised" content="2026-09-01" />
+  <link rel="preload" href="./src/assets/images/promotion.png" as="image" />
+  <script>
+    // 阿里云验证码配置
+    window.AliyunCaptchaConfig = {
+      region: "cn",
+      prefix: "1t1ecp",
+    }
+  </script>
+  <!-- 阿里云验证码 -->
+  <script type="text/javascript" src="https://o.alicdn.com/captcha-frontend/aliyunCaptcha/AliyunCaptcha.js"></script>
+</head>
+
+<body>
+  <noscript>
+    <p>
+      当前页面需要在开启 JavaScript 的现代浏览器中运行。请启用 JavaScript
+      后刷新，或使用最新版本的 Chrome / Edge / Safari 访问。
+    </p>
+  </noscript>
+  <div id="app"></div>
+  <script type="module" src="/src/main.ts"></script>
+  <!-- 阿里云RUM监控 -->
+  <script>
+    !(function (c, b, d, a) {
+      c[a] || (c[a] = {});
+      c[a] = {
+        endpoint:
+          "https://proj-xtrace-a45f4b3b2dd6128b9f0828726d469-cn-hangzhou.cn-hangzhou.log.aliyuncs.com/rum/web/v2?workspace=default-cms-1602778325276373-cn-hangzhou&service_id=fs4y74cxxx@0a8bb6b0f9e054537a556",
+        // 设置环境信息，参考值：'prod' | 'gray' | 'pre' | 'daily' | 'local'
+        env: "prod",
+        // 设置路由模式， 参考值：'history' | 'hash'
+        spaMode: "history",
+        collectors: {
+          // 页面性能指标监听开关，默认开启
+          perf: true,
+          // WebVitals指标监听开关，默认开启
+          webVitals: true,
+          // Ajax监听开关，默认开启
+          api: true,
+          // 静态资源开关，默认开启
+          staticResource: true,
+          // JS错误监听开关，默认开启
+          jsError: true,
+          // 控制台错误监听开关，默认开启
+          consoleError: true,
+          // 用户行为监听开关，默认开启
+          action: true,
+        },
+        // 链路追踪配置开关，默认关闭
+        tracing: true,
+      };
+      with (b)
+      with (body)
+      with (insertBefore(createElement("script"), firstChild))
+      setAttribute("crossorigin", "", (src = d));
+    })(
+      window,
+      document,
+      "https://sdk.rum.aliyuncs.com/v2/browser-sdk.js",
+      "__rum",
+    );
+  </script>
+</body>
+
 </html>
