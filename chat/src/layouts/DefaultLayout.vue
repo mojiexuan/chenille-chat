@@ -3,7 +3,7 @@
         <div class="default-layout-nav" :class="{ 'active': sidebarActive }">
             <section class="default-layout-nav-header">
                 <!-- 开关侧边栏 -->
-                <div class="default-layout-nav-header-button" @click="switchSidebarClick">
+                <div class="default-layout-nav-header-button" @click="switchSidebarClick" title="关闭侧边栏">
                     <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="6" y="6" width="36" height="36" rx="3" fill="none" stroke="#1b1b1f" stroke-width="3"
                             stroke-linejoin="round" />
@@ -17,13 +17,17 @@
                 </div>
                 <!-- 新会话 -->
                 <div class="default-layout-nav-header-button default-layout-nav-header-button-new-session"
-                    @click="newSessionClick">
+                    @click="newSessionClick" title="创建新会话">
                     <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 6H44V36H29L24 41L19 36H4V6Z" fill="none" stroke="#1b1b1f" stroke-width="3"
+                        <path d="M25.5 37H21L11 42V37H4V7H44V18" stroke="#1b1b1f" stroke-width="3"
                             stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M23 21H25.0025" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" />
-                        <path d="M33.001 21H34.9999" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" />
-                        <path d="M13.001 21H14.9999" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" />
+                        <path d="M12 15H18" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 21H24" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <!-- 右下角 + -->
+                        <path d="M38 25V37" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" />
+                        <path d="M32 31H44" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" />
                     </svg>
                 </div>
             </section>
@@ -34,7 +38,7 @@
                         :key="item.id" @click="sessionItemClick(item.id)"
                         :class="{ 'active': item.id === sessionStore.currentSession.id }">
                         <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
-                        }}</span>
+                            }}</span>
                         <div class="default-layout-nav-content-session-item-more"
                             @click.stop="sessionMoreClick($event, item.id)">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
@@ -74,7 +78,7 @@
                                     alt="用户头像" />
                                 <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{
                                     userNameNickname
-                                }}</span>
+                                    }}</span>
                             </div>
                         </menu>
                     </Transition>
