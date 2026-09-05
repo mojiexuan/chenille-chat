@@ -1,7 +1,15 @@
-import { computed, ref } from "vue";
+import { computed, ref, shallowRef } from "vue";
 import { defineStore } from "pinia";
 import type { MessageStreaming, SessionItem, Session } from "@/types";
-import { getSessionList, getSessionRequest, deleteSessionRequest, updateSessionRequest } from "@/request";
+import {
+    getSessionList,
+    getSessionRequest,
+    deleteSessionRequest,
+    updateSessionRequest,
+    aiChatSse,
+    getSessionTitleRequest,
+    getGerundIndicatorRequest
+} from "@/request";
 import { getValidDirectoryHandle, saveDirectoryHandle } from "@/utils";
 import { IndexedKeyEnum } from "@/enumeration";
 
@@ -11,6 +19,10 @@ import { IndexedKeyEnum } from "@/enumeration";
  * @date 2026-05-31
  */
 export const useSessionStore = defineStore("session", () => {
+    // 编辑器消息，用于存储用户输入的消息
+    const editorMessage = ref<string>("");
+    // 是否可以发送消息
+    const canSend = computed(() => editorMessage.value.trim().length > 0);
     // 会话列表
     const sessions = ref<SessionItem[]>([]);
     // 是否还有更多会话
@@ -223,7 +235,138 @@ export const useSessionStore = defineStore("session", () => {
         sessions.value = sessions.value.filter((item) => item.id !== sessionId);
     }
 
+    // 当前请求控制器
+    const abortController = shallowRef<AbortController | null>(null);
+    /**
+     * 发送消息
+     * @param regenerate 是否重新生成
+     * @param onMessage 消息回调
+     * @author 陈佳宝
+     * @date 2026-05-31
+     */
+    function sendMessage({
+        currentModelId = void 0,
+        regenerate = false,
+        onUpdateUi = async () => { },
+    }:{
+        currentModelId?: string;
+        regenerate?: boolean;
+        onUpdateUi?: () => void;
+    }) {
+        if (!canSend.value) {
+            return;
+        }
+        // 如果正在回复，直接取消请求
+        if (isReplying.value) {
+            abortController.value?.abort();
+            isReplying.value = false;
+            return;
+        }
+        const message = editorMessage.value.trim();
+        editorMessage.value = "";
+
+        addCurrentSessionMessage(
+            { id: Date.now().toString(), role: "user", content: message, isStreaming: false },
+            { id: (Date.now() + 1).toString(), role: "assistant", content: "", isStreaming: true },
+        );
+
+        const assistantIndex = currentSession.value.messages.length - 1;
+        const assistant = getMessageInCurrentSession(assistantIndex);
+
+        isReplying.value = true;
+
+        // 获取动词指示器
+        getGerundIndicatorRequest(message).then((res) => {
+            if (res && res.length > 0) {
+                gerundIndicator.value = res;
+            }
+        });
+
+        // 发起请求
+        abortController.value = aiChatSse(
+            currentSession.value.id,
+            {
+                message,
+                ...(isCurrentSessionWorkSpaceStatus.value === "ready" ? { workSpace: currentSession.value.workSpace } : {}),
+                modelId: currentModelId,
+                regenerate,
+            },
+            (msg) => {
+                if (msg.error) {
+                    if (assistant) {
+                        assistant.error = msg.error;
+                        assistant.isStreaming = false;
+                    }
+                    abortController.value?.abort(msg.error);
+                    return;
+                }
+
+                if (currentSession.value.id !== msg.sessionId && msg.sessionId) {
+                    updateCurrentSessionId(msg.sessionId);
+                }
+
+                // 有推理内容
+                if (msg.reasoning && msg.reasoning.length > 0) {
+                    if (assistant) {
+                        if (!assistant.reasoning) {
+                            assistant.reasoning = "";
+                        }
+                        assistant.reasoning += msg.reasoning;
+                        onUpdateUi?.();
+                    }
+                }
+
+                // 有内容
+                if (msg.content && msg.content.length > 0) {
+                    if (assistant) {
+                        assistant.content += msg.content;
+                        onUpdateUi?.();
+                    }
+                }
+
+                if (msg.usage) {
+                    if (assistant) {
+                        assistant.promptTokens = msg.usage.prompt_tokens || 0;
+                        assistant.completionTokens = msg.usage.completion_tokens || 0;
+                        assistant.totalTokens = msg.usage.total_tokens || 0;
+                        assistant.cachedTokens = msg.usage.prompt_tokens_details?.cached_tokens || 0;
+                    }
+                }
+
+                if (msg.finished) {
+                    isReplying.value = false;
+                    if (currentSession.value.title === "新会话" && currentSession.value.id) {
+                        getSessionTitleRequest(currentSession.value.id).then((title) => {
+                            updateCurrentSessionTitle(title);
+                        });
+                    }
+                    if (assistant) {
+                        assistant.isStreaming = false;
+                    }
+                    abortController.value?.abort();
+                    return;
+                }
+            },
+            () => {
+                // 请求完成
+                if (isReplying.value) {
+                    isReplying.value = false;
+                }
+                abortController.value?.abort();
+            },
+            () => {
+                // 请求错误
+                if (isReplying.value) {
+                    isReplying.value = false;
+                }
+                abortController.value?.abort();
+            },
+        );
+    }
+
     return {
+        editorMessage,
+        canSend,
         sessions,
         currentSession,
         currentSessionTotalTokens,
@@ -243,5 +386,6 @@ export const useSessionStore = defineStore("session", () => {
         deleteSession,
         queryCurrentSessionWorkSpace,
         setCurrentSessionWorkSpace,
+        sendMessage,
     };
 });
