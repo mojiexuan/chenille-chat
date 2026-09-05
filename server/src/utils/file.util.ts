@@ -64,6 +64,7 @@ export async function convertFileToMemoryBasedFile(file: MultipartFile): Promise
     const buffer = await file.toBuffer();
     const type = await getFileType(buffer);
     return {
+        originalName: file.filename || '',
         name: randomUUID() + '.' + type.ext,
         type,
         size: buffer.length,

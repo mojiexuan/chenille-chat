@@ -8,6 +8,7 @@ import {
   meUsageAiTokenHandle,
   meUserSettingsHandler,
   meUpdateUserSettingsHandler,
+  chatAttachmentHandler,
   chatSseHandler,
   chatGerundIndicatorHandler,
   getSessionListHandler,
@@ -46,6 +47,7 @@ export async function v1Router(fastify: FastifyInstance) {
       scope.get("/user/me/ai/token", meUsageAiTokenHandle);
       scope.get("/user/me/settings", meUserSettingsHandler);
       scope.patch("/user/me/settings", meUpdateUserSettingsHandler);
+      scope.post("/chat/attachment", chatAttachmentHandler);
       scope.post("/chat/sse", chatSseHandler);
       scope.post("/chat/gerund", chatGerundIndicatorHandler);
       scope.get("/chat/sessions", getSessionListHandler);

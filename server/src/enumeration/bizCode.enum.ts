@@ -51,6 +51,8 @@ export class BizCode {
   static readonly FILE_TOO_LARGE = new BizCode(40045, 400, "文件大小超出限制");
   static readonly FILE_NOT_FOUND = new BizCode(40046, 400, "未找到文件");
   static readonly FILE_TYPE_UNKNOWN = new BizCode(40047, 400, "未知的文件类型");
+  static readonly FILE_COUNT_EXCEEDED = new BizCode(40048, 400, "上传文件数量超过限制");
+  static readonly FILE_FINALIZE_FAIL = new BizCode(40049, 500, "文件转正失败");
 
   static readonly USER_UPDATE_FAIL = new BizCode(40051, 500, "用户更新失败");
   static readonly ASR_AGENT_NOT_CONFIGURED = new BizCode(40060, 500, "语音识别代理未配置");

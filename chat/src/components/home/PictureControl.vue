@@ -46,7 +46,7 @@ function pictureSelectClick() {
         fileName: file.name,
         fileUrl: URL.createObjectURL(file),
         fileType: "image",
-        status: "uploaded",
+        status: "failed",
       })));
     }
   }

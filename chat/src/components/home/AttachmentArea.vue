@@ -2,9 +2,12 @@
     <div v-if="sessionStore.attachments.length > 0" class="home-attachment-area">
         <div :class="['home-attachment-area-item', attachment.status === 'uploaded' ? 'home-attachment-area-item-loaded' : '']"
             v-for="attachment in sessionStore.attachments" :key="attachment.id">
-            <img v-if="attachment.fileType === 'image'" class="home-attachment-area-item-image" :src="attachment.fileUrl" :alt="attachment.fileName" draggable="false">
+            <img v-if="attachment.fileType === 'image'" class="home-attachment-area-item-image"
+                :src="attachment.fileUrl" :alt="attachment.fileName" draggable="false">
             <!-- 上传动画 -->
-            <div class="home-attachment-area-item-uploading"></div>
+            <div v-if="attachment.status === 'uploading'" class="home-attachment-area-item-uploading"></div>
+            <!-- 失败 -->
+            <div v-if="attachment.status === 'failed'" class="home-attachment-area-item-failed"></div>
             <!-- 预览 -->
             <div class="home-attachment-area-item-preview" @click="previewPictureClick(attachment)">
                 <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -17,9 +20,14 @@
                 </svg>
             </div>
             <!-- 删除 -->
-             <div class="home-attachment-area-item-delete" @click="deleteAttachmentClick(attachment)">
-                <svg width="10" height="10" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 14L34 34" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 34L34 14" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-             </div>
+            <div class="home-attachment-area-item-delete" @click="deleteAttachmentClick(attachment)">
+                <svg width="10" height="10" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 14L34 34" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M14 34L34 14" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
         </div>
     </div>
 </template>
@@ -79,6 +87,40 @@ function deleteAttachmentClick(attachment: ChatAttachmentUploadInfo) {
     border-radius: 10px;
 }
 
+.home-attachment-area-item:hover .home-attachment-area-item-delete {
+    display: flex;
+}
+
+.home-attachment-area-item-uploading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: color-mix(in srgb,
+            var(--ch-feature-card-hover-bg) 80%,
+            transparent);
+}
+
+.home-attachment-area-item-failed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: color-mix(in srgb,
+            var(--ch-tip-error-color) 80%,
+            transparent);
+}
+
 .home-attachment-area-item-preview {
     position: absolute;
     top: 0;
@@ -112,8 +154,7 @@ function deleteAttachmentClick(attachment: ChatAttachmentUploadInfo) {
     stroke: var(--ch-white-color);
 }
 
-.home-attachment-area-item-loaded:hover .home-attachment-area-item-preview,
-.home-attachment-area-item-loaded:hover .home-attachment-area-item-delete {
+.home-attachment-area-item-loaded:hover .home-attachment-area-item-preview {
     display: flex;
 }
 </style>

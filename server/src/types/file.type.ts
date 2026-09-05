@@ -12,6 +12,8 @@ export interface FileType {
  * 内存化的文件对象
  */
 export interface MemoryBasedFile {
+    /** 文件原始名称 */
+    originalName: string;
     /** 文件名（含扩展名） */
     name: string;
     /** 文件类型 */

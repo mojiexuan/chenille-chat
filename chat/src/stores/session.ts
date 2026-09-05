@@ -2,13 +2,14 @@ import { computed, ref, shallowRef } from "vue";
 import { defineStore } from "pinia";
 import type { MessageStreaming, SessionItem, Session, ChatAttachmentUploadInfo } from "@/types";
 import {
-    getSessionList,
+    getSessionListRequest,
     getSessionRequest,
     deleteSessionRequest,
     updateSessionRequest,
     aiChatSse,
     getSessionTitleRequest,
-    getGerundIndicatorRequest
+    getGerundIndicatorRequest,
+    uploadChatAttachmentRequest
 } from "@/request";
 import { getValidDirectoryHandle, saveDirectoryHandle } from "@/utils";
 import { IndexedKeyEnum } from "@/enumeration";
@@ -121,7 +122,7 @@ export const useSessionStore = defineStore("session", () => {
             return;
         }
         const pageSize = 20;
-        return getSessionList({ page, pageSize })
+        return getSessionListRequest({ page, pageSize })
             .then((res) => {
                 sessions.value = res.list || [];
                 hasMoreSessions.value = res.list.length < pageSize;
@@ -243,8 +244,39 @@ export const useSessionStore = defineStore("session", () => {
      * @author 陈佳宝
      * @date 2026-05-31
      */
-    function addAttachment(attachmentList: ChatAttachmentUploadInfo[]): void {
+    async function addAttachment(attachmentList: ChatAttachmentUploadInfo[]) {
+        // 记录当前批次附件 id
+        const ids = new Set(attachmentList.map((item) => item.id));
         attachments.value.push(...attachmentList);
+        // // 更新状态
+        // attachments.value.forEach((item) => {
+        //     if (ids.has(item.id)) item.status = "uploading";
+        // });
+
+        // try {
+        //     const results = await uploadChatAttachmentRequest(attachmentList);
+
+        //     const urlMap = new Map<string, string>();
+        //     attachmentList.forEach((item, index) => {
+        //         const res = results[index];
+        //         if (res) {
+        //             urlMap.set(item.id, res.url);
+        //         }
+        //     });
+
+        //     // 数据回填
+        //     attachments.value.forEach((item) => {
+        //         const url = urlMap.get(item.id);
+        //         if (url) {
+        //             item.fileUrl = url;
+        //             item.status = "uploaded";
+        //         }
+        //     });
+        // } catch {
+        //     attachments.value.forEach((item) => {
+        //         if (ids.has(item.id)) item.status = "failed";
+        //     });
+        // }
     }
 
     /**
@@ -270,7 +302,7 @@ export const useSessionStore = defineStore("session", () => {
         currentModelId = void 0,
         regenerate = false,
         onUpdateUi = async () => { },
-    }:{
+    }: {
         currentModelId?: string;
         regenerate?: boolean;
         onUpdateUi?: () => void;

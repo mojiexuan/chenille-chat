@@ -6,13 +6,30 @@ import type {
   PaginationRequest,
   PaginationResponse,
   SessionItem,
+  ChatAttachmentUploadInfo,
 } from "@/types";
 
 /**
  * 获取会话列表
  */
-export const getSessionList = (params: PaginationRequest) => {
+export const getSessionListRequest = (params: PaginationRequest) => {
   return get<PaginationResponse<SessionItem>>("/chat/sessions", { params });
+};
+
+/**
+ * 上传会话附件
+ */
+export const uploadChatAttachmentRequest = (attachments:ChatAttachmentUploadInfo[]) => {
+  const formData = new FormData();
+  attachments.forEach((attachment) => {
+    formData.append("file", attachment.file);
+  });
+  return post<{
+    originalName: string;
+    url: string;
+  }[]>("/chat/attachment", void 0, {
+    body: formData,
+  });
 };
 
 /**
