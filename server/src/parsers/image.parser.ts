@@ -82,10 +82,19 @@ class ImageParser extends Parser {
     /**
      * 支持的文件扩展名
      */
-    readonly extensions = new Set([
-        "jpg",
-        "jpeg",
-        "png"
+    readonly types = new Set([
+        {
+            ext: "jpg",
+            mime: "image/jpeg",
+        },
+        {
+            ext: "jpeg",
+            mime: "image/jpeg",
+        },
+        {
+            ext: "png",
+            mime: "image/png",
+        }
     ]);
 
     /**
@@ -142,7 +151,7 @@ class ImageParser extends Parser {
             }
             return parsed.map((item, index) => ({
                 fileName: files[index].name,
-                mimeType: files[index].mimetype,
+                mimeType: files[index].type.mime,
                 size: files[index].size,
                 type: "image" as const,
                 content: item.content,

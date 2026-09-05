@@ -70,14 +70,6 @@ class OssService {
   }
 
   /**
-   * 上传文件到OSS
-   */
-  async uploadFileToOss(file: MultipartFile) {
-    const buffer = await file.toBuffer();
-    return await this.uploadFileToOssWithBuffer(buffer, file.filename);
-  }
-
-  /**
    * 从OSS下载文件
    */
   async downloadFileFromOss(fileUrl: string) {

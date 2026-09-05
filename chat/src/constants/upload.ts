@@ -1,3 +1,4 @@
+// 支持的文件类型
 export const AI_CHAT_ACCEPTED_FILE_TYPES = [
     ".txt",
 
@@ -48,4 +49,12 @@ export const AI_CHAT_ACCEPTED_FILE_TYPES = [
     ".cs",
 
     ".sql",
+] as const;
+
+// 支持的图片类型
+export const AI_CHAT_ACCEPTED_IMAGE_TYPES = [
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".webp",
 ] as const;

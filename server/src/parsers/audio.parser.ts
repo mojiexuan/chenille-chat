@@ -20,10 +20,19 @@ class AudioParser extends Parser {
     /**
      * 支持的文件扩展名
      */
-    readonly extensions = new Set([
-        "mp3",
-        "wav",
-        "aac",
+    readonly types = new Set([
+        {
+            ext: "mp3",
+            mime: "audio/mpeg",
+        },
+        {
+            ext: "wav",
+            mime: "audio/wav",
+        },
+        {
+            ext: "aac",
+            mime: "audio/aac",
+        }
     ]);
 
     /**

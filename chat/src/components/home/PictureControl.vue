@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div @click="pictureSelectClick">
         <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
                 d="M44 24C44 22.8954 43.1046 22 42 22C40.8954 22 40 22.8954 40 24H44ZM24 8C25.1046 8 26 7.10457 26 6C26 4.89543 25.1046 4 24 4V8ZM39 40H9V44H39V40ZM8 39V9H4V39H8ZM40 24V39H44V24H40ZM9 8H24V4H9V8ZM9 40C8.44772 40 8 39.5523 8 39H4C4 41.7614 6.23857 44 9 44V40ZM39 44C41.7614 44 44 41.7614 44 39H40C40 39.5523 39.5523 40 39 40V44ZM8 9C8 8.44772 8.44771 8 9 8V4C6.23858 4 4 6.23857 4 9H8Z"
@@ -14,3 +14,33 @@
         </svg>
     </div>
 </template>
+
+<script setup lang="ts" name="PictureControl">
+import { AI_CHAT_ACCEPTED_IMAGE_TYPES } from "@/constants";
+import { useToast } from "@/composables";
+
+// 通知
+const toast = useToast();
+
+/**
+ * 图片选择
+ */
+function pictureSelectClick() {
+  const input =
+    document.createElement("input");
+  input.type = "file";
+  input.accept = AI_CHAT_ACCEPTED_IMAGE_TYPES.join(",");
+  input.multiple = true;
+  input.onchange = () => {
+    const files =
+      Array.from(input.files ?? []);
+    if (files.length <= 0) {
+      toast.warning("未选择图片");
+      return;
+    } else {
+      console.log(files);
+    }
+  }
+  input.click();
+}
+</script>

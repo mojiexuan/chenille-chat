@@ -4,9 +4,10 @@ import { userSafeInfo, userSettingsInfo } from "@/vo";
 import { BizException } from "@/exception";
 import { BizCode, UserRole } from "@/enumeration";
 import { ossService } from "@/services";
-import { logger, formatNumber } from "@/utils";
+import { logger, formatNumber,convertFileToMemoryBasedFile,validateFile } from "@/utils";
 import type { MultipartFile } from "@fastify/multipart";
 import { MeUpdateUserInfoDto, MeUserSettingsDto } from "@/dto";
+import { USER_AVATAR_IMAGE_TYPES } from "@/constants";
 
 /**
  * 用户服务
@@ -60,9 +61,16 @@ class UserService {
    * 更新用户头像
    */
   async updateAvatar(userId: string, avatar: MultipartFile) {
+    // 获取用户信息
     const user = await this.getUserInfoById(userId);
+    // 转换文件
+    const memoryFile = await convertFileToMemoryBasedFile(avatar);
+    // 校验文件类型 + 大小是否在允许的范围内
+    validateFile(memoryFile,USER_AVATAR_IMAGE_TYPES,10 * 1024 * 1024);
+    // 删除旧的头像文件
     ossService.deleteFileFromOss(user.avatar);
-    const { url, path } = await ossService.uploadFileToOss(avatar);
+    // 上传新头像
+    const { url, path } = await ossService.uploadFileToOssWithBuffer(memoryFile.buffer, memoryFile.name);
     try {
       await db.update(users).set({ avatar: path }).where(eq(users.id, userId));
       return url;

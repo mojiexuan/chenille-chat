@@ -18,53 +18,19 @@ class TextParser extends Parser {
     /**
      * 支持的文件扩展名
      */
-    readonly extensions = new Set([
-        "txt",
-
-        "md",
-        "markdown",
-
-        "json",
-        "jsonl",
-
-        "yaml",
-        "yml",
-
-        "xml",
-
-        "csv",
-        "tsv",
-
-        "ini",
-        "toml",
-        "conf",
-
-        "env",
-        "properties",
-
-        "log",
-
-        "js",
-        "jsx",
-
-        "ts",
-        "tsx",
-
-        "vue",
-
-        "html",
-        "css",
-
-        "py",
-        "java",
-        "kt",
-        "go",
-        "rs",
-        "php",
-        "rb",
-        "cs",
-
-        "sql",
+    readonly types = new Set([
+        {
+            ext: "txt",
+            mime: "text/plain",
+        },
+        {
+            ext: "md",
+            mime: "text/markdown",
+        },
+        {
+            ext: "json",
+            mime: "application/json",
+        }
     ]);
 
     /**
@@ -75,7 +41,7 @@ class TextParser extends Parser {
         return Promise.all(files.map(file => ({
             type:"text" as const,
             fileName: file.name,
-            mimeType: file.mimetype,
+            mimeType: file.type.mime,
             size: file.size,
             content: file.buffer.toString("utf-8"),
         })))
