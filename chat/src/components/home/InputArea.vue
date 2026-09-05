@@ -1,6 +1,9 @@
 <template>
     <div class="home-input-area">
         <div class="home-input-area-box">
+            <!-- 附件区域 -->
+             <AttachmentArea />
+            <!-- 编辑区 -->
             <div class="home-input-area-box-editor">
                 <div class="home-input-area-box-editor-wrapper" :class="{ 'speech-active': showSpeechRecognition }"
                     :data-message="sessionStore.editorMessage">
@@ -115,6 +118,7 @@ import VoiceCallControl from "./VoiceCallControl.vue";
 import AttachmentControl from "./AttachmentControl.vue";
 import PictureControl from "./PictureControl.vue";
 import ModelSelect from "./ModelSelect.vue";
+import AttachmentArea from "./AttachmentArea.vue";
 
 const sessionStore = useSessionStore();
 const modelStore = useModelStore();

@@ -2,6 +2,7 @@
 import AuthModal from '@/components/modal/AuthModal.vue'
 import ToastMessage from '@/components/toast/ToastMessage.vue';
 import ConfirmDialog from '@/components/dialog/ConfirmDialog.vue';
+import PreviewPicture from '@/components/preview/PreviewPicture.vue';
 import { onMounted } from 'vue';
 import { useUserStore } from '@/stores';
 import { initCaptcha } from '@/utils';
@@ -25,6 +26,7 @@ onMounted(() => {
     <AuthModal />
     <ToastMessage />
     <ConfirmDialog />
+    <PreviewPicture />
   </div>
 </template>
 

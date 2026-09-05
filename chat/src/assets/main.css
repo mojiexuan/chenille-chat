@@ -1,6 +1,8 @@
 html[data-theme="light"] {
   --ch-main-color: #f15a29;
   --ch-main-hover-color: #e23914;
+  --ch-black-color: #1b1b1f;
+  --ch-white-color: #ffffff;
   --ch-bg-color-card: #ffffff;
   --ch-feature-card-bg: #f6f6f7;
   --ch-feature-card-hover-bg: #e7e8ec;

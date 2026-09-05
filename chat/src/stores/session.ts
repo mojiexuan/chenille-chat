@@ -1,6 +1,6 @@
 import { computed, ref, shallowRef } from "vue";
 import { defineStore } from "pinia";
-import type { MessageStreaming, SessionItem, Session } from "@/types";
+import type { MessageStreaming, SessionItem, Session, ChatAttachmentUploadInfo } from "@/types";
 import {
     getSessionList,
     getSessionRequest,
@@ -21,6 +21,8 @@ import { IndexedKeyEnum } from "@/enumeration";
 export const useSessionStore = defineStore("session", () => {
     // 编辑器消息，用于存储用户输入的消息
     const editorMessage = ref<string>("");
+    // 当前选择的附件
+    const attachments = ref<ChatAttachmentUploadInfo[]>([]);
     // 是否可以发送消息
     const canSend = computed(() => editorMessage.value.trim().length > 0);
     // 会话列表
@@ -235,6 +237,26 @@ export const useSessionStore = defineStore("session", () => {
         sessions.value = sessions.value.filter((item) => item.id !== sessionId);
     }
 
+    /**
+     * 添加附件
+     * @param attachmentList 附件列表
+     * @author 陈佳宝
+     * @date 2026-05-31
+     */
+    function addAttachment(attachmentList: ChatAttachmentUploadInfo[]): void {
+        attachments.value.push(...attachmentList);
+    }
+
+    /**
+     * 删除附件
+     * @param attachmentId 附件ID
+     * @author 陈佳宝
+     * @date 2026-05-31
+     */
+    function removeAttachment(attachmentId: string): void {
+        attachments.value = attachments.value.filter((item) => item.id !== attachmentId);
+    }
+
     // 当前请求控制器
     const abortController = shallowRef<AbortController | null>(null);
     /**
@@ -366,6 +388,7 @@ export const useSessionStore = defineStore("session", () => {
 
     return {
         editorMessage,
+        attachments,
         canSend,
         sessions,
         currentSession,
@@ -386,6 +409,8 @@ export const useSessionStore = defineStore("session", () => {
         deleteSession,
         queryCurrentSessionWorkSpace,
         setCurrentSessionWorkSpace,
+        addAttachment,
+        removeAttachment,
         sendMessage,
     };
 });

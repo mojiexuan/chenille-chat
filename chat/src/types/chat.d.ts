@@ -1,4 +1,22 @@
 /**
+ * 会话附件信息
+ */
+export interface ChatAttachmentUploadInfo {
+  /** 附件 ID */
+  id: string;
+  /** 文件 */
+  file: File;
+  /** 文件名 */
+  fileName: string;
+  /** 文件 URL */
+  fileUrl: string;
+  /** 文件类型 */
+  fileType: "image" | "file";
+  /** 上传状态 */
+  status: "uploading" | "uploaded" | "failed";
+}
+
+/**
  * 调用 AI 聊天接口参数
  */
 export interface AiChatParams {

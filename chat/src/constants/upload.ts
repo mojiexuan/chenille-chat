@@ -53,6 +53,7 @@ export const AI_CHAT_ACCEPTED_FILE_TYPES = [
 
 // 支持的图片类型
 export const AI_CHAT_ACCEPTED_IMAGE_TYPES = [
+    ".jpg",
     ".jpeg",
     ".png",
     ".gif",

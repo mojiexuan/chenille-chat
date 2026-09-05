@@ -194,17 +194,6 @@ function regenerateClick() {
     gap: 16px;
 }
 
-.home-container-replying {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.home-container-replying-image {
-    width: 20px;
-    height: 20px;
-}
-
 .home-container-status-bar-button,
 .home-container-status-bar-button path {
     cursor: pointer;

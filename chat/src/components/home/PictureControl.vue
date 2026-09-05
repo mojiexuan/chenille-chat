@@ -1,26 +1,27 @@
 <template>
-    <div @click="pictureSelectClick">
-        <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M44 24C44 22.8954 43.1046 22 42 22C40.8954 22 40 22.8954 40 24H44ZM24 8C25.1046 8 26 7.10457 26 6C26 4.89543 25.1046 4 24 4V8ZM39 40H9V44H39V40ZM8 39V9H4V39H8ZM40 24V39H44V24H40ZM9 8H24V4H9V8ZM9 40C8.44772 40 8 39.5523 8 39H4C4 41.7614 6.23857 44 9 44V40ZM39 44C41.7614 44 44 41.7614 44 39H40C40 39.5523 39.5523 40 39 40V44ZM8 9C8 8.44772 8.44771 8 9 8V4C6.23858 4 4 6.23857 4 9H8Z"
-                fill="#3c3c43" />
-            <path d="M6 35L16.6931 25.198C17.4389 24.5143 18.5779 24.4953 19.3461 25.1538L32 36" stroke="#3c3c43"
-                stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M28 31L32.7735 26.2265C33.4772 25.5228 34.5914 25.4436 35.3877 26.0408L42 31" stroke="#3c3c43"
-                stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M37 18L37 6" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M32 11L37 6L42 11" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
-                stroke-linejoin="round" />
-        </svg>
-    </div>
+  <div @click="pictureSelectClick">
+    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M44 24C44 22.8954 43.1046 22 42 22C40.8954 22 40 22.8954 40 24H44ZM24 8C25.1046 8 26 7.10457 26 6C26 4.89543 25.1046 4 24 4V8ZM39 40H9V44H39V40ZM8 39V9H4V39H8ZM40 24V39H44V24H40ZM9 8H24V4H9V8ZM9 40C8.44772 40 8 39.5523 8 39H4C4 41.7614 6.23857 44 9 44V40ZM39 44C41.7614 44 44 41.7614 44 39H40C40 39.5523 39.5523 40 39 40V44ZM8 9C8 8.44772 8.44771 8 9 8V4C6.23858 4 4 6.23857 4 9H8Z"
+        fill="#3c3c43" />
+      <path d="M6 35L16.6931 25.198C17.4389 24.5143 18.5779 24.4953 19.3461 25.1538L32 36" stroke="#3c3c43"
+        stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M28 31L32.7735 26.2265C33.4772 25.5228 34.5914 25.4436 35.3877 26.0408L42 31" stroke="#3c3c43"
+        stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M37 18L37 6" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M32 11L37 6L42 11" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </div>
 </template>
 
 <script setup lang="ts" name="PictureControl">
 import { AI_CHAT_ACCEPTED_IMAGE_TYPES } from "@/constants";
 import { useToast } from "@/composables";
+import { useSessionStore } from "@/stores";
 
 // 通知
 const toast = useToast();
+const sessionStore = useSessionStore();
 
 /**
  * 图片选择
@@ -38,7 +39,15 @@ function pictureSelectClick() {
       toast.warning("未选择图片");
       return;
     } else {
-      console.log(files);
+      // 添加附件
+      sessionStore.addAttachment(files.map((file) => ({
+        id: crypto.randomUUID(),
+        file,
+        fileName: file.name,
+        fileUrl: URL.createObjectURL(file),
+        fileType: "image",
+        status: "uploaded",
+      })));
     }
   }
   input.click();

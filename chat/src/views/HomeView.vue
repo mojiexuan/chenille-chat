@@ -75,6 +75,17 @@ function sendClick(_event?: MouseEvent, regenerate = false) {
   justify-content: center;
 }
 
+.home-container-replying {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.home-container-replying-image {
+    width: 20px;
+    height: 20px;
+}
+
 .home-container-hi {
   width: 100%;
   display: flex;
