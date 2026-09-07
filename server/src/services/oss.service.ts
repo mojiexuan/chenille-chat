@@ -32,8 +32,8 @@ class OssService {
    * @param path 文件路径
    * @returns 文件的完整URL
    */
-  getFullUrl(path: string | null) {
-    if (!path || path.startsWith("http")) {
+  getFullUrl(path: string) {
+    if (path.startsWith("http")) {
       return path;
     }
     const endpoint = config.ALIBABA_CLOUD_OSS_ENDPOINT.replace(/\/+$/, "");

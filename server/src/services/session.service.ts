@@ -119,12 +119,13 @@ class SessionService {
           if (!exists) {
             throw new BizException(BizCode.FILE_NOT_FOUND);
           }
+          const newUrl = await ossService.finalizeFileFromOss(a.url);
           return {
             messageId: message.id,
             userId,
             role,
             fileName: a.name,
-            url: a.url,
+            url: newUrl,
             type: MediaType.Image,
             size,
           }
@@ -284,7 +285,9 @@ class SessionService {
                   },
                   ...msg.attachments.map((attachment) => ({
                     type: "image_url",
-                    image_url: attachment.url,
+                    image_url: {
+                      url: attachment.url,
+                    },
                   } as UserImageMessage)),
                 ]
               }

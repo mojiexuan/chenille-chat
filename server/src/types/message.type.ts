@@ -68,8 +68,10 @@ export type UserImageMessageDetail = "low" | "high" | "original" | "auto";
  */
 export type UserImageMessage = {
   type: "image_url";
-  image_url: string;
-  detail?: UserImageMessageDetail;
+  image_url: {
+    url: string;
+    detail?: UserImageMessageDetail;
+  }
 }
 
 /**
