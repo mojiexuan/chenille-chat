@@ -1,18 +1,21 @@
-import { db, sessions, messages, aiTokenUsages } from "@/db";
-import { eq, asc, desc, count, and } from "drizzle-orm";
-import { AiRole } from "@/enumeration";
+import { db, sessions, messages, aiTokenUsages, messageAttachments } from "@/db";
+import { eq, asc, desc, count, and, sql } from "drizzle-orm";
+import { AiRole, MediaType } from "@/enumeration";
 import {
   Pagination,
   Message,
   AssistantMessage,
   UserMessage,
   ChatUsage,
+  ChatMessageAttachment,
+  UserImageMessage,
 } from "@/types";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { generateSessionTitle } from "@/session";
 import { logger } from "@/utils";
 import { UpdateSessionRequestDto } from "@/dto";
+import { ossService } from "@/services";
 
 /**
  * 会话服务
@@ -88,6 +91,7 @@ class SessionService {
     sessionId: string,
     role: AiRole,
     content: string,
+    attachments?: ChatMessageAttachment[],
     reasoning?: string | null,
     usage?: ChatUsage,
     meta?: unknown,
@@ -106,6 +110,27 @@ class SessionService {
         meta,
       })
       .returning();
+    // 插入附件
+    if (attachments && attachments.length > 0) {
+      // 构建附件插入值并检查文件是否存在，若不存在则抛出异常
+      const attachmentValues = await Promise.all(
+        attachments.map(async (a) => {
+          const { exists, size } = await ossService.isOssObjectExist(a.url);
+          if (!exists) {
+            throw new BizException(BizCode.FILE_NOT_FOUND);
+          }
+          return {
+            messageId: message.id,
+            userId,
+            role,
+            fileName: a.name,
+            url: a.url,
+            type: MediaType.Image,
+            size,
+          }
+        }));
+      await db.insert(messageAttachments).values(attachmentValues);
+    }
     if (usage) {
       // 记录token使用日志，不在意插入失败
       db.insert(aiTokenUsages)
@@ -128,11 +153,14 @@ class SessionService {
    * @param sessionId 会话ID
    */
   async getMessages(sessionId: string) {
-    return db
-      .select()
-      .from(messages)
-      .where(eq(messages.sessionId, sessionId))
-      .orderBy(asc(messages.createdAt));
+    return db.query.messages
+      .findMany({
+        where: eq(messages.sessionId, sessionId),
+        orderBy: asc(messages.createdAt),
+        with: {
+          attachments: true,
+        }
+      });
   }
 
   /**
@@ -234,7 +262,9 @@ class SessionService {
    * 构建上下文消息
    */
   buildContextMessages(
-    dbMessages: { role: string; content: string }[],
+    dbMessages: (typeof messages.$inferSelect & {
+      attachments: typeof messageAttachments.$inferSelect[];
+    })[],
   ): Message[] {
     return dbMessages
       .filter(
@@ -242,6 +272,24 @@ class SessionService {
       )
       .map((msg) => {
         if (msg.role === AiRole.User) {
+          if (msg.attachments.length > 0) {
+            return {
+              type: "user",
+              message: {
+                role: "user",
+                content: [
+                  {
+                    type: "text",
+                    text: msg.content,
+                  },
+                  ...msg.attachments.map((attachment) => ({
+                    type: "image_url",
+                    image_url: attachment.url,
+                  } as UserImageMessage)),
+                ]
+              }
+            } as UserMessage;
+          }
           return {
             type: "user",
             message: { role: "user", content: msg.content },

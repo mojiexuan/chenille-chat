@@ -3,4 +3,5 @@
  */
 export enum SseEventName {
     AI_CHAT_MESSAGE = "ai:chat:message",
+    ERROR = "error",
 }

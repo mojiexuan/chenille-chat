@@ -2,7 +2,7 @@ import type { MultipartFile } from "@fastify/multipart";
 import { createAiModel } from "@/models";
 import { agentService, ossService } from "@/services";
 import { logger } from "@/utils";
-import { MessageAttachmentType, BizCode } from "@/enumeration";
+import { MediaType, BizCode } from "@/enumeration";
 import { BizException } from "@/exception";
 
 
@@ -35,7 +35,7 @@ class AsrService {
                         type: "attachment",
                         content: [
                             {
-                                type: MessageAttachmentType.Audio,
+                                type: MediaType.Audio,
                                 url: url,
                             }
                         ]

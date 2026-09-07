@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import { CompressOptions, CompressResult } from "@/types";
+import { CompressOptions, CompressResult, MemoryFile } from "@/types";
 
 /**
  * 图片格式映射
@@ -17,15 +17,15 @@ const MIME_MAP: Record<string, string> = {
  * @param options 压缩选项
  * @returns 压缩结果
  */
-export async function compressToTargetSize(buffer: Buffer, targetSizeBytes: number, options: CompressOptions = {}): Promise<CompressResult> {
+export async function compressToTargetSize(file:MemoryFile, targetSizeBytes: number, options: CompressOptions = {}): Promise<CompressResult> {
     const {
         maxDimension: initDim = 2048,
         quality: initQuality = 80,
         minQuality = 30,
         background = "#fff",
-        format = "jpeg",
+        format = "jpg",
     } = options;
-    const input = buffer;
+    const input = file.buffer;
     // 原图已小于目标，直接返回
     if (input.length < targetSizeBytes) {
         return buildResult(input, format, initQuality, initDim);
@@ -52,8 +52,8 @@ export async function compressToTargetSize(buffer: Buffer, targetSizeBytes: numb
                 withoutEnlargement: true,
             });
 
-        if (format === "jpeg") {
-            // 压缩 JPEG 图片
+        if (format === "jpg") {
+            // 压缩 JPG 图片
             pipeline = pipeline
                 .flatten({ background })
                 .jpeg({ quality, mozjpeg: true });
@@ -110,7 +110,10 @@ function buildResult(
         size: buffer.length,
         quality,
         maxDimension,
-        mimeType,
+        type:{
+            ext:format,
+            mime:mimeType,
+        },
         toDataUrl() {
             return `data:${mimeType};base64,${buffer.toString("base64")}`;
         },

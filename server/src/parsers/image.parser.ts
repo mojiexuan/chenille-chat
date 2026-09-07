@@ -1,7 +1,7 @@
-import { BizCode, MessageAttachmentType } from "@/enumeration";
+import { BizCode, MediaType } from "@/enumeration";
 import { BizException } from "@/exception";
 import { Parser } from "@/parsers";
-import { ParsedDocument, MemoryBasedFile } from "@/types";
+import { ParsedDocument, MemoryFile } from "@/types";
 import { agentService, ossService } from "@/services";
 import { createAiModel } from "@/models";
 import { compressToTargetSize, parseWithSchema } from "@/utils";
@@ -101,7 +101,7 @@ class ImageParser extends Parser {
      * 解析文件
      * @param files 文件列表
      */
-    async parse(files: MemoryBasedFile[]): Promise<ParsedDocument[]> {
+    async parse(files: MemoryFile[]): Promise<ParsedDocument[]> {
         // 获取视觉识别代理
         const agent = await agentService.getVisionRecognitionAgent();
         if (!agent) {
@@ -116,10 +116,17 @@ class ImageParser extends Parser {
         let urls: string[] = [];
         try {
             urls = await Promise.all(files.map(async (file) => {
+                // 将图片压缩到10MB以下
+                const compressed = await compressToTargetSize(file, this.maxSize);
                 // 上传压缩后的图片到OSS
-                return (await ossService.uploadFileToOssWithBuffer(
-                    (await compressToTargetSize(file.buffer, this.maxSize)).buffer,// 将图片压缩到10MB以下
-                    file.name))
+                return (await ossService.uploadFileToOssWithBuffer({
+                        originalName:file.name,
+                        name:file.name,
+                        type:compressed.type,
+                        media:MediaType.Image,
+                        size:compressed.size,
+                        buffer:compressed.buffer,
+                    }))
                     .url;
             }));
             const result = await aiModel.generate({
@@ -128,7 +135,7 @@ class ImageParser extends Parser {
                         type: "attachment" as const,
                         content: [
                             {
-                                type: MessageAttachmentType.Image,
+                                type: MediaType.Image,
                                 url,
                             }
                         ]

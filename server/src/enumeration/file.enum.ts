@@ -1,7 +1,7 @@
 /**
- * 消息附件类型
+ * 媒体类型
  */
-export enum MessageAttachmentType {
+export enum MediaType {
     Image = "image",
     Video = "video",
     Audio = "audio",

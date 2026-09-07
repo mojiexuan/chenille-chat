@@ -4,7 +4,7 @@ import { userSafeInfo, userSettingsInfo } from "@/vo";
 import { BizException } from "@/exception";
 import { BizCode, UserRole } from "@/enumeration";
 import { ossService } from "@/services";
-import { logger, formatNumber,convertFileToMemoryBasedFile,validateFile } from "@/utils";
+import { logger, formatNumber,convertFileToMemoryFile,validateFile } from "@/utils";
 import type { MultipartFile } from "@fastify/multipart";
 import { MeUpdateUserInfoDto, MeUserSettingsDto } from "@/dto";
 import { USER_AVATAR_IMAGE_TYPES } from "@/constants";
@@ -64,7 +64,7 @@ class UserService {
     // 获取用户信息
     const user = await this.getUserInfoById(userId);
     // 转换文件
-    const memoryFile = await convertFileToMemoryBasedFile(avatar);
+    const memoryFile = await convertFileToMemoryFile(avatar);
     // 校验文件类型 + 大小是否在允许的范围内
     validateFile(memoryFile,USER_AVATAR_IMAGE_TYPES,10 * 1024 * 1024);
     // 删除旧的头像文件

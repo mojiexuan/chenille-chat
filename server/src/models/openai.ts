@@ -12,7 +12,7 @@ import { Stream } from "openai/core/streaming";
 import { ChatCompletionCreateParams, ReasoningEffort as OpenAiReasoningEffort } from "openai/resources/index";
 import z from "zod/v4";
 import { AiModel } from "./base.model";
-import { AiProvider, MessageAttachmentType, ReasoningEffort } from "@/enumeration";
+import { AiProvider, MediaType, ReasoningEffort } from "@/enumeration";
 
 /**
  * OpenAI 模型
@@ -237,10 +237,10 @@ class OpenAiModel extends AiModel {
           return {
             role: "user",
             content: msg.content.map((c) => ({
-              type: c.type === MessageAttachmentType.Audio ? "input_audio" : c.type === MessageAttachmentType.Image ? "image_url" : c.type === MessageAttachmentType.File ? "file" : "text",
+              type: c.type === MediaType.Audio ? "input_audio" : c.type === MediaType.Image ? "image_url" : c.type === MediaType.File ? "file" : "text",
               ...(
                 // !TODO 目前仅仅处理了音频附件
-                c.type === MessageAttachmentType.Audio ? {
+                c.type === MediaType.Audio ? {
                   input_audio: {
                     data: c.url || c.base64 || "",
                   },

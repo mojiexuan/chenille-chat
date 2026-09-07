@@ -7,6 +7,7 @@ import { logger } from "@/utils";
 import { BizException } from "@/exception";
 import { TEMP_PATH } from "@/constants";
 import path from "path";
+import { MemoryFile } from "@/types";
 
 /**
  * OSS服务
@@ -43,7 +44,7 @@ class OssService {
   /**
    * 上传文件到OSS，从Buffer区上传
    */
-  async uploadFileToOssWithBuffer(buffer: Buffer, fileName: string, isTemp: boolean = false) {
+  async uploadFileToOssWithBuffer(file: MemoryFile, isTemp: boolean = false) {
     // 自定义请求头
     const headers = {
       // 指定Object的存储类型
@@ -54,10 +55,15 @@ class OssService {
       "x-oss-forbid-overwrite": "false",
     };
     const { datePath, compact } = getTimeComponents();
-    const ext = path.extname(fileName) || ".png";
-    const objectName = isTemp ? `${OSS_KEY_PREFIX}/temp/${datePath}/${compact}_${randomStr(6, CharType.Upper)}${ext}` : `${OSS_KEY_PREFIX}/${datePath}/${compact}_${randomStr(6, CharType.Upper)}${ext}`;
+    const ext = path.extname(file.name) || ".png";
+
+    // 构建Object基础名称
+    const objectBaseName = `${file.media}/${datePath}/${compact}_${file.size}_${randomStr(6, CharType.Lower)}${ext}`
+
+    // 构建Object路径
+    const objectName = isTemp ? `${OSS_KEY_PREFIX}/temp/${objectBaseName}` : `${OSS_KEY_PREFIX}/${objectBaseName}`;
     try {
-      const result = await this.ossClient.put(objectName, buffer, { headers });
+      const result = await this.ossClient.put(objectName, file.buffer, { headers });
       return {
         url: result.url,
         path: objectName,
@@ -138,6 +144,27 @@ class OssService {
     } catch (err) {
       logger.error(err, "删除文件从OSS失败");
       throw new BizException(BizCode.FILE_DELETE_FAIL);
+    }
+  }
+
+  /**
+   * 检查OSS上的文件是否存在
+   * @param url 文件URL
+   * @returns 是否存在
+   */
+  async isOssObjectExist(url:string){
+    // 检查URL是否以OSS Endpoint开头
+    const endpoint = config.ALIBABA_CLOUD_OSS_ENDPOINT.replace(/\/+$/, "");
+    if(!url.startsWith(endpoint)){
+      return { exists: false, size: 0 };
+    }
+    const objectName = url.replace(`${endpoint}/`, "");
+    try {
+      const result = await this.ossClient.head(objectName);
+      return { exists: true, size: result.res.size || 0 };
+    } catch (err) {
+      logger.error(err, `检查OSS文件是否存在失败，URL: ${url}`);
+      return { exists: false, size: 0 };
     }
   }
 }

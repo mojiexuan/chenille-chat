@@ -1,4 +1,4 @@
-import { ParsedDocument,MemoryBasedFile,FileType } from "@/types";
+import { ParsedDocument,MemoryFile,FileType } from "@/types";
 import { validateFile } from "@/utils";
 
 /**
@@ -23,7 +23,7 @@ export abstract class Parser {
     /**
      * 检查解析器是否支持解析文件类型
      */
-    supports(files: MemoryBasedFile[]): boolean {
+    supports(files: MemoryFile[]): boolean {
         for (const file of files) {
             validateFile(file, this.types);
         }
@@ -33,5 +33,5 @@ export abstract class Parser {
      * 解析文件
      * @param files 文件列表
      */
-    abstract parse(files: MemoryBasedFile[]): Promise<ParsedDocument[]>;
+    abstract parse(files: MemoryFile[]): Promise<ParsedDocument[]>;
 }

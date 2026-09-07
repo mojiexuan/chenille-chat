@@ -2,7 +2,7 @@ import type { MultipartFile } from "@fastify/multipart";
 import { BizException } from "@/exception";
 import { Parser } from "./parser";
 import { BizCode } from "@/enumeration";
-import { convertFileToMemoryBasedFile } from "@/utils";
+import { convertFileToMemoryFile } from "@/utils";
 
 /**
  * 解析器注册器
@@ -24,8 +24,8 @@ class ParserRegistry {
      * @param files 文件列表
      */
     async parse(files: MultipartFile[]){
-        // 将 MultipartFile 转换为 MemoryBasedFile
-        const parsedFiles = await Promise.all(files.map(convertFileToMemoryBasedFile));
+        // 将 MultipartFile 转换为 MemoryFile
+        const parsedFiles = await Promise.all(files.map(convertFileToMemoryFile));
         // 查找解析器
         const parser = this.parsers.find(p => p.supports(parsedFiles));
         if (!parser) {

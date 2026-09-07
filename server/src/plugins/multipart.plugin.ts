@@ -3,7 +3,7 @@ import type { MultipartFile } from "@fastify/multipart";
 import fp from "fastify-plugin";
 import fastifyMultipart from "@fastify/multipart";
 import { USER_AVATAR_IMAGE_TYPES } from "@/constants";
-import { validateFileType,convertFileToMemoryBasedFile } from "@/utils";
+import { validateFileType,convertFileToMemoryFile } from "@/utils";
 import { FileType } from "@/types";
 
 
@@ -28,8 +28,8 @@ async function multipartPluginFn(fastify: FastifyInstance) {
             headerPairs: 2000, // 最多2000个头对值
         },
         onFile: async (file: MultipartFile) => {
-            const memoryBasedFile = await convertFileToMemoryBasedFile(file);
-            validateFileType(memoryBasedFile, ALLOWED_TYPES);
+            const MemoryFile = await convertFileToMemoryFile(file);
+            validateFileType(MemoryFile, ALLOWED_TYPES);
         }
     });
 }

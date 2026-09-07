@@ -1,9 +1,9 @@
+import * as schema from "./schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import pg from "pg";
 import { config } from "@/config";
 import path from "path";
-import { agents } from "./schema";
 import { AgentKey } from "@/enumeration";
 
 /**
@@ -17,7 +17,7 @@ export const pool = new pg.Pool({
     database: config.DB_NAME,
 });
 
-export const db = drizzle(pool);
+export const db = drizzle(pool, {schema});
 
 /**
  * 运行数据库迁移
@@ -60,8 +60,8 @@ async function seedAgents() {
     ];
 
     for (const item of seedData) {
-        await db.insert(agents).values(item).onConflictDoNothing({
-            target: agents.key,
+        await db.insert(schema.agents).values(item).onConflictDoNothing({
+            target: schema.agents.key,
         });
     }
 }

@@ -1,11 +1,14 @@
 import z from "zod/v4";
 import { UserGender } from "@/enumeration";
+import { sanitizeUserText } from "@/utils";
 
 /**
  * 发送手机号验证码DTO
  */
 export const meUpdateUserInfoDto = z.object({
-  nickname: z.string().max(20, "昵称最多20个字符").optional(),
+  nickname: z.string().trim().max(20, "昵称最多20个字符").transform((v)=>{
+    return sanitizeUserText(v, { replaceHtmlAndPathChars: true });
+  }).optional(),
   gender: z.enum(UserGender).optional(),
 });
 

@@ -5,9 +5,13 @@
             <img v-if="attachment.fileType === 'image'" class="home-attachment-area-item-image"
                 :src="attachment.fileUrl" :alt="attachment.fileName" draggable="false">
             <!-- 上传动画 -->
-            <div v-if="attachment.status === 'uploading'" class="home-attachment-area-item-uploading"></div>
+            <div v-if="attachment.status === 'uploading'" class="home-attachment-area-item-uploading">
+                <div class="home-attachment-area-item-uploading-loading"></div>
+            </div>
             <!-- 失败 -->
-            <div v-if="attachment.status === 'failed'" class="home-attachment-area-item-failed"></div>
+            <div v-if="attachment.status === 'failed'" class="home-attachment-area-item-failed" @click="deleteAttachmentClick(attachment)">
+                <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10V44H39V10H9Z" fill="none" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"/><path d="M20 20V33" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M28 20V33" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 10H44" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 10L19.289 4H28.7771L32 10H16Z" fill="none" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"/></svg>
+            </div>
             <!-- 预览 -->
             <div class="home-attachment-area-item-preview" @click="previewPictureClick(attachment)">
                 <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -97,13 +101,32 @@ function deleteAttachmentClick(attachment: ChatAttachmentUploadInfo) {
     left: 0;
     width: 100%;
     height: 100%;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     background: color-mix(in srgb,
             var(--ch-feature-card-hover-bg) 80%,
             transparent);
+    border-radius: 10px;
+}
+
+/* 加载动画 */
+.home-attachment-area-item-uploading-loading  {
+     width: 20px;
+     height: 20px;
+     border: 2px solid #000;
+     border-top-color: transparent;
+     border-radius: 100%;
+     animation: home-attachment-area-item-uploading-loading infinite 0.75s linear;
+}
+@keyframes home-attachment-area-item-uploading-loading  {
+     0%  {
+     transform: rotate(0);
+}
+ 100%  {
+     transform: rotate(360deg);
+}
 }
 
 .home-attachment-area-item-failed {
@@ -112,13 +135,14 @@ function deleteAttachmentClick(attachment: ChatAttachmentUploadInfo) {
     left: 0;
     width: 100%;
     height: 100%;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     background: color-mix(in srgb,
-            var(--ch-tip-error-color) 80%,
+            var(--ch-tip-error-color) 40%,
             transparent);
+    border-radius: 10px;
 }
 
 .home-attachment-area-item-preview {

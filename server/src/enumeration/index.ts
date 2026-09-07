@@ -5,6 +5,6 @@ export * from "./login.enum";
 export * from "./char.enum";
 export * from "./sse.enum";
 export * from "./agent.enum";
-export * from "./message.enum";
 export * from "./task.enum";
 export * from "./ws.enum";
+export * from "./file.enum";

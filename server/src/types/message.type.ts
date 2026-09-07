@@ -1,5 +1,5 @@
 import { ToolCall } from "./tool.type";
-import { MessageAttachmentType } from "@/enumeration";
+import { MediaType } from "@/enumeration";
 import { ExactlyOne } from "./type";
 
 /**
@@ -31,7 +31,7 @@ export type MessageBase = {
 export type AttachmentMessage = MessageBase & {
   type: "attachment";
   content: ({
-    type: MessageAttachmentType;
+    type: MediaType;
   } & ExactlyOne<{
     url: string;
     base64: string;
@@ -47,9 +47,30 @@ export type UserMessage = MessageBase & {
     role: "user";
     content:
     | string
-    | Array<{ type: string; text?: string;[key: string]: unknown }>;
+    | Array<UserTextMessage | UserImageMessage>;
   };
 };
+
+/**
+ * 用户文本消息
+ */
+export type UserTextMessage = {
+  type: "text";
+  text: string;
+}
+
+/**
+ * 用户图片消息详情
+ */
+export type UserImageMessageDetail = "low" | "high" | "original" | "auto";
+/**
+ * 用户图片消息
+ */
+export type UserImageMessage = {
+  type: "image_url";
+  image_url: string;
+  detail?: UserImageMessageDetail;
+}
 
 /**
  * 助手消息
@@ -108,3 +129,11 @@ export type Message =
   | SystemMessage
   | AttachmentMessage
   | ToolMessage;
+
+/**
+ * 会话消息附件
+ */
+export interface ChatMessageAttachment {
+  name: string;
+  url: string;
+}

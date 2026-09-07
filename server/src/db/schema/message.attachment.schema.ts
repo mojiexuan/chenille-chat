@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { ulid } from "ulid";
 import { messages } from "./message.schema";
-import { MessageAttachmentType, AiRole } from "@/enumeration";
+import { MediaType, AiRole } from "@/enumeration";
 import { users } from "./user.schema";
 
 /**
@@ -29,9 +29,9 @@ export const messageAttachments = pgTable(
     fileName: varchar("file_name", { length: 255 }), // 文件名
     url: varchar("url", { length: 255 }).notNull(),
     type: varchar("type", { length: 20 })
-      .$type<MessageAttachmentType>()
+      .$type<MediaType>()
       .notNull(), // "image" | "video" | "audio" | "link"
-    size: integer("size").default(0), // 字节大小
+    size: integer("size").default(-1), // 字节大小
     parsingContent: text("parsing_content"), // 解析内容
     meta: jsonb("meta"), // 元信息
     createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -1,5 +1,5 @@
 import { Parser } from "./parser";
-import { ParsedDocument, MemoryBasedFile } from "@/types";
+import { ParsedDocument, MemoryFile } from "@/types";
 
 /**
  * 文本解析器
@@ -37,7 +37,7 @@ class TextParser extends Parser {
      * 解析文件
      * @param files 文件列表
      */
-    async parse(files: MemoryBasedFile[]): Promise<ParsedDocument[]> {
+    async parse(files: MemoryFile[]): Promise<ParsedDocument[]> {
         return Promise.all(files.map(file => ({
             type:"text" as const,
             fileName: file.name,

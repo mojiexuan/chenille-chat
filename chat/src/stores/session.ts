@@ -248,35 +248,35 @@ export const useSessionStore = defineStore("session", () => {
         // 记录当前批次附件 id
         const ids = new Set(attachmentList.map((item) => item.id));
         attachments.value.push(...attachmentList);
-        // // 更新状态
-        // attachments.value.forEach((item) => {
-        //     if (ids.has(item.id)) item.status = "uploading";
-        // });
+        // 更新状态
+        attachments.value.forEach((item) => {
+            if (ids.has(item.id)) item.status = "uploading";
+        });
 
-        // try {
-        //     const results = await uploadChatAttachmentRequest(attachmentList);
+        try {
+            const results = await uploadChatAttachmentRequest(attachmentList);
 
-        //     const urlMap = new Map<string, string>();
-        //     attachmentList.forEach((item, index) => {
-        //         const res = results[index];
-        //         if (res) {
-        //             urlMap.set(item.id, res.url);
-        //         }
-        //     });
+            const urlMap = new Map<string, string>();
+            attachmentList.forEach((item, index) => {
+                const res = results[index];
+                if (res) {
+                    urlMap.set(item.id, res.url);
+                }
+            });
 
-        //     // 数据回填
-        //     attachments.value.forEach((item) => {
-        //         const url = urlMap.get(item.id);
-        //         if (url) {
-        //             item.fileUrl = url;
-        //             item.status = "uploaded";
-        //         }
-        //     });
-        // } catch {
-        //     attachments.value.forEach((item) => {
-        //         if (ids.has(item.id)) item.status = "failed";
-        //     });
-        // }
+            // 数据回填
+            attachments.value.forEach((item) => {
+                const url = urlMap.get(item.id);
+                if (url) {
+                    item.fileUrl = url;
+                    item.status = "uploaded";
+                }
+            });
+        } catch {
+            attachments.value.forEach((item) => {
+                if (ids.has(item.id)) item.status = "failed";
+            });
+        }
     }
 
     /**
@@ -336,11 +336,20 @@ export const useSessionStore = defineStore("session", () => {
             }
         });
 
+        // 会话附件URL列表
+        const attachmentUrls = attachments.value
+            .filter((item) => item.status === "uploaded")
+            .map((item) => ({
+                name: item.fileName,
+                url: item.fileUrl,
+            }));
+
         // 发起请求
         abortController.value = aiChatSse(
             currentSession.value.id,
             {
                 message,
+                ...(attachmentUrls.length > 0 ? { attachments: attachmentUrls } : {}),
                 ...(isCurrentSessionWorkSpaceStatus.value === "ready" ? { workSpace: currentSession.value.workSpace } : {}),
                 modelId: currentModelId,
                 regenerate,

@@ -1,3 +1,5 @@
+import { MediaType } from "@/enumeration";
+
 /**
  * 文件类型
  */
@@ -18,8 +20,16 @@ export interface MemoryBasedFile {
     name: string;
     /** 文件类型 */
     type: FileType;
+    /** 媒体类型 */
+    media: MediaType;
     /** 文件字节数 */
     size: number;
     /** 文件内容 */
     buffer: Buffer;
+}
+
+/**
+ * 内存化的文件对象
+ */
+export interface MemoryFile extends MemoryBasedFile {
 }

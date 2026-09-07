@@ -17,13 +17,27 @@ export interface ChatAttachmentUploadInfo {
 }
 
 /**
+ * 会话附件参数
+ */
+export interface AiChatAttachmentParams {
+  /** 文件名 */
+  name: string;
+  /** 文件 URL */
+  url: string;
+}
+
+/**
  * 调用 AI 聊天接口参数
  */
 export interface AiChatParams {
   message: string;
+  /** 会话附件URL列表 */
+  attachments?: AiChatAttachmentParams[];
   sessionId?: string;
   modelId?: string;
+  /** 工作空间 */
   workSpace?: string;
+  /** 是否重新生成 */
   regenerate?: boolean;
 }
 

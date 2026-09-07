@@ -50,6 +50,7 @@ class AiService {
       session.id,
       AiRole.User,
       params.data.message,
+      params.data.attachments || void 0,
     );
 
     // 获取会话历史消息
@@ -156,6 +157,7 @@ class AiService {
       session.id,
       AiRole.Assistant,
       content,
+      void 0,
       reasoning,
       usage,
     );

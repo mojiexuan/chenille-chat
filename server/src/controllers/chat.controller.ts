@@ -3,9 +3,9 @@ import { chatSseDto, chatGerundIndicatorDto } from "@/dto";
 import { BizException } from "@/exception";
 import { BizCode, SseEventName } from "@/enumeration";
 import { aiService, ossService } from "@/services";
-import type { SseEventChunk, MemoryBasedFile } from "@/types";
+import type { SseEventChunk, MemoryFile } from "@/types";
 import { generateGerundIndicator } from "@/gerund";
-import { convertFileToMemoryBasedFile } from "@/utils";
+import { convertFileToMemoryFile } from "@/utils";
 
 /**
  * 聊天附件控制器
@@ -16,22 +16,22 @@ export async function chatAttachmentHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const files: MemoryBasedFile[] = [];
+  const files: MemoryFile[] = [];
   // 获取上传的文件列表
   for await (const file of request.files()) {
-    files.push(await convertFileToMemoryBasedFile(file));
+    files.push(await convertFileToMemoryFile(file));
   }
-  if(files.length === 0){
+  if (files.length === 0) {
     // 未上传文件
     throw new BizException(BizCode.FILE_NOT_FOUND);
   }
-  if(files.length > 10){
+  if (files.length > 10) {
     // 上传文件数量超过限制
     throw new BizException(BizCode.FILE_COUNT_EXCEEDED);
   }
   // 上传文件到OSS
   const fileUrls = await Promise.all(files.map(async (file) => {
-    const urlInfo = await ossService.uploadFileToOssWithBuffer(file.buffer,file.name,true);
+    const urlInfo = await ossService.uploadFileToOssWithBuffer(file, true);
     return {
       originalName: file.originalName,
       url: urlInfo.url,
@@ -69,24 +69,32 @@ export async function chatSseHandler(
     aborted = true;
   });
 
-  await aiService.chat({
-    data: parsed.data,
-    userId: request.userId!,
-    callback: {
-      onAbort: (abort) => {
-        request.raw.on("close", abort);
+  try {
+    await aiService.chat({
+      data: parsed.data,
+      userId: request.userId!,
+      callback: {
+        onAbort: (abort) => {
+          request.raw.on("close", abort);
+        },
+        onMessage: (message) => {
+          if (aborted) {
+            return;
+          }
+          sseSend(reply, {
+            event: SseEventName.AI_CHAT_MESSAGE,
+            data: message,
+          });
+        },
       },
-      onMessage: (message) => {
-        if (aborted) {
-          return;
-        }
-        sseSend(reply, {
-          event: SseEventName.AI_CHAT_MESSAGE,
-          data: message,
-        });
-      },
-    },
-  });
+    });
+  } catch (err) {
+    const errorData = err instanceof BizException ? err.message : "未知错误";
+    sseSend(reply, {
+      event: SseEventName.ERROR,
+      data: errorData,
+    });
+  }
 
   reply.raw.end();
 }
