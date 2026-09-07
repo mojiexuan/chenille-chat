@@ -74,7 +74,7 @@ const router = createRouter({
 /**
  * 全局前置守卫：需要权限的路由在未登录时跳转登录页
  */
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   // 设置页面标题
   // if (to.meta.title) {
   //   document.title = `${to.meta.title}`;
@@ -82,6 +82,9 @@ router.beforeEach((to) => {
 
   if (to.meta.requiresAuth) {
     const userStore = useUserStore();
+    if (!userStore.isLogin) {
+      await userStore.refreshUserInfo();
+    }
     if (!userStore.isLogin) {
       userStore.logout();
     }

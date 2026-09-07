@@ -29,7 +29,10 @@ export const useUserStore = defineStore('user', () => {
         settings: {
             isLocationEnabled: false,
         },
-    })
+    });
+
+    // 登录状态
+    const isLogin = ref(false)
 
     /**
      * 登录
@@ -44,6 +47,8 @@ export const useUserStore = defineStore('user', () => {
             useToast().error('登录结果异常')
             return
         }
+        // 登录状态设置为true
+        isLogin.value = true
         // 隐藏AuthModal
         useAuth().hide()
         // 刷新当前路由
@@ -84,10 +89,11 @@ export const useUserStore = defineStore('user', () => {
             if (meSettings) {
                 user.value.settings = meSettings
             }
-            useAuth().hide();
+            // 登录状态设置为true
+            isLogin.value = true
         }).catch(() => {
-            // 退出登录
-            logout();
+            // 登录状态设置为false
+            isLogin.value = false
         })
     }
 
@@ -97,6 +103,8 @@ export const useUserStore = defineStore('user', () => {
      * @date 2026-01-12
      */
     function logout(): void {
+        // 登录状态设置为false
+        isLogin.value = false
         // 退出登录
         logoutRequest();
         // 移除token
@@ -138,6 +146,7 @@ export const useUserStore = defineStore('user', () => {
 
     return {
         user,
+        isLogin,
         phoneLogin,
         refreshUserInfo,
         logout,
