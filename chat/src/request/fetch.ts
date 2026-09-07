@@ -6,17 +6,10 @@
  * - 支持 Toast 提示
  */
 import type { ApiResponse, FetchOptions, SseOptions, SseEvent } from '@/types';
-import { API_BASE_URL, TOKEN_KEY, SUCCESS_CODE } from '@/config';
+import { API_BASE_URL, SUCCESS_CODE } from '@/config';
 import { useToast } from '@/composables';
 import { useUserStore } from '@/stores';
 import { SseEventName } from '@/enumeration';
-
-/**
- * 从本地存储获取 token
- */
-function getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
-}
 
 /**
  * 构建完整的 URL
@@ -48,12 +41,6 @@ function buildHeaders(customHeaders?: HeadersInit): Headers {
     // 设置默认 Content-Type
     if (!headers.has('Content-Type')) {
         headers.set('Content-Type', 'application/json');
-    }
-
-    // 添加 token
-    const token = getToken();
-    if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
     }
 
     return headers;
@@ -96,7 +83,7 @@ async function handleResponse<T>(
 ): Promise<T> {
     const toast = useToast();
     // 检查 HTTP 状态码
-    checkResponseStatus(response, showErrorToast);
+    await checkResponseStatus(response, showErrorToast);
 
     // 解析 JSON 响应
     let apiResponse: ApiResponse<T>;
@@ -178,6 +165,7 @@ export async function request<T = unknown, P = unknown>(
     const requestInit: RequestInit = {
         ...restOptions,
         headers: requestHeaders,
+        credentials: 'include',
     };
 
     const method = (restOptions.method || 'GET').toUpperCase();
@@ -324,6 +312,7 @@ export function sse<T = unknown, P = unknown>(url: string, options: SseOptions<T
         method: restOptions.method || 'POST',
         headers: requestHeaders,
         signal: controller.signal,
+        credentials: 'include',
     };
 
     if (body) {

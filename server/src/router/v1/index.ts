@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import {
   sendPhoneCodeHandler,
   phoneCodeLoginHandler,
+  logoutHandler,
   meGetInfoHandler,
   meUpdateAvatarHandler,
   meUpdateUserInfoHandler,
@@ -35,6 +36,7 @@ import { UserRole } from "@/enumeration";
 export async function v1Router(fastify: FastifyInstance) {
   fastify.post("/auth/phone/code", sendPhoneCodeHandler);
   fastify.post("/auth/phone/login", phoneCodeLoginHandler);
+  fastify.post("/auth/logout", logoutHandler);
   // 需要登录才能访问的接口
   fastify.register(async (authScope) => {
     authScope.addHook("preHandler", verifyJwt);

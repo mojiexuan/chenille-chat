@@ -42,5 +42,15 @@ export async function phoneCodeLoginHandler(request: FastifyRequest, reply: Fast
         path: "/",
         maxAge: expiresInToSeconds(config.JWT_EXPIRES_IN),      // 与 JWT 有效期一致
     });
-    return reply.success(token, "登录成功");
+    return reply.success(null, "登录成功");
+}
+
+/**
+ * 退出登录
+ * @param request 请求
+ * @param reply 响应
+ */
+export async function logoutHandler(request: FastifyRequest, reply: FastifyReply) {
+    reply.clearCookie("access_token", { path: "/" });
+    return reply.success(null, "退出成功");
 }

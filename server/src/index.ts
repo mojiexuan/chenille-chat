@@ -1,6 +1,7 @@
 import 'tsconfig-paths/register';
 import Fastify from "fastify";
 import FastifyCookie from "@fastify/cookie";
+import FastifyCors from "@fastify/cors";
 import { config } from "@/config";
 import {
   responsePlugin,
@@ -35,6 +36,11 @@ async function main() {
   // 注册cookie插件
   app.register(FastifyCookie,{
     secret:config.JWT_SECRET,
+  });
+  // 注册CORS插件
+  app.register(FastifyCors, {
+    origin: config.CORS_ORIGIN || true,
+    credentials: true,
   });
   // 注册multipart插件
   app.register(multipartPlugin);

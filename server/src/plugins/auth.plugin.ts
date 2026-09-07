@@ -42,7 +42,10 @@ export async function verifyJwt(request: FastifyRequest) {
       user = await userService.updateUserRole(payload.userId, UserRole.Admin);
     }
     request.userRole = user.role;
-  } catch {
+  } catch (error) {
+    if (error instanceof BizException) {
+      throw error;
+    }
     throw new BizException(BizCode.AUTH_EXPIRED);
   }
 }

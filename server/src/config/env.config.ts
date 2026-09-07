@@ -8,6 +8,9 @@ import type { Config, EnvSchema } from "@/types";
  */
 export const schema = {
   NODE_ENV: "development",
+  // CORS配置
+  CORS_ORIGIN: "*",
+  // 应用配置
   APP_NAME: "AiChat",
   APP_PORT: "3000",
   OPENAI_API_KEY: void 0,

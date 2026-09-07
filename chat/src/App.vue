@@ -14,9 +14,7 @@ onMounted(() => {
   // 初始化验证码
   initCaptcha();
   // 初始化用户信息
-  if (userStore.isLogin) {
-    userStore.refreshUserInfo();
-  }
+  userStore.refreshUserInfo();
 })
 </script>
 
