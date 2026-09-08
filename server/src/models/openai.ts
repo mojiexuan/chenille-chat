@@ -60,7 +60,7 @@ class OpenAiModel extends AiModel {
           messages: this.buildMessages(options.messages, options.systemPrompt),
           stream: options.stream ?? false,
           temperature: options.temperature ?? 0.7,
-          max_tokens: options.max_tokens ?? 1024,
+          max_tokens: options.max_tokens ?? 384000,
           ...(options.jsonSchema
             ? {
               response_format: {
