@@ -23,11 +23,11 @@
                             <!-- 左侧 -->
                             <div class="home-input-area-box-editor-end-track-middle-left">
                                 <!-- 附件选择 -->
-                                <AttachmentControl class="home-input-area-box-editor-end-track-middle-left-button"/>
+                                <!-- <AttachmentControl class="home-input-area-box-editor-end-track-middle-left-button"/> -->
                                 <!-- 图片上传 -->
                                 <PictureControl class="home-input-area-box-editor-end-track-middle-left-button"/>
                                 <!-- 打开语音通话页面 -->
-                                <VoiceCallControl class="home-input-area-box-editor-end-track-middle-left-button"/>
+                                <!-- <VoiceCallControl class="home-input-area-box-editor-end-track-middle-left-button"/> -->
                             </div>
                             <!-- 右侧 -->
                             <div class="home-input-area-box-editor-end-track-middle-right">
