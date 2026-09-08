@@ -28,6 +28,7 @@ export interface Message {
     totalTokens?: number,
     cachedTokens?: number,
     error?: string,
+    attachments?: MessageAttachment[];
 }
 
 /**
@@ -42,4 +43,18 @@ export interface MessageStreaming extends Message {
  */
 export interface SessionDetail extends Session {
     messages: Message[];
+}
+
+/**
+ * 消息附件类型
+ */
+export interface MessageAttachment {
+    id: string;
+    messageId: string;
+    userId: string;
+    userRole: 'user' | 'assistant';
+    fileName: string;
+    type: "image" | "file";
+    url: string;
+    size: number;
 }

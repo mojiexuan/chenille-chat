@@ -37,6 +37,27 @@
                 <MarkdownRenderer :content="item.reasoning"></MarkdownRenderer>
             </div>
         </details>
+        <!-- 用户附件列表 -->
+        <div v-if="item.role === 'user' && item.attachments && item.attachments.length > 0"
+            class="home-container-user-message-attachments">
+            <div v-for="attachment in item.attachments" :key="attachment.id"
+                class="home-container-user-message-attachment-image">
+                <img v-if="attachment.type === 'image'" :src="attachment.url" alt="图片" />
+                <!-- 预览 -->
+                <div class="home-container-user-message-attachment-image-preview"
+                    @click="previewPictureClick(attachment.url)">
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M24 36C35.0457 36 44 24 44 24C44 24 35.0457 12 24 12C12.9543 12 4 24 4 24C4 24 12.9543 36 24 36Z"
+                            fill="none" stroke="#1b1b1f" stroke-width="3" stroke-linejoin="round" />
+                        <path
+                            d="M24 29C26.7614 29 29 26.7614 29 24C29 21.2386 26.7614 19 24 19C21.2386 19 19 21.2386 19 24C19 26.7614 21.2386 29 24 29Z"
+                            fill="none" stroke="#1b1b1f" stroke-width="3" stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <!-- 用户消息内容 -->
         <div v-if="item.role === 'user'" class="home-container-user-message-content">
             {{ item.content }}
         </div>
@@ -149,8 +170,9 @@
 <script setup lang="ts" name="MessageItem">
 import { useSessionStore } from "@/stores";
 import MarkdownRenderer from "@/components/renderer/MarkdownRenderer.vue";
-import { useToast } from "@/composables";
+import { useToast, usePreviewPicture } from "@/composables";
 import { copyTextToClipboard } from "@/utils";
+import type { ChatAttachmentUploadInfo } from "@/types";
 
 const emit = defineEmits(["regenerate"])
 
@@ -159,6 +181,9 @@ const toast = useToast();
 
 // 会话store
 const sessionStore = useSessionStore();
+
+// 预览图片
+const previewPicture = usePreviewPicture();
 
 /**
  * 复制文本到剪贴板
@@ -177,6 +202,13 @@ async function handleCopyTextClick(text: string) {
  */
 function regenerateClick() {
     emit("regenerate");
+}
+
+/**
+ * 预览图片
+ */
+function previewPictureClick(imageUrl: string) {
+    previewPicture.show(imageUrl);
 }
 </script>
 
@@ -319,6 +351,54 @@ function regenerateClick() {
     border-left: 2.14286px solid var(--ch-line-color);
     padding-left: 12.85714px;
     margin-top: 12px;
+}
+
+.home-container-user-message-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.home-container-user-message-attachment-image {
+    position: relative;
+    width: 52px;
+    max-width: 52px;
+    min-width: 52px;
+    height: 52px;
+    max-height: 52px;
+    min-height: 52px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.home-container-user-message-attachment-image:hover .home-container-user-message-attachment-image-preview {
+    display: flex;
+}
+
+.home-container-user-message-attachment-image img {
+    width: 52px;
+    max-width: 52px;
+    min-width: 52px;
+    height: 52px;
+    max-height: 52px;
+    min-height: 52px;
+    border-radius: 10px;
+}
+
+.home-container-user-message-attachment-image-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    cursor: pointer;
+    background: color-mix(in srgb,
+            var(--ch-feature-card-hover-bg) 80%,
+            transparent);
 }
 
 .home-container-error-message {
