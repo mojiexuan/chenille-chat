@@ -319,8 +319,26 @@ export const useSessionStore = defineStore("session", () => {
         const message = editorMessage.value.trim();
         editorMessage.value = "";
 
+        // 会话附件URL列表
+        const attachmentUrls = attachments.value
+            .filter((item) => item.status === "uploaded")
+            .map((item) => ({
+                name: item.fileName,
+                url: item.fileUrl,
+            }));
+
+        // 清空附件列表
+        attachments.value = [];
+
         addCurrentSessionMessage(
-            { id: Date.now().toString(), role: "user", content: message, isStreaming: false },
+            {
+                id: Date.now().toString(), role: "user", content: message, isStreaming: false,
+                attachments: attachmentUrls.map((item) => ({
+                    fileName: item.name,
+                    url: item.url,
+                    type: "image",
+                })),
+            },
             { id: (Date.now() + 1).toString(), role: "assistant", content: "", isStreaming: true },
         );
 
@@ -335,17 +353,6 @@ export const useSessionStore = defineStore("session", () => {
                 gerundIndicator.value = res;
             }
         });
-
-        // 会话附件URL列表
-        const attachmentUrls = attachments.value
-            .filter((item) => item.status === "uploaded")
-            .map((item) => ({
-                name: item.fileName,
-                url: item.fileUrl,
-            }));
-
-        // 清空附件列表
-        attachments.value = [];
 
         // 发起请求
         abortController.value = aiChatSse(

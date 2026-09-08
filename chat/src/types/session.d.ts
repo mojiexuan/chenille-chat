@@ -49,12 +49,12 @@ export interface SessionDetail extends Session {
  * 消息附件类型
  */
 export interface MessageAttachment {
-    id: string;
-    messageId: string;
-    userId: string;
-    userRole: 'user' | 'assistant';
+    id?: string;
+    messageId?: string;
+    userId?: string;
+    userRole?: 'user' | 'assistant';
     fileName: string;
     type: "image" | "file";
     url: string;
-    size: number;
+    size?: number;
 }
