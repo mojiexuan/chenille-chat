@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts" name="InputArea">
-import { ref, watch, onUnmounted } from "vue";
+import { ref, watch, onUnmounted, nextTick, inject } from "vue";
 
 import { asrRecognizeRequest } from "@/request";
 import { useSessionStore, useModelStore } from "@/stores";
@@ -150,6 +150,8 @@ let stopVolumeWatch: (() => void) | null = null;
 let mediaRecorder: MediaRecorder | null = null;
 // 录音数据块缓存
 const audioChunks: Blob[] = [];
+// 滚动到内容区域底部的方法
+const scrollMainToBottom = inject<(force?: boolean) => void>("scrollMainToBottom", () => { });
 
 /**
  * 发送消息
@@ -157,6 +159,10 @@ const audioChunks: Blob[] = [];
 function sendClick() {
     sessionStore.sendMessage({
         currentModelId: modelStore.currentModel?.id || void 0,
+        regenerate: false,
+        onUpdateUi: async () => {
+            nextTick(() => scrollMainToBottom());
+        },
     });
 }
 

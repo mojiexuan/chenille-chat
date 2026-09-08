@@ -45,6 +45,7 @@ function sendClick(_event?: MouseEvent, regenerate = false) {
     currentModelId: modelStore.currentModel?.id || void 0,
     regenerate,
     onUpdateUi: async () => {
+      console.log("onUpdateUi");
       nextTick(() => scrollMainToBottom());
     },
   });
