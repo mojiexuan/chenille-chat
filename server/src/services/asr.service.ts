@@ -1,7 +1,7 @@
 import type { MultipartFile } from "@fastify/multipart";
 import { createAiModel } from "@/models";
 import { agentService, ossService } from "@/services";
-import { logger } from "@/utils";
+import { logger, convertFileToMemoryFile } from "@/utils";
 import { MediaType, BizCode } from "@/enumeration";
 import { BizException } from "@/exception";
 
@@ -27,7 +27,8 @@ class AsrService {
         });
         let url = "";
         try {
-            const r = await ossService.uploadFileToOss(audio);
+            const memoryFile = await convertFileToMemoryFile(audio);
+            const r = await ossService.uploadFileToOssWithBuffer(memoryFile);
             url = r.url;
             const result = await aiModel.generate({
                 messages: [

@@ -2,7 +2,6 @@ import {
   ChatResult,
   ChatModel,
   ChatRequest,
-  ChatToolCall,
   Message,
   SystemPrompt,
   Tool,
@@ -105,13 +104,13 @@ class OpenAiModel extends AiModel {
             .choices?.[0]?.message?.tool_calls || [];
           if (toolCalls.length > 0) {
             result.message.toolCalls = toolCalls.flatMap((call) => {
-              if (call.type === "function") {
-                return {
-                  id: call.id,
-                  name: call.function?.name,
-                  arguments: call.function?.arguments || void 0,
-                } as ChatToolCall;
-              }
+              // if (call.type === "function") {
+              //   return {
+              //     id: call.id,
+              //     name: call.function?.name,
+              //     arguments: call.function?.arguments || void 0,
+              //   } as ChatToolCall;
+              // }
               return [];
             });
           }

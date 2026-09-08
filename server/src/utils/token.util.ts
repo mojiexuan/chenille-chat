@@ -53,7 +53,16 @@ export function estimateMessagesTokens(messages: Message[]) {
       if (typeof content === "string") {
         return acc + estimateTokens(content);
       }
-      const text = content.map((part) => part.text ?? "").join("");
+      const text = content.map((part) => {
+        if(part.type === "text"){
+          return part.text ?? "";
+        } else if (part.type === "image_url"){
+          // 随意估值
+          return "chenille".repeat(80);
+        }else {
+          return "";
+        }
+      }).join("");
       return acc + estimateTokens(text);
     }
     if (msg.type === "assistant") {

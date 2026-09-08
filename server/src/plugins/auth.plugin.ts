@@ -5,6 +5,7 @@ import { BizException } from "@/exception";
 import { BizCode, UserStatus, UserRole } from "@/enumeration";
 import type { JwtPayload } from "@/types/jwt.type";
 import { userService } from "@/services";
+import { logger } from "@/utils";
 
 /**
  * 验证JWT
@@ -46,6 +47,7 @@ export async function verifyJwt(request: FastifyRequest) {
     if (error instanceof BizException) {
       throw error;
     }
+    logger.error(error, "[verifyJwt] jwt.verify 失败");
     throw new BizException(BizCode.AUTH_EXPIRED);
   }
 }

@@ -1,4 +1,4 @@
-import { ChatModel, ChatRequest, ChatResult, ChatToolCall, Message, SystemPrompt, Tool } from "@/types";
+import { ChatModel, ChatRequest, ChatResult, Message, SystemPrompt, Tool } from "@/types";
 import { Content, GoogleGenAI, FunctionDeclaration } from "@google/genai";
 import { AiModel } from "./base.model";
 
@@ -65,15 +65,15 @@ class GoogleModel extends AiModel {
             result.finished = true;
             const toolCalls = res.functionCalls || [];
 
-            if (toolCalls.length > 0) {
-                result.message.toolCalls = toolCalls.flatMap((call) => {
-                    return {
-                        id: call.id || "",
-                        name: call.name || "",
-                        arguments: JSON.stringify(call.args || {}),
-                    } as ChatToolCall
-                });
-            }
+            // if (toolCalls.length > 0) {
+            //     result.message.toolCalls = toolCalls.flatMap((call) => {
+            //         return {
+            //             id: call.id || "",
+            //             name: call.name || "",
+            //             arguments: JSON.stringify(call.args || {}),
+            //         } as ChatToolCall
+            //     });
+            // }
             return result;
         })
     }

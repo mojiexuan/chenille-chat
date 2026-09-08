@@ -27,7 +27,7 @@ class UserService {
     if (!user) {
       throw new BizException(BizCode.USER_NOT_FOUND);
     }
-    user.avatar = ossService.getFullUrl(user.avatar);
+    user.avatar = user.avatar ? ossService.getFullUrl(user.avatar) : null;
     return user;
   }
 
@@ -70,7 +70,7 @@ class UserService {
     // 删除旧的头像文件
     ossService.deleteFileFromOss(user.avatar);
     // 上传新头像
-    const { url, path } = await ossService.uploadFileToOssWithBuffer(memoryFile.buffer, memoryFile.name);
+    const { url, path } = await ossService.uploadFileToOssWithBuffer(memoryFile);
     try {
       await db.update(users).set({ avatar: path }).where(eq(users.id, userId));
       return url;

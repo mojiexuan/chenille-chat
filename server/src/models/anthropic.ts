@@ -2,7 +2,6 @@ import {
   ChatResult,
   ChatModel,
   ChatRequest,
-  ChatToolCall,
   Message,
   SystemPrompt,
   Tool,
