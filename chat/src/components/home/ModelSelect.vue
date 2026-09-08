@@ -4,26 +4,26 @@
     <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M36 18L24 30L12 18" stroke="#3c3c43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
-  </div>
-  <!-- 模型选择菜单 -->
-  <ContextMenu :visible="modelSelectMenuVisible" :anchor="modelSelectMenuAnchor"
-    @close="modelSelectMenuVisible = false">
-    <div class="home-model-select-menu">
-      <div class="home-model-select-menu-item" v-for="item in modelStore.models" :key="item.id"
-        @click="switchModelClick(item.id)">
-        <div class="home-model-select-menu-item-content">
-          <span>{{ item.name }}</span>
-        </div>
-        <div class="home-model-select-menu-item-default">
-          <svg v-if="item.isDefault" width="20" height="20" viewBox="0 0 48 48" fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 24L20 34L40 14" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
+    <!-- 模型选择菜单 -->
+    <ContextMenu :visible="modelSelectMenuVisible" :anchor="modelSelectMenuAnchor"
+      @close="modelSelectMenuVisible = false">
+      <div class="home-model-select-menu">
+        <div class="home-model-select-menu-item" v-for="item in modelStore.models" :key="item.id"
+          @click="switchModelClick(item.id)">
+          <div class="home-model-select-menu-item-content">
+            <span>{{ item.name }}</span>
+          </div>
+          <div class="home-model-select-menu-item-default">
+            <svg v-if="item.isDefault" width="20" height="20" viewBox="0 0 48 48" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 24L20 34L40 14" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
         </div>
       </div>
-    </div>
-  </ContextMenu>
+    </ContextMenu>
+  </div>
 </template>
 
 <script setup lang="ts" name="ModelSelect">
