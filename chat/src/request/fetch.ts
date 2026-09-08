@@ -64,7 +64,6 @@ async function checkResponseStatus(response: Response, showErrorToast: boolean) 
     if (response.status === 401) {
         const userStore = useUserStore()
         // 401 错误，可能需要重新登录
-        toast.error("登录过期，请重新登录");
         userStore.logout()
     }
     if (showErrorToast) {
@@ -196,9 +195,7 @@ export async function request<T = unknown, P = unknown>(
         }
     } else {
         // 无 params 也无 body 的 GET/DELETE，移除 Content-Type
-        if (method === 'GET' || method === 'DELETE') {
-            requestHeaders.delete('Content-Type');
-        }
+        requestHeaders.delete('Content-Type');
     }
 
     try {

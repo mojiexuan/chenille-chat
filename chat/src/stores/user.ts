@@ -35,6 +35,15 @@ export const useUserStore = defineStore('user', () => {
     const isLogin = ref(false)
 
     /**
+     * 检查登录状态
+     * @author 陈佳宝
+     * @date 2026-01-12
+     */
+    async function checkLogin() {
+        await refreshUserInfo()
+    }
+
+    /**
      * 登录
      * @author 陈佳宝
      * @date 2026-01-12
@@ -44,11 +53,16 @@ export const useUserStore = defineStore('user', () => {
             await phoneLoginRequest(phone, code)
         }catch {
             // 登示错误提示
+            useToast().error('登录失败')
+            return
+        }
+        // 刷新用户信息
+        await refreshUserInfo()
+        if (!isLogin.value) {
+            // 登示错误提示
             useToast().error('登录结果异常')
             return
         }
-        // 登录状态设置为true
-        isLogin.value = true
         // 隐藏AuthModal
         useAuth().hide()
         // 刷新当前路由
@@ -63,11 +77,12 @@ export const useUserStore = defineStore('user', () => {
     async function refreshUserInfo(): Promise<void> {
         // 模型store
         const modelStore = useModelStore()
-        Promise.all([
-            userInfoRequest(),
-            userSettingsRequest(),
-            modelStore.refreshModelList(),
-        ]).then(([me, meSettings, _]) => {
+        try {
+            const [me, meSettings, _] = await Promise.all([
+                userInfoRequest(),
+                userSettingsRequest(),
+                modelStore.refreshModelList(),
+            ]);
             if (me.username) {
                 user.value.username = me.username
             }
@@ -91,10 +106,10 @@ export const useUserStore = defineStore('user', () => {
             }
             // 登录状态设置为true
             isLogin.value = true
-        }).catch(() => {
+        } catch {
             // 登录状态设置为false
             isLogin.value = false
-        })
+        }
     }
 
     /**
@@ -104,20 +119,21 @@ export const useUserStore = defineStore('user', () => {
      */
     function logout(): void {
         // 登录状态设置为false
-        isLogin.value = false
+        isLogin.value = false;
         // 退出登录
         logoutRequest();
         // 移除token
-        user.value.token = null
+        user.value.token = null;
         // 清空用户信息
-        user.value.nickname = '未登录'
-        user.value.avatar = defaultAvatar
-        user.value.username = ''
-        user.value.email = ''
-        user.value.phone = ''
-        user.value.gender = ''
+        user.value.nickname = '未登录';
+        user.value.avatar = defaultAvatar;
+        user.value.username = '';
+        user.value.email = '';
+        user.value.phone = '';
+        user.value.gender = '';
+        useToast().error('登录过期，请重新登录');
         // 展示AuthModal
-        useAuth().show()
+        useAuth().show();
     }
 
     /**
@@ -147,6 +163,7 @@ export const useUserStore = defineStore('user', () => {
     return {
         user,
         isLogin,
+        checkLogin,
         phoneLogin,
         refreshUserInfo,
         logout,

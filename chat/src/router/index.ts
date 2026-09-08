@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/stores'
+import { useAuth } from '@/composables'
 
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import BlankLayout from '@/layouts/BlankLayout.vue';
@@ -83,10 +84,10 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresAuth) {
     const userStore = useUserStore();
     if (!userStore.isLogin) {
-      await userStore.refreshUserInfo();
+      await userStore.checkLogin();
     }
     if (!userStore.isLogin) {
-      userStore.logout();
+      useAuth().show();
     }
   }
 });
