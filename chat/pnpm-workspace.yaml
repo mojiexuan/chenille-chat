@@ -1,2 +1,5 @@
+overrides:
+  "@types/markdown-it": "14.1.2"
+
 patchedDependencies:
   vue-cropper@1.1.4: patches/vue-cropper@1.1.4.patch

@@ -38,7 +38,7 @@
                                 <div class="home-input-area-box-editor-end-track-middle-right-button"
                                     @click="toggleSpeechRecognitionClick">
                                     <img v-if="speechRecognitionLoading" width="20" height="20"
-                                        src="../assets/images/loading.svg" alt="语音识别中">
+                                        src="../../assets/images/loading.svg" alt="语音识别中">
                                     <svg v-else width="20" height="20" viewBox="0 0 48 48" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <rect x="17" y="4" width="14" height="27" rx="7" fill="none" stroke="#3c3c43"
