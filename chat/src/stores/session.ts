@@ -344,6 +344,9 @@ export const useSessionStore = defineStore("session", () => {
                 url: item.fileUrl,
             }));
 
+        // 清空附件列表
+        attachments.value = [];
+
         // 发起请求
         abortController.value = aiChatSse(
             currentSession.value.id,
