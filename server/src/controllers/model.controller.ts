@@ -5,7 +5,7 @@ import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 
 /**
- * 获取模型列表，按排序顺序降序排序
+ * 获取可用模型列表，按排序顺序降序排序
  * @param request 请求
  * @param reply 响应
  */
