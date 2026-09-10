@@ -86,7 +86,7 @@
             </svg>
             <!-- 重新生成 -->
             <svg v-if="item.role === 'assistant' && index === sessionStore.currentSession.messages.length - 1"
-                @click="regenerateClick" class="home-container-status-bar-button" width="20" height="20"
+                @click="regenerateClick(index, item.id)" class="home-container-status-bar-button" width="20" height="20"
                 viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                     d="M36.7279 36.7279C33.4706 39.9853 28.9706 42 24 42C14.0589 42 6 33.9411 6 24C6 14.0589 14.0589 6 24 6C28.9706 6 33.4706 8.01472 36.7279 11.2721C38.3859 12.9301 42 17 42 17"
@@ -168,19 +168,23 @@
 </template>
 
 <script setup lang="ts" name="MessageItem">
-import { useSessionStore } from "@/stores";
+import { nextTick, inject } from "vue";
+import { useSessionStore, useModelStore } from "@/stores";
 import MarkdownRenderer from "@/components/renderer/MarkdownRenderer.vue";
-import { useToast, usePreviewPicture } from "@/composables";
+import { useToast, usePreviewPicture, useConfirm } from "@/composables";
 import { copyTextToClipboard } from "@/utils";
 import type { ChatAttachmentUploadInfo } from "@/types";
-
-const emit = defineEmits(["regenerate"])
+// 滚动到内容区域底部的方法
+const scrollMainToBottom = inject<(force?: boolean) => void>("scrollMainToBottom", () => { });
 
 // toast
 const toast = useToast();
 
 // 会话store
 const sessionStore = useSessionStore();
+
+// 模型store
+const modelStore = useModelStore();
 
 // 预览图片
 const previewPicture = usePreviewPicture();
@@ -200,8 +204,23 @@ async function handleCopyTextClick(text: string) {
 /**
  * 重新生成点击事件
  */
-function regenerateClick() {
-    emit("regenerate");
+function regenerateClick(index: number, messageId: string) {
+    useConfirm().warning({
+        title: "重新生成",
+        message: "已生成的消息将被删除，是否继续？",
+        onConfirm: () => {
+            sessionStore.sendMessage({
+                currentModelId: modelStore.currentModel?.id || void 0,
+                regenerate: {
+                    index,
+                    messageId,
+                },
+                onUpdateUi: async () => {
+                    nextTick(() => scrollMainToBottom());
+                },
+            });
+        }
+    })
 }
 
 /**

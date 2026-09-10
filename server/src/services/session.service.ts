@@ -1,5 +1,5 @@
 import { db, sessions, messages, aiTokenUsages, messageAttachments } from "@/db";
-import { eq, asc, desc, count, and, sql } from "drizzle-orm";
+import { eq, asc, desc, count, and } from "drizzle-orm";
 import { AiRole, MediaType } from "@/enumeration";
 import {
   Pagination,

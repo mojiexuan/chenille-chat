@@ -38,7 +38,10 @@ export interface AiChatParams {
   /** 工作空间 */
   workSpace?: string;
   /** 是否重新生成 */
-  regenerate?: boolean;
+  regenerate?: {
+    index: number;
+    messageId: string;
+  };
 }
 
 /**

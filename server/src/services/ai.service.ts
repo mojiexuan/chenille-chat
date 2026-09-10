@@ -44,6 +44,12 @@ class AiService {
       });
     }
 
+    // 重新生成消息
+    if(params.data.regenerate){
+      const { index, messageId } = params.data.regenerate;
+      
+    }
+
     // 添加用户消息到会话
     await sessionService.addMessage(
       params.userId,

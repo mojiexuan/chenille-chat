@@ -300,14 +300,18 @@ export const useSessionStore = defineStore("session", () => {
      */
     function sendMessage({
         currentModelId = void 0,
-        regenerate = false,
+        regenerate = void 0,
         onUpdateUi = async () => { },
     }: {
         currentModelId?: string;
-        regenerate?: boolean;
+        regenerate?: {
+            index: number;
+            messageId: string;
+        };
         onUpdateUi?: () => void;
     }) {
-        if (!canSend.value) {
+        // 如果不能发送且不是重新生成，直接返回
+        if (!canSend.value && !regenerate) {
             return;
         }
         // 如果正在回复，直接取消请求
@@ -316,7 +320,8 @@ export const useSessionStore = defineStore("session", () => {
             isReplying.value = false;
             return;
         }
-        const message = editorMessage.value.trim();
+
+        let message = editorMessage.value.trim();
         editorMessage.value = "";
 
         // 会话附件URL列表
@@ -329,6 +334,22 @@ export const useSessionStore = defineStore("session", () => {
 
         // 清空附件列表
         attachments.value = [];
+
+        // 如果是重新生成
+        if(regenerate){
+            const targetIndex = regenerate.index - 1;
+            if (targetIndex < 0 || targetIndex >= currentSession.value.messages.length) {
+                return;
+            }
+            const targetMessage = getMessageInCurrentSession(targetIndex);
+            if (!targetMessage || targetMessage.id !== regenerate.messageId) {
+                return;
+            }
+            // 重新生成消息内容
+            message = targetMessage.content;
+            // 删除目标后续消息
+            currentSession.value.messages.splice(targetIndex, 1);
+        }
 
         addCurrentSessionMessage(
             {
@@ -362,7 +383,7 @@ export const useSessionStore = defineStore("session", () => {
                 ...(attachmentUrls.length > 0 ? { attachments: attachmentUrls } : {}),
                 ...(isCurrentSessionWorkSpaceStatus.value === "ready" ? { workSpace: currentSession.value.workSpace } : {}),
                 modelId: currentModelId,
-                regenerate,
+                ...(regenerate ? { regenerate } : {}),
             },
             (msg) => {
                 if (msg.error) {

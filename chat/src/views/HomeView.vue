@@ -2,7 +2,7 @@
   <div class="home">
     <div class="home-container" :class="{ 'home-container-empty': sessionStore.currentSession.messages.length === 0 }">
       <!-- 消息列表 -->
-      <MessageItem @regenerate="(e) => sendClick(e, true)" />
+      <MessageItem />
       <!-- 等待动画 -->
       <div v-if="sessionStore.isReplying" class="home-container-replying">
         <img class="home-container-replying-image" src="../assets/images/replying.svg" alt="思考中" />
@@ -22,8 +22,7 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { nextTick, inject } from "vue";
-import { useSessionStore, useUserStore, useModelStore } from "@/stores";
+import { useSessionStore, useUserStore } from "@/stores";
 import MessageItem from "@/components/home/MessageItem.vue";
 import RotatingText from "@/component/RotatingText/RotatingText.vue";
 import InputArea from "@/components/home/InputArea.vue";
@@ -32,23 +31,6 @@ import InputArea from "@/components/home/InputArea.vue";
 const sessionStore = useSessionStore();
 // 用户store
 const userStore = useUserStore();
-// 模型store
-const modelStore = useModelStore();
-// 滚动到内容区域底部的方法
-const scrollMainToBottom = inject<(force?: boolean) => void>("scrollMainToBottom", () => { });
-
-/**
- * 发送按钮点击事件处理
- */
-function sendClick(_event?: MouseEvent, regenerate = false) {
-  sessionStore.sendMessage({
-    currentModelId: modelStore.currentModel?.id || void 0,
-    regenerate,
-    onUpdateUi: async () => {
-      nextTick(() => scrollMainToBottom());
-    },
-  });
-}
 </script>
 
 <style scoped>

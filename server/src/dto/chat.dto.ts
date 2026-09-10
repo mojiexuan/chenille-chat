@@ -18,6 +18,10 @@ export const chatSseDto = z.object({
     .min(1, "工作空间不能为空")
     .max(500, "工作空间最多500个字符")
     .optional(),
+  regenerate: z.object({
+    index: z.number().int().min(0, "索引不能小于0"),
+    messageId: z.string().trim().min(1, "消息ID不能为空"),
+  }).optional(),
 });
 
 export type ChatSseDto = z.infer<typeof chatSseDto>;
