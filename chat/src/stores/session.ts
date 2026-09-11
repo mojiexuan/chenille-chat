@@ -312,10 +312,12 @@ export const useSessionStore = defineStore("session", () => {
     }) {
         // 如果不能发送且不是重新生成，直接返回
         if (!canSend.value && !regenerate) {
+            console.log("不能发送且不是重新生成");
             return;
         }
         // 如果正在回复，直接取消请求
         if (isReplying.value) {
+            console.log("正在回复，取消请求");
             abortController.value?.abort();
             isReplying.value = false;
             return;
@@ -336,19 +338,19 @@ export const useSessionStore = defineStore("session", () => {
         attachments.value = [];
 
         // 如果是重新生成
-        if(regenerate){
+        if (regenerate) {
             const targetIndex = regenerate.index - 1;
             if (targetIndex < 0 || targetIndex >= currentSession.value.messages.length) {
                 return;
             }
             const targetMessage = getMessageInCurrentSession(targetIndex);
-            if (!targetMessage || targetMessage.id !== regenerate.messageId) {
+            if (!targetMessage) {
                 return;
             }
             // 重新生成消息内容
             message = targetMessage.content;
-            // 删除目标后续消息
-            currentSession.value.messages.splice(targetIndex, 1);
+            // 删除目标消息及后续消息
+            currentSession.value.messages.splice(targetIndex);
         }
 
         addCurrentSessionMessage(

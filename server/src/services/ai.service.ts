@@ -59,6 +59,7 @@ class AiService {
     // 获取会话历史消息
     let history = await sessionService.getMessages(session.id);
 
+    // 重新生成
     if (params.data.regenerate) {
       const { messageId } = params.data.regenerate;
       const targetIndex = history.findIndex((msg) => msg.id === messageId);
