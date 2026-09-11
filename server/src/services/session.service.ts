@@ -1,5 +1,5 @@
 import { db, sessions, messages, aiTokenUsages, messageAttachments } from "@/db";
-import { eq, asc, desc, count, and } from "drizzle-orm";
+import { eq, asc, desc, count, and, inArray } from "drizzle-orm";
 import { AiRole, MediaType } from "@/enumeration";
 import {
   Pagination,
@@ -165,6 +165,19 @@ class SessionService {
   }
 
   /**
+   * 获取消息
+   * @param messageId 消息ID
+   */
+  async getMessage(messageId: string) {
+    return db.query.messages.findFirst({
+      where: eq(messages.id, messageId),
+      with: {
+        attachments: true,
+      }
+    });
+  }
+
+  /**
    * 获取用户会话标题
    */
   async getUserSessionTitle(userId: string, sessionId: string) {
@@ -303,6 +316,19 @@ class SessionService {
           message: { role: "assistant", content: msg.content },
         } as AssistantMessage;
       });
+  }
+
+  /**
+   * 删除会话消息
+   * @param sessionId 会话ID
+   * @param messageIds 消息ID列表
+   */
+  async deleteMessages(sessionId: string, messageIds: string[]) {
+    if (messageIds.length === 0) {
+      return;
+    }
+    await db.delete(messages)
+    .where(and(eq(messages.sessionId, sessionId), inArray(messages.id, messageIds)));
   }
 }
 

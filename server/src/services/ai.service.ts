@@ -45,22 +45,43 @@ class AiService {
     }
 
     // 重新生成消息
-    if(params.data.regenerate){
-      const { index, messageId } = params.data.regenerate;
-      
+    if (!params.data.regenerate) {
+      // 添加用户消息到会话
+      await sessionService.addMessage(
+        params.userId,
+        session.id,
+        AiRole.User,
+        params.data.message,
+        params.data.attachments || void 0,
+      );
     }
 
-    // 添加用户消息到会话
-    await sessionService.addMessage(
-      params.userId,
-      session.id,
-      AiRole.User,
-      params.data.message,
-      params.data.attachments || void 0,
-    );
-
     // 获取会话历史消息
-    const history = await sessionService.getMessages(session.id);
+    let history = await sessionService.getMessages(session.id);
+
+    if (params.data.regenerate) {
+      const { messageId } = params.data.regenerate;
+      const targetIndex = history.findIndex((msg) => msg.id === messageId);
+      if (targetIndex >= 0){
+        let userIndex = targetIndex;
+        if(history[targetIndex].role !== AiRole.User){
+          for(let i = targetIndex - 1;i>= 0; i--){
+            if(history[i].role === AiRole.User){
+              userIndex = i;
+              break;
+            }
+          }
+        }
+
+        const deleteMessageIds = history.slice(userIndex +1).map((msg) => msg.id);
+        if(deleteMessageIds.length > 0){
+          await sessionService.deleteMessages(session.id, deleteMessageIds);
+          const deleteIdSet = new Set(deleteMessageIds);
+          history = history.filter((msg) => !deleteIdSet.has(msg.id));
+        }
+      }
+
+    }
 
     // 构建上下文消息
     const contextMessages = sessionService.buildContextMessages(history);
