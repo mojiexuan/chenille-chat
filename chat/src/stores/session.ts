@@ -139,6 +139,26 @@ export const useSessionStore = defineStore("session", () => {
     }
 
     /**
+     * 更新会话标题
+     * @param sessionId 会话ID
+     * @param title 会话标题
+     */
+    function updateSessionTitle(sessionId: string, title: string): void {
+        if(title === "新会话"){
+            return;
+        }
+        const session = sessions.value.find((item) => item.id === sessionId);
+        if (session) {
+            const oldTitle = session.title
+            session.title = title;
+            // 更新会话标题
+            updateSessionRequest(sessionId, { title }).catch(() => {
+                session.title = oldTitle;
+            });
+        }
+    }
+
+    /**
      * 更新当前会话标题
      * @author 陈佳宝
      * @date 2026-05-31
@@ -476,6 +496,7 @@ export const useSessionStore = defineStore("session", () => {
         getSessions,
         updateCurrentSessionId,
         updateCurrentSessionTitle,
+        updateSessionTitle,
         resetCurrentSession,
         addCurrentSessionMessage,
         getMessageInCurrentSession,

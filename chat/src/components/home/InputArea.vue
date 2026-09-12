@@ -159,7 +159,6 @@ const scrollMainToBottom = inject<(force?: boolean) => void>("scrollMainToBottom
 function sendClick() {
     sessionStore.sendMessage({
         currentModelId: modelStore.currentModel?.id || void 0,
-        regenerate: false,
         onUpdateUi: async () => {
             nextTick(() => scrollMainToBottom());
         },

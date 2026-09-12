@@ -38,7 +38,7 @@
                         :key="item.id" @click="sessionItemClick(item.id)"
                         :class="{ 'active': item.id === sessionStore.currentSession.id }">
                         <span class="default-layout-nav-content-session-item-title ellipsis">{{ item.title ?? "未知会话标题"
-                            }}</span>
+                        }}</span>
                         <div class="default-layout-nav-content-session-item-more"
                             @click.stop="sessionMoreClick($event, item.id)">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
@@ -78,7 +78,7 @@
                                     alt="用户头像" />
                                 <span class="default-layout-nav-footer-me-content-item-name ellipsis">{{
                                     userNameNickname
-                                    }}</span>
+                                }}</span>
                             </div>
                         </menu>
                     </Transition>
@@ -178,6 +178,15 @@
         <!-- 会话列表的更多操作菜单 -->
         <ContextMenu :visible="sessionMenuVisible" :anchor="sessionMenuAnchor" @close="sessionMenuVisible = false">
             <div class="default-layout-nav-content-session-item-more-menu">
+                <div class="default-layout-nav-content-session-item-more-menu-item" @click="handleEditSessionName">
+                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 42H43" stroke="#3c3c43" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M11 26.7199V34H18.3172L39 13.3081L31.6951 6L11 26.7199Z" fill="none" stroke="#3c3c43"
+                            stroke-width="3" stroke-linejoin="round" />
+                    </svg>
+                    <span>编辑名称</span>
+                </div>
                 <div class="default-layout-nav-content-session-item-more-menu-item default-layout-nav-content-session-item-more-menu-item-delete"
                     @click="handleDeleteSession">
                     <svg width="16" height="16" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -329,6 +338,25 @@ function sessionMoreClick(e: MouseEvent, sessionId: string) {
 }
 
 /**
+ * 处理编辑会话名称
+ */
+function handleEditSessionName(){
+    useConfirm().show({
+        title: '编辑会话名称',
+        edit: {
+            placeholder: '请输入会话名称',
+            maxlength: 50,
+            minlength: 1,
+        },
+        onConfirm:(params)=>{
+            if(params?.edit?.value && sessionMenuTarget.value){
+                sessionStore.updateSessionTitle(sessionMenuTarget.value, params.edit.value);
+            }
+        }
+    });
+}
+
+/**
  * 处理删除会话
  */
 function handleDeleteSession() {
@@ -469,11 +497,13 @@ onMounted(() => {
     padding: 5px;
     background-color: var(--ch-bg-color-card);
     box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+    display: flex;
+    flex-direction: column;
 }
 
 .default-layout-nav-content-session-item-more-menu-item {
     width: 100%;
-    height: 32px;
+    height: 40px;
     border-radius: 10px;
     display: flex;
     align-items: center;

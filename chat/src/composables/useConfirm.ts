@@ -8,9 +8,14 @@ export type ConfirmOptions = {
     confirmText?: string;
     cancelText?: string;
     showCancelButton?: boolean;
-    icon: ConfirmIconType;
-    onConfirm?: (e: MouseEvent) => void;
-    onCancel?: (e: MouseEvent) => void;
+    icon?: ConfirmIconType;
+    edit?: {
+        placeholder?: string;
+        maxlength?: number;
+        minlength?: number;
+    };
+    onConfirm?: ( params?: { edit?: { value: string } }) => void;
+    onCancel?: () => void;
 };
 
 export type ConfirmOptionsNoIcon = Omit<ConfirmOptions, 'icon'>;
@@ -25,7 +30,6 @@ export const confirmState = reactive<ConfirmOptions & { visible: boolean }>({
     confirmText: '确认',
     cancelText: '取消',
     showCancelButton: true,
-    icon: 'prompt' as ConfirmIconType,
 });
 
 export function useConfirm() {
