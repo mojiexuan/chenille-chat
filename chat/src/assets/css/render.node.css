@@ -3,6 +3,10 @@
   border-radius: 5px;
 }
 
+.markdown-renderer a[target="_blank"]::after {
+  content: " ↗";
+}
+
 .markdown-renderer :not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) > a {
   font-weight: 500;
   color: var(--ch-main-color);

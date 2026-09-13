@@ -45,13 +45,15 @@ import { tasklist as markdownittasklist } from "@mdit/plugin-tasklist";
 import type { MarkdownItContainerTokenType } from "@/types";
 import { watch, ref, nextTick, onMounted } from 'vue';
 import { copyTextToClipboard, debounce } from '@/utils';
-import { useToast } from '@/composables';
+import { useToast,useConfirm } from '@/composables';
 
 // 组件根元素
 const rootRef = ref<HTMLElement>();
 
 // 初始化toast
 const toast = useToast();
+// 初始化确认弹窗
+const confirm = useConfirm();
 
 /**
  * 定义组件属性
@@ -229,6 +231,15 @@ md.use(markdownitcontainer, "details", {
 // 禁止将电子邮件转换为链接
 md.linkify.set({ fuzzyEmail: false });
 
+// 外部链接（http/https）自动新窗口打开
+md.renderer.rules.link_open = function (tokens, idx, options, _env, self) {
+    const token = tokens[idx]; const href = token?.attrGet("href") ?? ""; if (/^https?:\/\//i.test(href)) {
+        token?.attrSet("target", "_blank");
+        token?.attrSet("rel", "noopener noreferrer");
+    }
+    return self.renderToken(tokens, idx, options);
+};
+
 // 定义事件
 const emit = defineEmits<{
     rendered: [];
@@ -300,6 +311,46 @@ const debounceCopyClick = debounce(async (e: PointerEvent) => {
     trailing: false,
 });
 
+// 允许直接跳转的域名白名单（当前站点域名始终放行）
+const LINK_DOMAIN_WHITELIST = ["chat.chenjiabao.com","chenjiabao.com","doc.chenjiabao.com"];
+/**
+ * 判断链接域名是否在白名单内
+ * @param href 链接地址
+ */
+const isTrustedLink = (href: string): boolean => {
+    try {
+        const url = new URL(href, window.location.href);
+        return (
+            url.host === window.location.host ||
+            LINK_DOMAIN_WHITELIST.some(
+                (domain) => url.host === domain || url.host.endsWith(`.${domain}`),
+            )
+        );
+    } catch {
+        return true;
+    }
+};
+/**
+ * 处理链接点击事件
+ */
+const handleLinkClick = (e: MouseEvent) => {
+    const anchor = (e.target as Element)?.closest?.("a");
+    const href = anchor?.getAttribute("href") ?? "";
+    if (!/^https?:\/\//i.test(href) || isTrustedLink(href)) {
+        return;
+    }
+    e.preventDefault();
+    confirm.warning({
+        title: "即将离开本站",
+        message: `即将跳转到外部网站：${new URL(href).host}，是否继续访问？`,
+        confirmText: "继续访问",
+        cancelText: "取消",
+        onConfirm: () => {
+            window.open(href, "_blank", "noopener,noreferrer");
+        },
+    });
+}
+
 /**
  * 组件挂载时初始化
  */
@@ -307,6 +358,7 @@ onMounted(() => {
     const root = rootRef.value;
     if (root) {
         root.addEventListener('click', debounceCopyClick)
+        root.addEventListener('click', handleLinkClick)
     };
 })
 </script>

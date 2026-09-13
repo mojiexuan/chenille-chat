@@ -169,7 +169,7 @@
                     </div>
                 </div>
             </div>
-            <main ref="contentMainRef" class="default-layout-content-main">
+            <main ref="contentMainRef" class="default-layout-content-main" @scroll="handleMainScroll">
                 <div class="default-layout-content-main-container">
                     <router-view></router-view>
                 </div>
@@ -255,22 +255,37 @@ const sessionMenuTarget = ref<string | null>(null);
 
 // 内容区域滚动容器
 const contentMainRef = ref<HTMLElement>();
+// 内容区域是否已滚动到底部
+const mainAtBottom = ref(true);
 
 // 提供滚动到内容区域底部的方法
 provide('scrollMainToBottom', scrollMainToBottom);
+// 提供内容区域是否已滚动到底部的状态
+provide('mainAtBottom', mainAtBottom);
 
 /**
  * 滚动到内容区域底部
  * @param force 是否强制滚动
  */
-function scrollMainToBottom(force: boolean = false) {
+function scrollMainToBottom(force: boolean = false,smooth: boolean = false) {
     const el = contentMainRef.value;
     if (!el) return;
     const threshold = 80;
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
     if (force || atBottom) {
-        el.scrollTop = el.scrollHeight;
+        el.scrollTo({top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto'});
     }
+    mainAtBottom.value = true;
+}
+
+/**
+ * 处理内容区域滚动事件
+ */
+function handleMainScroll() {
+    const el = contentMainRef.value;
+    if (!el) return;
+    const threshold = 80;
+    mainAtBottom.value = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
 }
 
 /**

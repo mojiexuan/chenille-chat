@@ -103,11 +103,23 @@
             <Workspace />
         </div>
         <div class="home-input-area-tip">内容由AI生成，请仔细甄别</div>
+        <!-- 滚动到底部 -->
+        <Transition name="fade-card">
+            <div v-if="!mainAtBottom" class="home-input-area-scroll-bottom" @click="scrollMainToBottom(true,true)">
+                <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 36V12" stroke="#1b1b1f" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M13 25L24 36L35 25" stroke="#1b1b1f" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+        </Transition>
     </div>
 </template>
 
 <script setup lang="ts" name="InputArea">
 import { ref, watch, onUnmounted, nextTick, inject } from "vue";
+import type { Ref } from "vue";
 
 import { asrRecognizeRequest } from "@/request";
 import { useSessionStore, useModelStore } from "@/stores";
@@ -151,7 +163,9 @@ let mediaRecorder: MediaRecorder | null = null;
 // 录音数据块缓存
 const audioChunks: Blob[] = [];
 // 滚动到内容区域底部的方法
-const scrollMainToBottom = inject<(force?: boolean) => void>("scrollMainToBottom", () => { });
+const scrollMainToBottom = inject<(force?: boolean,smooth?: boolean) => void>("scrollMainToBottom", () => { });
+// 内容区域是否已滚动到底部
+const mainAtBottom = inject<Ref<boolean>>("mainAtBottom", ref(true));
 
 /**
  * 发送消息
@@ -546,5 +560,29 @@ onUnmounted(() => {
     padding: 6px 0;
     font-size: 11px;
     line-height: 16px;
+}
+
+.home-input-area-scroll-bottom {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--ch-bg-color-card);
+    border: 1px solid var(--ch-border-card-color);
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+    cursor: pointer;
+    z-index: 10;
+    transition: all .3s ease;
+}
+
+.home-input-area-scroll-bottom:hover {
+    transform: translateX(-50%) scale(1.05);
 }
 </style>
