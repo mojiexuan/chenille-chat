@@ -61,4 +61,6 @@ export class BizCode {
   static readonly VISION_ERROR = new BizCode(40063, 500, "视觉识别失败");
   static readonly MODEL_PROVIDER_NOT_FOUND = new BizCode(40070, 400, "模型提供方不存在");
   static readonly MODEL_NOT_FOUND = new BizCode(40080, 400, "模型不存在");
+
+  static readonly WEB_SEARCH_ERROR = new BizCode(40090, 500, "网页搜索失败");
 }

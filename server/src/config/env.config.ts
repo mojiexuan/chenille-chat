@@ -42,6 +42,8 @@ export const schema = {
   SMTP_PORT: "465",
   SMTP_USER: void 0,
   SMTP_PASS: void 0,
+  // Tavily搜索配置
+  WEB_SEARCH_TAVILY_API_KEY: void 0,
 } satisfies EnvSchema;
 
 const cache = new Map<string, string>();
