@@ -1,10 +1,10 @@
-name: chenille_ai_chat
+name: chenille_chat
 
 version: "3.8"
 
 services:
   postgres:
-    container_name: chenille_ai_chat_postgres
+    container_name: chenille_chat_postgres
     image: docker.1ms.run/postgres:16-alpine
     restart: unless-stopped
     environment:
@@ -16,10 +16,10 @@ services:
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
-      - ./volumes/chenille_ai_chat/postgres/db_back:/db_back
-      - ./volumes/chenille_ai_chat/postgres/data:/var/lib/postgresql/data
+      - ./volumes/chenille_chat/postgres/db_back:/db_back
+      - ./volumes/chenille_chat/postgres/data:/var/lib/postgresql/data
     networks:
-      - chenille_ai_chat_network
+      - chenille_chat_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
@@ -27,19 +27,19 @@ services:
       retries: 5
 
   redis:
-    container_name: chenille_ai_chat_redis
+    container_name: chenille_chat_redis
     restart: unless-stopped
     image: docker.1ms.run/redis:7-alpine
     command: redis-server --appendonly yes
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
-      - ./volumes/chenille_ai_chat/redis/data:/data
-      - ./volumes/chenille_ai_chat/redis/logs:/var/log/redis
+      - ./volumes/chenille_chat/redis/data:/data
+      - ./volumes/chenille_chat/redis/logs:/var/log/redis
     environment:
       - TZ=Asia/Shanghai
     networks:
-      - chenille_ai_chat_network
+      - chenille_chat_network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -47,5 +47,5 @@ services:
       retries: 5
 
 networks:
-  chenille_ai_chat_network:
+  chenille_chat_network:
     driver: bridge

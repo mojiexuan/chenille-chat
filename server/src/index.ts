@@ -21,6 +21,9 @@ import { UPLOADS_PATH, ensurePaths } from "@/constants/path";
  * 主函数
  */
 async function main() {
+  const app = Fastify({});
+  app.log = logger;
+
   try {
     await runMigrate();
     await runSeed();
@@ -29,13 +32,11 @@ async function main() {
     process.exit(1);
   }
 
-  const app = Fastify({});
-  app.log = logger;
   // 确保必要路径存在
   ensurePaths();
   // 注册cookie插件
-  app.register(FastifyCookie,{
-    secret:config.JWT_SECRET,
+  app.register(FastifyCookie, {
+    secret: config.JWT_SECRET,
   });
   // 注册CORS插件
   app.register(FastifyCors, {

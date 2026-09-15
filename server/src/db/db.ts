@@ -5,6 +5,7 @@ import pg from "pg";
 import { config } from "@/config";
 import path from "path";
 import { AgentKey } from "@/enumeration";
+import { logger } from "@/utils";
 
 /**
  * 数据库连接池
@@ -25,6 +26,7 @@ export const db = drizzle(pool, {schema});
 export async function runMigrate() {
     const migrationsFolder = path.join(__dirname, "../../drizzle");
     await migrate(db, { migrationsFolder });
+    logger.info("数据库迁移完成");
 }
 
 /**
@@ -72,4 +74,5 @@ async function seedAgents() {
 export async function runSeed() {
     // 种子数据：创建默认的agent
     await seedAgents();
+    logger.info("种子数据创建完成");
 }
