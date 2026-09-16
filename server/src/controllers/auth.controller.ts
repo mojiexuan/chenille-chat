@@ -42,7 +42,7 @@ export async function phoneCodeLoginHandler(request: FastifyRequest, reply: Fast
         path: "/",
         maxAge: expiresInToSeconds(config.JWT_EXPIRES_IN),      // 与 JWT 有效期一致
     });
-    return reply.success(null, "登录成功");
+    return reply.success(token, "登录成功");
 }
 
 /**

@@ -91,17 +91,17 @@
         <div class="default-layout-content">
             <div class="default-layout-content-header">
                 <div class="default-layout-content-header-left">
-                    <!-- 返回按钮 -->
-                    <div v-if="needBack" class="default-layout-content-header-back-button active" @click="navigateBack">
-                        <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M31 36L19 24L31 12" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg>
-                    </div>
                     <!-- 开关侧边栏 -->
-                    <div class="default-layout-content-header-left-button" :class="{ 'active': !sidebarActive }"
-                        @click="switchSidebarClick">
-                        <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <div class="default-layout-content-header-left-button" :class="{'active': !sidebarActive}" @click="switchSidebarClick" title="开启侧边栏">
+                        <svg class="icon-small" width="20" height="20" viewBox="0 0 48 48" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 16L42 16" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                            <path d="M6 32L30 32" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                        </svg>
+                        <svg class="icon-big" width="20" height="20" viewBox="0 0 48 48" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
                             <rect x="6" y="6" width="36" height="36" rx="3" fill="none" stroke="#1b1b1f"
                                 stroke-width="3" stroke-linejoin="round" />
                             <path d="M16 6V42" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
@@ -112,13 +112,23 @@
                                 stroke-linejoin="round" />
                         </svg>
                     </div>
+                    <!-- 返回按钮 -->
+                    <div v-if="needBack" class="default-layout-content-header-left-back-button active"
+                        @click="navigateBack">
+                        <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M31 36L19 24L31 12" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="default-layout-content-header-center">
                     <!-- 标题 -->
-                    <span class="default-layout-content-header-left-title ellipsis">{{ pageTitle }}</span>
+                    <span class="default-layout-content-header-center-title ellipsis">{{ pageTitle }}</span>
                     <!-- 当前会话信息 -->
-                    <div v-if="route.name === 'Home'" class="default-layout-content-header-left-session-info">
+                    <div v-if="route.name === 'Home'" class="default-layout-content-header-center-session-info">
                         <!-- 当前会话总token数 -->
                         <div v-if="sessionStore.currentSessionTotalTokens > 0"
-                            class="default-layout-content-header-left-session-info-item">
+                            class="default-layout-content-header-center-session-info-item">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path d="M14 24L15.25 25.25M44 14L24 34L22.75 32.75" stroke="#3c3c43" stroke-width="4"
@@ -130,7 +140,7 @@
                         </div>
                         <!-- 当前会话总缓存token数 -->
                         <div v-if="sessionStore.currentSessionCachedTokens > 0"
-                            class="default-layout-content-header-left-session-info-item">
+                            class="default-layout-content-header-center-session-info-item">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -155,7 +165,7 @@
                         </div>
                         <!-- 当前会话缓存命中率 -->
                         <div v-if="sessionStore.currentSessionCacheHitRate > 0"
-                            class="default-layout-content-header-left-session-info-item">
+                            class="default-layout-content-header-center-session-info-item">
                             <svg width="20" height="20" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -168,12 +178,33 @@
                         </div>
                     </div>
                 </div>
+                <div class="default-layout-content-header-right">
+                    <!-- 添加新会话 -->
+                    <div class="default-layout-content-header-right-button" @click="newSessionClick" title="创建新会话">
+                        <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            data-v-75d0be1e="">
+                            <path d="M25.5 37H21L11 42V37H4V7H44V18" stroke="#1b1b1f" stroke-width="3"
+                                stroke-linecap="round" stroke-linejoin="round" data-v-75d0be1e=""></path>
+                            <path d="M12 15H18" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                                stroke-linejoin="round" data-v-75d0be1e=""></path>
+                            <path d="M12 21H24" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                                stroke-linejoin="round" data-v-75d0be1e=""></path><!-- 右下角 + -->
+                            <path d="M38 25V37" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                                data-v-75d0be1e=""></path>
+                            <path d="M32 31H44" stroke="#1b1b1f" stroke-width="3" stroke-linecap="round"
+                                data-v-75d0be1e=""></path>
+                        </svg>
+                    </div>
+                </div>
             </div>
             <main ref="contentMainRef" class="default-layout-content-main" @scroll="handleMainScroll">
                 <div class="default-layout-content-main-container">
                     <router-view></router-view>
                 </div>
             </main>
+            <!-- 关闭左侧遮罩层 -->
+            <div class="default-layout-content-mask" :class="{ 'active': sidebarActive }" @click="switchSidebarClick"
+                title="关闭侧边栏"></div>
         </div>
         <!-- 会话列表的更多操作菜单 -->
         <ContextMenu :visible="sessionMenuVisible" :anchor="sessionMenuAnchor" @close="sessionMenuVisible = false">
@@ -244,7 +275,7 @@ const userNameNickname = computed(() => userStore.user.nickname);
 // 悬浮卡片是否显示
 const footerMeActive = ref(false);
 // 侧边栏是否显示
-const sidebarActive = ref(true);
+const sidebarActive = ref(false);
 
 // 会话右键菜单
 const sessionMenuVisible = ref(false);
@@ -267,13 +298,13 @@ provide('mainAtBottom', mainAtBottom);
  * 滚动到内容区域底部
  * @param force 是否强制滚动
  */
-function scrollMainToBottom(force: boolean = false,smooth: boolean = false) {
+function scrollMainToBottom(force: boolean = false, smooth: boolean = false) {
     const el = contentMainRef.value;
     if (!el) return;
     const threshold = 80;
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
     if (force || atBottom) {
-        el.scrollTo({top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto'});
+        el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
     }
     mainAtBottom.value = true;
 }
@@ -355,7 +386,7 @@ function sessionMoreClick(e: MouseEvent, sessionId: string) {
 /**
  * 处理编辑会话名称
  */
-function handleEditSessionName(){
+function handleEditSessionName() {
     useConfirm().show({
         title: '编辑会话名称',
         edit: {
@@ -363,8 +394,8 @@ function handleEditSessionName(){
             maxlength: 50,
             minlength: 1,
         },
-        onConfirm:(params)=>{
-            if(params?.edit?.value && sessionMenuTarget.value){
+        onConfirm: (params) => {
+            if (params?.edit?.value && sessionMenuTarget.value) {
                 sessionStore.updateSessionTitle(sessionMenuTarget.value, params.edit.value);
             }
         }
@@ -416,19 +447,25 @@ onMounted(() => {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+    background: var(--ch-feature-card-bg);
     width: 254px;
+    max-width: 80vw;
     height: calc(100vh - 12px);
     padding: 0 6px;
     overflow: hidden;
     position: fixed;
     transform: translateX(-100%);
     transition: all .3s ease;
+    z-index: 10;
+}
+
+.default-layout-nav.active {
+    transform: translateX(0);
 }
 
 @media screen and (min-width: 768px) {
     .default-layout-nav.active {
         position: unset;
-        transform: translateX(0);
     }
 }
 
@@ -663,10 +700,49 @@ onMounted(() => {
 .default-layout-content-header-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 10px;
 }
 
-.default-layout-content-header-back-button {
+.default-layout-content-header-left-button {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.default-layout-content-header-left-button.active {
+    display: flex;
+}
+
+.default-layout-content-header-left-button .icon-small {
+    display: block;
+}
+
+.default-layout-content-header-left-button .icon-big {
+    display: none;
+}
+
+@media screen and (min-width: 768px) {
+    .default-layout-content-header {
+        justify-content: flex-start;
+    }
+
+    .default-layout-content-header-left-button .icon-small {
+        display: none;
+    }
+
+    .default-layout-content-header-left-button .icon-big {
+        display: block;
+    }
+
+    .default-layout-content-header-right {
+        display: none;
+    }
+}
+
+.default-layout-content-header-left-back-button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -675,37 +751,45 @@ onMounted(() => {
     cursor: pointer;
 }
 
-.default-layout-content-header-left-button {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    cursor: w-resize;
-}
-
-.default-layout-content-header-left-button.active {
-    display: flex;
-}
-
-.default-layout-content-header-left-title {
-    font-size: 14px;
-    font-weight: 600;
-    user-select: none;
-}
-
-.default-layout-content-header-left-session-info {
+.default-layout-content-header-center {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
-.default-layout-content-header-left-session-info-item {
+.default-layout-content-header-center-title {
+    font-size: 14px;
+    font-weight: 600;
+    user-select: none;
+}
+
+.default-layout-content-header-center-session-info {
+    display: none;
+    align-items: center;
+    gap: 16px;
+}
+
+@media screen and (min-width: 768px) {
+    .default-layout-content-header-center-session-info {
+        display: flex;
+    }
+}
+
+.default-layout-content-header-center-session-info-item {
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: 14px;
     user-select: none;
+}
+
+.default-layout-content-header-right-button {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .default-layout-content-main {
@@ -722,5 +806,28 @@ onMounted(() => {
     transition: all .3s ease;
     display: flex;
     flex-direction: column;
+}
+
+.default-layout-content-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: color-mix(in srgb, var(--ch-white-bg-black) 50%, transparent);
+    z-index: 9;
+    cursor: pointer;
+    display: none;
+    transition: all .3s ease;
+}
+
+.default-layout-content-mask.active {
+    display: flex;
+}
+
+@media screen and (min-width: 768px) {
+    .default-layout-content-mask.active {
+        display: none;
+    }
 }
 </style>
