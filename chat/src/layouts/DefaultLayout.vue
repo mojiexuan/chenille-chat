@@ -240,11 +240,11 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { computed, ref, onMounted, provide } from 'vue'
+import { computed, ref, onMounted, provide,watch } from 'vue'
 import { useSessionStore, useUserStore } from '@/stores';
 import { useRouter, useRoute } from 'vue-router';
 import ContextMenu from '@/components/menu/ContextMenu.vue';
-import { useConfirm } from '@/composables';
+import { useConfirm, useIsDesktop } from '@/composables';
 
 // 路由
 const router = useRouter();
@@ -288,6 +288,14 @@ const sessionMenuTarget = ref<string | null>(null);
 const contentMainRef = ref<HTMLElement>();
 // 内容区域是否已滚动到底部
 const mainAtBottom = ref(true);
+// 是否为大屏
+const isDesktop = useIsDesktop();
+// 屏幕尺寸跨越断点时自动同步侧边栏状态
+watch(isDesktop, (val) => {
+    if (!val) {
+        closeSidebar();
+    }
+}, { immediate: true });
 
 // 提供滚动到内容区域底部的方法
 provide('scrollMainToBottom', scrollMainToBottom);
@@ -346,9 +354,19 @@ function switchSidebarClick() {
 }
 
 /**
+ * 关闭侧边栏
+ */
+function closeSidebar() {
+    sidebarActive.value = false;
+}
+
+/**
  * 点击新会话
  */
 function newSessionClick() {
+    if (!isDesktop.value) {
+        closeSidebar();
+    }
     sessionStore.resetCurrentSession();
     if (route.name !== "Home") {
         router.replace({ name: 'Home' });
@@ -368,6 +386,9 @@ function navigateToSetting() {
  * 点击会话
  */
 function sessionItemClick(sessionId: string) {
+    if (!isDesktop.value) {
+        closeSidebar();
+    }
     sessionStore.switchCurrentSession(sessionId);
     if (route.name !== "Home") {
         router.replace({ name: 'Home' });
@@ -707,7 +728,7 @@ onMounted(() => {
     width: 32px;
     height: 32px;
     cursor: pointer;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -727,6 +748,10 @@ onMounted(() => {
 @media screen and (min-width: 768px) {
     .default-layout-content-header {
         justify-content: flex-start;
+    }
+
+    .default-layout-content-header-left-button {
+        display: none;
     }
 
     .default-layout-content-header-left-button .icon-small {
