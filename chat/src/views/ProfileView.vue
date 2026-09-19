@@ -140,7 +140,7 @@ onMounted(() => {
 .profile {
   width: 100%;
   height: 100%;
-  padding: 35px 0 0 0;
+  padding: 35px 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;

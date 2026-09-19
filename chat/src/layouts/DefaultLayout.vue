@@ -92,7 +92,7 @@
             <div class="default-layout-content-header">
                 <div class="default-layout-content-header-left">
                     <!-- 开关侧边栏 -->
-                    <div class="default-layout-content-header-left-button" :class="{'active': !sidebarActive}" @click="switchSidebarClick" title="开启侧边栏">
+                    <div v-if="route.name !== 'Profile'" class="default-layout-content-header-left-button" :class="{'active': !sidebarActive}" @click="switchSidebarClick" title="开启侧边栏">
                         <svg class="icon-small" width="20" height="20" viewBox="0 0 48 48" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <path d="M6 16L42 16" stroke="currentColor" stroke-width="4" stroke-linecap="round"
@@ -293,7 +293,9 @@ const isDesktop = useIsDesktop();
 // 屏幕尺寸跨越断点时自动同步侧边栏状态
 watch(isDesktop, (val) => {
     if (!val) {
-        closeSidebar();
+        sidebarActive.value = false;
+    }else{
+        sidebarActive.value = true;
     }
 }, { immediate: true });
 
@@ -377,6 +379,9 @@ function newSessionClick() {
  * 点击设置
  */
 function navigateToSetting() {
+    if (!isDesktop.value) {
+        closeSidebar();
+    }
     if (route.name !== "Setting") {
         router.replace({ name: 'Setting' });
     }
@@ -443,6 +448,9 @@ function handleDeleteSession() {
 }
 
 onMounted(() => {
+    if(isDesktop.value){
+        sidebarActive.value = true;
+    }
     if (userStore.isLogin) {
         sessionStore.getSessions()
     }
@@ -781,12 +789,14 @@ onMounted(() => {
     display: flex;
     align-items: center;
     gap: 16px;
+    transition: all .3s ease;
 }
 
 .default-layout-content-header-center-title {
     font-size: 14px;
     font-weight: 600;
     user-select: none;
+    transition: all .3s ease;
 }
 
 .default-layout-content-header-center-session-info {

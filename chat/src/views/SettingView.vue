@@ -125,13 +125,14 @@ onMounted(() => {
 
 <style scoped>
 .setting {
-    width: 550px;
+    width: 100%;
+    min-width: min(550px, 100%);
     max-width: 550px;
     margin: 0 auto;
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding-top: 12px;
+    padding: 12px 12px 0;
     gap: 24px;
     user-select: none;
 }
