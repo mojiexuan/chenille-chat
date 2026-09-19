@@ -1,5 +1,3 @@
-import { registerLarkApp } from "@larksuite/vercel-chat-adapter";
-
 /**
  * Vercel 服务
  */
@@ -22,6 +20,8 @@ class VercelService {
             resolveUrl = resolve;
             rejectUrl = reject;
         });
+
+        const { registerLarkApp } = await import("@larksuite/vercel-chat-adapter");
 
             // 注册绑定应用
         registerLarkApp({

@@ -1,4 +1,3 @@
-import 'tsconfig-paths/register';
 import Fastify from "fastify";
 import FastifyCookie from "@fastify/cookie";
 import FastifyCors from "@fastify/cors";

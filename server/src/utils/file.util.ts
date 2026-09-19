@@ -2,7 +2,6 @@ import type { MultipartFile } from "@fastify/multipart";
 import { BizException } from "@/exception";
 import { BizCode, MediaType } from "@/enumeration";
 import { MemoryFile,FileType } from "@/types";
-import { fileTypeFromBuffer } from "file-type";
 import {randomUUID} from './crypto.util';
 
 /**
@@ -10,6 +9,7 @@ import {randomUUID} from './crypto.util';
  * @param buffer 文件内容
  */
 async function getFileType(buffer:Buffer){
+    const { fileTypeFromBuffer } = await import("file-type");
     const result = await fileTypeFromBuffer(buffer);
     if (!result) {
         // 未知文件类型
