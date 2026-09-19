@@ -16,7 +16,7 @@
                 <!-- 功能区域 -->
                 <div class="home-input-area-box-editor-end">
                     <div class="home-input-area-box-editor-end-track"
-                        :style="{ transform: `translateY(-${activeToolbarPanel * 34}px)` }">
+                        :style="{ marginTop: `-${activeToolbarPanel * 34}px` }">
                         <!-- 上 -->
                         <div class="home-input-area-box-editor-end-track-top"></div>
                         <!-- 中 -->
@@ -442,7 +442,7 @@ onUnmounted(() => {
 }
 
 .home-input-area-box-editor-end-track {
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: margin-top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .home-input-area-box-editor-end-track-top {

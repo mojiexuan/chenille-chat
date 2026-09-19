@@ -15,7 +15,7 @@ export const useModelStore = defineStore('model', () => {
         {
             id: "0",
             providerId: "0",
-            name: "Auto",
+            name: "自动",
             description: "自动选择模型",
             canThinking: true,
             canInputImage: true,
@@ -57,7 +57,7 @@ export const useModelStore = defineStore('model', () => {
                 models.value = [{
                     id: "0",
                     providerId: "0",
-                    name: "Auto",
+                    name: "自动",
                     description: "自动选择模型",
                     canThinking: true,
                     canInputImage: true,

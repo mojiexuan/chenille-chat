@@ -735,6 +735,7 @@ onMounted(() => {
 
     .default-layout-content-header-left-button .icon-big {
         display: block;
+        cursor: w-resize;
     }
 
     .default-layout-content-header-right {
