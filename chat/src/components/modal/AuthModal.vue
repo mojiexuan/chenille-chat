@@ -19,12 +19,12 @@
                     <section class="auth-modal-content-form" @keyup.enter="phoneLogin">
                         <div class="auth-modal-content-form-item">
                             <span class="auth-modal-content-form-item-prefix">+86</span>
-                            <input v-model="userPhone" @change="userPhoneChange" type="text" placeholder="请输入手机号"
+                            <input v-model="userPhone" id="userPhone" @change="userPhoneChange" type="text" placeholder="请输入手机号"
                                 maxlength="11" minlength="11">
                         </div>
                         <div class="auth-modal-content-form-item-tip">{{ phoneTip }}</div>
                         <div class="auth-modal-content-form-item">
-                            <input v-model="userCode" @change="userCodeChange" type="text" placeholder="请输入验证码"
+                            <input v-model="userCode" id="userCode" @change="userCodeChange" type="text" placeholder="请输入验证码"
                                 maxlength="6" minlength="6">
                             <span class="auth-modal-content-form-item-separator">|</span>
                             <a class="auth-modal-content-form-item-get-code" :disabled="isDisabledCodeButton"
@@ -159,7 +159,6 @@ async function phoneLogin() {
 }
 
 @media screen and (min-width: 768px) {
-
     .auth-modal-content-promotion,
     .auth-modal-content-promotion-image {
         display: block;
@@ -173,10 +172,15 @@ async function phoneLogin() {
     background: var(--ch-bg-color-card);
     border-radius: 16px;
     overflow: hidden;
-    display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+}
+
+@media screen and (min-width: 768px) {
+    .auth-modal-content {
+        display: flex;
+    }
 }
 
 .auth-modal-content-close {

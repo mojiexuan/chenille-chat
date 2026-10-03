@@ -8,3 +8,4 @@ export * from "./agent.enum";
 export * from "./task.enum";
 export * from "./ws.enum";
 export * from "./file.enum";
+export * from "./feedback.enum";

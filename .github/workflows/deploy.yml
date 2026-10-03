@@ -1,34 +1,98 @@
 name: 部署
 
-# on:
-#   push:
-#     branches: [main]
+on:
+  push:
+    branches: [main]
 
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: 检出代码
-#         uses: actions/checkout@v4
+jobs:
+  # ── Chat 前端构建并上传 ──
+  chat:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: chat
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
 
-#       - name: 复制到服务器
-#         uses: appleboy/scp-action@v0
-#         with:
-#           host: ${{ secrets.DEPLOY_HOST }}
-#           username: ${{ secrets.DEPLOY_USER }}
-#           key: ${{ secrets.DEPLOY_SSH_KEY }}
-#           source: "."
-#           target: /opt/chenille/
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-#       - name: 构建并启动
-#         uses: appleboy/ssh-action@v1
-#         with:
-#           host: ${{ secrets.DEPLOY_HOST }}
-#           username: ${{ secrets.DEPLOY_USER }}
-#           key: ${{ secrets.DEPLOY_SSH_KEY }}
-#           script: |
-#             cd /opt/chenille
-#             cp server/.env.production server/.env 2>/dev/null || true
-#             docker compose --env-file server/.env build
-#             docker compose --env-file server/.env up -d --remove-orphans
-#             docker image prune -f
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: chat/pnpm-lock.yaml
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建
+        run: pnpm build-only
+
+      - name: 上传到服务器
+        uses: appleboy/scp-action@v0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: chat/dist/
+          target: /www/wwwroot/chat.chenjiabao.com/
+          strip_component: 2
+          overwrite: true
+
+  # ── Server 后端构建并上传，PM2 重启 ──
+  server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: server/pnpm-lock.yaml
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建
+        run: pnpm build
+
+      - name: 上传 dist + package.json + lock
+        uses: appleboy/scp-action@v0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: |
+            server/dist/
+            server/package.json
+            server/pnpm-lock.yaml
+          target: /www/wwwroot/chat.api.chenjiabao.com/
+          strip_component: 1
+          overwrite: true
+
+      - name: 在服务器上安装生产依赖并重启 PM2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd /www/wwwroot/api.chat.chenjiabao.com
+            pnpm install --frozen-lockfile --prod
+            pm2 reload chenille-chat || pm2 start dist/index.js --name chenille-chat

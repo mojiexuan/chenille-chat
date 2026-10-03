@@ -256,9 +256,15 @@ function previewPictureClick(imageUrl: string) {
 }
 
 .home-container-status-bar-token {
-    display: flex;
+    display: none;
     align-items: center;
     gap: 16px;
+}
+
+@media screen and (min-width: 768px) {
+    .home-container-status-bar-token {
+        display: flex;
+    }
 }
 
 .home-container-status-bar-token-item,

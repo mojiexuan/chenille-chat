@@ -132,7 +132,7 @@ onMounted(() => {
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 12px 12px 0;
+    padding: 12px;
     gap: 24px;
     user-select: none;
 }
@@ -193,9 +193,15 @@ onMounted(() => {
 }
 
 .setting-card-token {
-    display: grid;
+    display: none;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
+}
+
+@media screen and (min-width: 768px) {
+    .setting-card-token {
+        display: grid;
+    }
 }
 
 .setting-card-token-item {

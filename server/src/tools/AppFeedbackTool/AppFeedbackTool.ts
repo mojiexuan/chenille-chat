@@ -5,7 +5,8 @@ import { lazySchema } from "@/utils";
 
 const inputSchema = lazySchema(() =>
   z.object({
-    description: z.string().trim().min(1),
+    description: z.string().trim().min(1).max(1000),
+    imageUrl: z.string().optional(),
   }),
 );
 
@@ -20,6 +21,7 @@ const outputSchema = lazySchema(() =>
  */
 export const AppFeedbackTool = buildTool({
   name: APP_FEEDBACK_TOOL_NAME,
+  searchHint: "反馈,崩溃,问题",
   maxResultSizeChars: 100_000,
   async prompt(options) {
     return APP_FEEDBACK_TOOL_PROMPT;

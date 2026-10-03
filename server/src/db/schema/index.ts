@@ -8,4 +8,6 @@ export * from "./message.attachment.schema";
 export * from "./agent.schema";
 export * from "./user.setting.schema";
 export * from "./ai.token.usage.schema";
+export * from "./feedback.schema";
+
 export * from "./relation";
