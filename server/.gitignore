@@ -13,3 +13,4 @@ volumes/
 scripts/
 uploads/
 logs/
+certs/

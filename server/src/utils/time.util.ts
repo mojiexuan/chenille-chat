@@ -11,6 +11,28 @@ const DURATION_UNIT_SECONDS: Record<string, number> = {
 };
 
 /**
+ * 东八区时区偏移（毫秒）
+ */
+const TIMEZONE_OFFSET_MS = 8 * 60 * 60 * 1000;
+
+/**
+ * 东八区 RFC3339 时区后缀，与 TIMEZONE_OFFSET_MS 对应
+ */
+export const EAST8_TIMEZONE_SUFFIX = "+08:00";
+
+/**
+ * 将时间转换为东八区对应的“虚拟时间”
+ *
+ * 注意：这里必须配合 getUTC* 系列方法读取，不能用 getHours() 等本地方法。
+ * 因为 getTime() 返回的是绝对时间戳、getUTC* 读取的也是 UTC 分量，
+ * 二者都不受系统时区影响，所以在任何时区的服务器上结果都稳定为东八区，不会双重偏移；
+ * 而 getHours()/getDate() 等本地方法会受系统时区影响，若在已是东八区的机器上使用会再叠加一次偏移。
+ */
+export function toEast8(date: Date): Date {
+  return new Date(date.getTime() + TIMEZONE_OFFSET_MS);
+}
+
+/**
  * 将expiresIn时间单位转换为秒
  * @param expiresIn 时间单位字符串，例如 "1h"、"2d" 等
  * @returns 秒数
@@ -76,12 +98,14 @@ export function expiresInToSeconds(expiresIn: string | number): number {
  * 获取当前时间的各个分量
  */
 export function getTimeComponents(date = new Date()) {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hour = date.getHours();
-  const minute = date.getMinutes();
-  const second = date.getSeconds();
+  // 转换为东八区时间，避免受服务器系统时区影响
+  const east8 = toEast8(date);
+  const year = east8.getUTCFullYear();
+  const month = east8.getUTCMonth() + 1;
+  const day = east8.getUTCDate();
+  const hour = east8.getUTCHours();
+  const minute = east8.getUTCMinutes();
+  const second = east8.getUTCSeconds();
   const timestamp = date.getTime();
 
   return {
@@ -104,12 +128,14 @@ export function getTimeComponents(date = new Date()) {
  * 格式化时间
  */
 export function formatTime(date = new Date(), template = "yyyy年M月d日 HH:mm") {
-  const y = date.getFullYear();
-  const M = date.getMonth() + 1;
-  const d = date.getDate();
-  const H = date.getHours();
-  const m = date.getMinutes();
-  const s = date.getSeconds();
+  // 转换为东八区时间，避免受服务器系统时区影响
+  const east8 = toEast8(date);
+  const y = east8.getUTCFullYear();
+  const M = east8.getUTCMonth() + 1;
+  const d = east8.getUTCDate();
+  const H = east8.getUTCHours();
+  const m = east8.getUTCMinutes();
+  const s = east8.getUTCSeconds();
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -135,5 +161,19 @@ export function formatTime(date = new Date(), template = "yyyy年M月d日 HH:mm"
  */
 export function getWeekDay(date = new Date(), format = "周") {
   const WEEK_DAYS = ["日", "一", "二", "三", "四", "五", "六"];
-  return format + WEEK_DAYS[date.getDay()];
+  // 转换为东八区时间后再取星期
+  return format + WEEK_DAYS[toEast8(date).getUTCDay()];
+}
+
+/**
+ * 获取当前时间加上指定秒数后的时间
+ * @param seconds 需要增加的秒数（整数）
+ * @param from 起始时间，默认当前时间
+ * @returns 增加指定秒数后的 Date 对象
+ */
+export function getDateAfterSeconds(seconds: number, from = new Date()): Date {
+  if (!Number.isInteger(seconds) || seconds <= 0) {
+    throw new Error(`秒数必须为整数且大于0：${seconds}`);
+  }
+  return new Date(from.getTime() + seconds * 1000);
 }

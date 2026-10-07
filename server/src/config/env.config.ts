@@ -13,16 +13,17 @@ export const schema = {
   // 应用配置
   APP_NAME: "AiChat",
   APP_PORT: "3000",
-  OPENAI_API_KEY: void 0,
-  OPENAI_API_BASE: void 0,
-  OPENAI_API_MODEL: "gpt-5.4",
+  APP_URL: "http://localhost:3000",
+  // redis配置
   REDIS_HOST: "127.0.0.1",
   REDIS_PORT: "6379",
+  // 数据库配置
   DB_HOST: "127.0.0.1",
   DB_PORT: "5432",
   DB_USER: void 0,
   DB_PASSWORD: void 0,
   DB_NAME: void 0,
+  // JWT配置
   JWT_SECRET: void 0,
   JWT_EXPIRES_IN: "604800",
   // 阿里云短信配置
