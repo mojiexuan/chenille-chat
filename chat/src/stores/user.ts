@@ -54,14 +54,14 @@ export const useUserStore = defineStore('user', () => {
         }catch {
             // 登示错误提示
             useToast().error('登录失败')
-            return
+            throw new Error('登录失败')
         }
         // 刷新用户信息
         await refreshUserInfo()
         if (!isLogin.value) {
             // 登示错误提示
             useToast().error('登录结果异常')
-            return
+            throw new Error('登录结果异常')
         }
         // 隐藏AuthModal
         useAuth().hide()

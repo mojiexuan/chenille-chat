@@ -19,20 +19,20 @@
                     <section class="auth-modal-content-form" @keyup.enter="phoneLogin">
                         <div class="auth-modal-content-form-item">
                             <span class="auth-modal-content-form-item-prefix">+86</span>
-                            <input v-model="userPhone" id="userPhone" @change="userPhoneChange" type="text" placeholder="请输入手机号"
-                                maxlength="11" minlength="11">
+                            <input v-model="userPhone" id="userPhone" @change="userPhoneChange" type="text"
+                                placeholder="请输入手机号" maxlength="11" minlength="11">
                         </div>
                         <div class="auth-modal-content-form-item-tip">{{ phoneTip }}</div>
                         <div class="auth-modal-content-form-item">
-                            <input v-model="userCode" id="userCode" @change="userCodeChange" type="text" placeholder="请输入验证码"
-                                maxlength="6" minlength="6">
+                            <input v-model="userCode" id="userCode" @change="userCodeChange" type="text"
+                                placeholder="请输入验证码" maxlength="6" minlength="6">
                             <span class="auth-modal-content-form-item-separator">|</span>
                             <a class="auth-modal-content-form-item-get-code" :disabled="isDisabledCodeButton"
                                 @click="getPhoneCode">{{ codeButtonText }}</a>
                         </div>
                         <div class="auth-modal-content-form-item-tip">{{ codeTip }}</div>
                         <button class="auth-modal-content-form-item auth-modal-content-form-item-login"
-                            @click="phoneLogin">登录</button>
+                            :disabled="isDisabledLoginButton" @click="phoneLogin">登录</button>
                     </section>
                 </div>
             </div>
@@ -57,7 +57,10 @@ const codeTip = ref('');
 const userPhone = ref('');
 const userCode = ref('');
 const codeButtonText = ref('获取验证码');
+// 获取验证码按钮是否禁用
 const isDisabledCodeButton = ref(false);
+// 登录按钮是否禁用
+const isDisabledLoginButton = ref(false);
 
 /**
  * 手机号输入框改变事件
@@ -78,9 +81,9 @@ function userCodeChange() {
  */
 async function getPhoneCode() {
     if (validatePhone()) {
+        isDisabledCodeButton.value = true;
         phoneCodeRequest(userPhone.value)
             .then(() => {
-                isDisabledCodeButton.value = true;
                 phoneTip.value = '';
                 codeTip.value = '';
                 // 60秒倒计时，从60开始
@@ -98,6 +101,7 @@ async function getPhoneCode() {
             })
             .catch(() => {
                 codeTip.value = '获取验证码失败';
+                isDisabledCodeButton.value = false;
             })
     }
 }
@@ -107,11 +111,11 @@ async function getPhoneCode() {
  */
 function validatePhone() {
     if (userPhone.value.length !== 11) {
-        phoneTip.value = '手机号长度应该在4-50个字符之间';
+        phoneTip.value = '手机号长度不对';
         return false;
     }
     if (!isPhone(userPhone.value)) {
-        phoneTip.value = '请输入正确的手机号格式';
+        phoneTip.value = '请输入正确的手机号';
         return false;
     }
     return true;
@@ -130,7 +134,10 @@ async function phoneLogin() {
             codeTip.value = '请输入数字验证码';
             return false;
         }
-        userStore.phoneLogin(userPhone.value, userCode.value)
+        isDisabledLoginButton.value = true;
+        userStore.phoneLogin(userPhone.value, userCode.value).finally(() => {
+            isDisabledLoginButton.value = false;
+        })
     }
 }
 </script>
@@ -159,6 +166,7 @@ async function phoneLogin() {
 }
 
 @media screen and (min-width: 768px) {
+
     .auth-modal-content-promotion,
     .auth-modal-content-promotion-image {
         display: block;
@@ -293,6 +301,11 @@ async function phoneLogin() {
 
 .auth-modal-content-form-item-login:hover {
     background-color: var(--ch-main-hover-color);
+}
+
+.auth-modal-content-form-item-login[disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 @media screen and (min-width: 1024px) {}
