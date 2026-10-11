@@ -46,6 +46,7 @@ import type { MarkdownItContainerTokenType } from "@/types";
 import { watch, ref, nextTick, onMounted } from 'vue';
 import { copyTextToClipboard, debounce } from '@/utils';
 import { useToast,useConfirm } from '@/composables';
+import DOMPurify from 'dompurify';
 
 // 组件根元素
 const rootRef = ref<HTMLElement>();
@@ -117,7 +118,7 @@ const addCustomContainer = (
     });
 };
 
-const md = MarkdownItAsync("default", {
+const md: MarkdownIt = MarkdownItAsync("default", {
     html: true, // 可以识别html
     xhtmlOut: true,
     breaks: true, // 回车换行
@@ -258,7 +259,10 @@ const copySvg = `<svg t="1747030748345" class="icon" viewBox="0 0 1024 1024" ver
  * @param code 处理后的html代码串,getPre不会处理，只做拼接
  */
 const getPre = (lang: string, code: string, codeHtml: string) => {
-    return `<div><button class="article-content-pre-copy">${copySvg}<span style="display: none;white-space: pre-wrap;word-break: break-word;">${code}</span></button><span class="article-content-pre-lang">${lang}</span><div class="language language-${lang}">${codeHtml}</div></div>`;
+    // 安全转义
+    const safeLang = md.utils.escapeHtml(lang);
+    const safeCode = md.utils.escapeHtml(code);
+    return `<div><button class="article-content-pre-copy">${copySvg}<span style="display: none;white-space: pre-wrap;word-break: break-word;">${safeCode}</span></button><span class="article-content-pre-lang">${safeLang}</span><div class="language language-${safeLang}">${codeHtml}</div></div>`;
 }
 
 /**
@@ -267,7 +271,9 @@ const getPre = (lang: string, code: string, codeHtml: string) => {
 function doRender(content: string) {
     md.renderAsync(content)
         .then((html) => {
-            renderedHtml.value = html;
+            renderedHtml.value = DOMPurify.sanitize(html,{
+                FORBID_TAGS: ['iframe']
+            });
             nextTick(() => emit('rendered'));
         })
         .catch((err) => {

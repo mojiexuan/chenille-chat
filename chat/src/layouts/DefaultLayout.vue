@@ -394,9 +394,8 @@ function sessionItemClick(sessionId: string) {
     if (!isDesktop.value) {
         closeSidebar();
     }
-    sessionStore.switchCurrentSession(sessionId);
-    if (route.name !== "Home") {
-        router.replace({ name: 'Home' });
+    if (route.name !== "Home" || route.params.sessionId !== sessionId) {
+        router.replace({ name: 'Home', params: { sessionId } });
     }
 }
 

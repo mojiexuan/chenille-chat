@@ -27,7 +27,7 @@ const routes: RouteRecordRaw[] = [
     meta: { layout: 'default' },
     children: [
       {
-        path: 'home',
+        path: 'home/:sessionId?',
         name: 'Home',
         component: () => import('@/views/HomeView.vue'),
         meta: { title: '首页', requiresAuth: true },

@@ -22,6 +22,8 @@
 </template>
 
 <script setup lang="ts" name="home">
+import { watch } from "vue";
+import { useRoute } from "vue-router";
 import { useSessionStore, useUserStore } from "@/stores";
 import MessageItem from "@/components/home/MessageItem.vue";
 import RotatingText from "@/component/RotatingText/RotatingText.vue";
@@ -31,6 +33,19 @@ import InputArea from "@/components/home/InputArea.vue";
 const sessionStore = useSessionStore();
 // 用户store
 const userStore = useUserStore();
+// 路由参数
+const route = useRoute();
+// 会话id
+let sessionId: string | undefined = route.params.sessionId as string | undefined;
+
+watch(() => route.params.sessionId, (newSessionId, _oldSessionId) => {
+  sessionId = newSessionId as string | undefined;
+  if (sessionId) {
+    sessionStore.switchCurrentSession(sessionId);
+  } else {
+    sessionStore.resetCurrentSession();
+  }
+}, { immediate: true });
 </script>
 
 <style scoped>
@@ -58,14 +73,14 @@ const userStore = useUserStore();
 }
 
 .home-container-replying {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .home-container-replying-image {
-    width: 20px;
-    height: 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .home-container-hi {
