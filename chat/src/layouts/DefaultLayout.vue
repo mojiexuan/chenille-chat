@@ -385,6 +385,7 @@ function navigateToSetting() {
     if (route.name !== "Setting") {
         router.replace({ name: 'Setting' });
     }
+    sessionStore.resetCurrentSession();
 }
 
 /**
