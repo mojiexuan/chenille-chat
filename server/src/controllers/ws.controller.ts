@@ -15,6 +15,7 @@ export async function getWebSocketTicketHandler(
     if (!userId) {
         throw new BizException(BizCode.AUTH_UNAUTHORIZED);
     }
+    // 生成 Ticket
     const ticket = await wsService.generateTicket(userId);
     return reply.success(ticket, "Ticket 生成成功");
 }
@@ -26,13 +27,14 @@ export async function webSocketHandler(
     socket: WebSocket,
     request: FastifyRequest,
 ) {
+    // 获取 Ticket
     const ticket = new URLSearchParams(request.url.split("?")[1] || "").get("ticket");
 
     if (!ticket) {
         socket.close(4001, "缺少 ticket");
         return;
     }
-
+    // 验证 Ticket
     const userId = await wsService.validateTicket(ticket);
     if (!userId) {
         socket.close(4001, "ticket 无效或已过期");

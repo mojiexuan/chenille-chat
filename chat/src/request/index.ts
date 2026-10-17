@@ -4,3 +4,4 @@ export * from './chat.api';
 export * from './session.api';
 export * from './model.api';
 export * from './asr.api';
+export * from './ws';

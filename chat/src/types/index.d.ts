@@ -8,3 +8,4 @@ export * from './model';
 export * from './file';
 export * from './window';
 export * from './captcha';
+export * from './ws';
