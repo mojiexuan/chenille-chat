@@ -13,6 +13,7 @@ import {
 } from "@/request";
 import { getValidDirectoryHandle, saveDirectoryHandle } from "@/utils";
 import { IndexedKeyEnum } from "@/enumeration";
+import router from "@/router";
 
 /**
  * 会话store
@@ -30,6 +31,8 @@ export const useSessionStore = defineStore("session", () => {
     const sessions = ref<SessionItem[]>([]);
     // 是否还有更多会话
     const hasMoreSessions = ref(true);
+    // 会话分页页码
+    const sessionPageNumber = ref(0);
     // 当前会话
     const currentSession = ref<Session>({
         id: void 0,
@@ -117,15 +120,18 @@ export const useSessionStore = defineStore("session", () => {
      * @author 陈佳宝
      * @date 2026-05-31
      */
-    async function getSessions(page = 1) {
-        if (!hasMoreSessions.value || page <= 0) {
+    async function getSessions() {
+        if (!hasMoreSessions.value) {
             return;
         }
+        // 代替加载中使用
+        hasMoreSessions.value = false;
         const pageSize = 20;
-        return getSessionListRequest({ page, pageSize })
+        sessionPageNumber.value++;
+        return getSessionListRequest({ page: sessionPageNumber.value, pageSize })
             .then((res) => {
-                sessions.value = res.list || [];
-                hasMoreSessions.value = res.list.length < pageSize;
+                sessions.value.push(...(res.list || []));
+                hasMoreSessions.value = res.list.length >= pageSize;
             })
     }
 
@@ -136,6 +142,9 @@ export const useSessionStore = defineStore("session", () => {
      */
     function updateCurrentSessionId(id: string): void {
         currentSession.value.id = id;
+        if (router.currentRoute.value.name === "Home" && router.currentRoute.value.params.sessionId !== id) {
+            router.replace({ name: "Home", params: { sessionId: id } });
+        }
     }
 
     /**
@@ -485,6 +494,7 @@ export const useSessionStore = defineStore("session", () => {
         attachments,
         canSend,
         sessions,
+        hasMoreSessions,
         currentSession,
         currentSessionTotalTokens,
         currentSessionCachedTokens,

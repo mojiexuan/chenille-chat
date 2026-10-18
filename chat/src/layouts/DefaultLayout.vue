@@ -31,7 +31,7 @@
                     </svg>
                 </div>
             </section>
-            <section class="default-layout-nav-content">
+            <section ref="navContentRef" class="default-layout-nav-content" @scroll="handleNavContentScroll">
                 <!-- 会话列表 -->
                 <section class="default-layout-nav-content-session">
                     <div class="default-layout-nav-content-session-item" v-for="item in sessionStore.sessions"
@@ -48,6 +48,10 @@
                                 <circle cx="24" cy="35" r="3" fill="#3c3c43" />
                             </svg>
                         </div>
+                    </div>
+                    <!-- 更多会话 -->
+                    <div class="default-layout-nav-content-session-item-has-more" v-if="sessionStore.hasMoreSessions" @click="sessionStore.getSessions">
+                        <span class="default-layout-nav-content-session-item-has-more-text ellipsis">更多会话</span>
                     </div>
                 </section>
             </section>
@@ -283,7 +287,8 @@ const sessionMenuAnchor = ref({ x: 0, y: 0 });
 
 // 会话右键菜单目标会话ID
 const sessionMenuTarget = ref<string | null>(null);
-
+// 会话列表滚动容器
+const navContentRef = ref<HTMLElement>();
 // 内容区域滚动容器
 const contentMainRef = ref<HTMLElement>();
 // 内容区域是否已滚动到底部
@@ -330,6 +335,25 @@ function handleMainScroll() {
 }
 
 /**
+ * 处理会话列表滚动事件（滚动加载更多会话）
+ */
+function handleNavContentScroll() {
+    const el = navContentRef.value;
+    if (!el) {
+        return;
+    }
+    const threshold = 40;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+    if (!atBottom) {
+        return;
+    }
+    if(!sessionStore.hasMoreSessions){
+        return;
+    }
+    sessionStore.getSessions();
+}
+
+/**
  * 点击返回按钮
  */
 function navigateBack() {
@@ -370,7 +394,7 @@ function newSessionClick() {
         closeSidebar();
     }
     sessionStore.resetCurrentSession();
-    if (route.name !== "Home") {
+    if (route.name !== "Home" || route.params.sessionId !== void 0) {
         router.replace({ name: 'Home' });
     }
 }
@@ -524,6 +548,8 @@ onMounted(() => {
 .default-layout-nav-content {
     flex: 1;
     width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .default-layout-nav-content-session {
@@ -596,6 +622,26 @@ onMounted(() => {
 
 .default-layout-nav-content-session-item-more-menu-item:hover {
     background: var(--ch-feature-card-hover-bg);
+}
+
+.default-layout-nav-content-session-item-has-more {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.default-layout-nav-content-session-item-has-more-text {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    line-height: 24px;
+    user-select: none;
+    color: var(--ch-text-color-2);
 }
 
 .default-layout-nav-footer-me {
