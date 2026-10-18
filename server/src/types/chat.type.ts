@@ -1,3 +1,4 @@
+import { AgentToolEvent } from "./agent.type";
 import { AiAbort } from "./ai.type";
 import { ChatUsage } from "./model.type";
 
@@ -19,4 +20,5 @@ export type MessageCallback = {
 export type ChatCallback = {
   onAbort?: AiAbort;
   onMessage?: (message: MessageCallback) => void;
+  onTool?: (tool: AgentToolEvent) => void;
 };

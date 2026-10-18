@@ -2,6 +2,7 @@ import { SseEventName } from "@/enumeration";
 import { sse, get, post } from "./fetch";
 import type {
   ChatSseMessage,
+  ChatToolEvent,
   AiChatParams,
   PaginationRequest,
   PaginationResponse,
@@ -41,12 +42,15 @@ export const aiChatSse = (
   onMessage: (msg: ChatSseMessage) => void,
   onComplete?: () => void,
   onError?: (error: Error) => void,
+  onTool?: (tool: ChatToolEvent) => void,
 ) => {
-  return sse<ChatSseMessage, AiChatParams>("/chat/sse", {
+  return sse<ChatSseMessage | ChatToolEvent, AiChatParams>("/chat/sse", {
     params: { ...params, ...{ sessionId } },
     onMessage: (event) => {
       if (event.event === SseEventName.AI_CHAT_MESSAGE) {
         onMessage(event.data as ChatSseMessage);
+      } else if (event.event === SseEventName.AI_CHAT_TOOL) {
+        onTool?.(event.data as ChatToolEvent);
       }
     },
     onComplete,

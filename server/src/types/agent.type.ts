@@ -15,7 +15,20 @@ export interface AgentOption {
   tools?: Tools;
   systemPrompt?: SystemPrompt;
   maxToolRounds?: number; // 不传默认无限次
+  onTool?: (event: AgentToolEvent) => void;
   options?: Omit<ChatRequest, "systemPrompt" | "messages">;
+}
+
+/**
+ * 智能体工具调用事件
+ */
+export interface AgentToolEvent {
+  // 工具调用ID
+  id: string;
+  // 工具名称
+  name: string;
+  // 工具调用状态
+  status: "running" | "success" | "error";
 }
 
 /**

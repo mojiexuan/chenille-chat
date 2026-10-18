@@ -1,6 +1,6 @@
 import { computed, ref, shallowRef } from "vue";
 import { defineStore } from "pinia";
-import type { MessageStreaming, SessionItem, Session, ChatAttachmentUploadInfo } from "@/types";
+import type { MessageStreaming, SessionItem, Session, ChatAttachmentUploadInfo, ChatToolEvent } from "@/types";
 import {
     getSessionListRequest,
     getSessionRequest,
@@ -485,6 +485,23 @@ export const useSessionStore = defineStore("session", () => {
                     isReplying.value = false;
                 }
                 abortController.value?.abort();
+            },
+            (tool: ChatToolEvent) => {
+                // 工具调用事件
+                if (!assistant) {
+                    return;
+                }
+                if (!assistant.tools) {
+                    assistant.tools = [];
+                }
+                const existing = assistant.tools.find((item) => item.id === tool.id);
+                if (existing) {
+                    existing.name = tool.name;
+                    existing.status = tool.status;
+                } else {
+                    assistant.tools.push({ ...tool });
+                }
+                onUpdateUi?.();
             },
         );
     }

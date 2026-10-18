@@ -73,3 +73,15 @@ export interface ChatSseMessage {
   /** 错误信息 */
   error?: string;
 }
+
+/**
+ * 聊天工具事件
+ */
+export interface ChatToolEvent {
+  /** 工具 ID */
+  id: string;
+  /** 工具名称 */
+  name: string;
+  /** 工具状态 */
+  status: "running" | "success" | "error";
+}

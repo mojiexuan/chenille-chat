@@ -1,3 +1,5 @@
+import type { ChatToolEvent } from "./chat";
+
 /**
  * 会话项类型
  */
@@ -29,6 +31,7 @@ export interface Message {
     cachedTokens?: number,
     error?: string,
     attachments?: MessageAttachment[];
+    tools?: ChatToolEvent[];
 }
 
 /**

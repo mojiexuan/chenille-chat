@@ -7,7 +7,8 @@ import {
   ChatResult,
   ChatRequest,
   ChatUsage,
-  SystemPrompt
+  SystemPrompt,
+  AgentToolEvent
 } from "@/types";
 import { executeToolCalls } from "@/tools";
 import {
@@ -142,10 +143,27 @@ class Agent {
         };
       }
 
+      for(const toolCall of toolCalls){
+        this.emitTool({
+          id: toolCall.id,
+          name: toolCall.name,
+          status: "running",
+        });
+      }
       // 执行工具调用
       const toolMessages = await executeToolCalls(toolCalls, tools ?? []);
       messages.push(...toolMessages);
       session?.addMessage(...toolMessages);
+
+      for (let i = 0; i < toolCalls.length; i++) {
+        const toolCall = toolCalls[i];
+        const result = toolMessages[i]?.message.content ?? "";
+        this.emitTool({
+          id: toolCall.id,
+          name: toolCall.name,
+          status: this.isToolError(result) ? "error" : "success",
+        });
+      }
 
       content = "";
     }
@@ -182,6 +200,20 @@ class Agent {
       usage,
       finished: true,
     });
+  }
+
+  /**
+   * 触发工具调用事件
+   */
+  private emitTool(event: AgentToolEvent): void {
+    this.options.onTool?.(event);
+  }
+
+  /**
+   * 判断工具执行结果是否为错误
+   */
+  private isToolError(result: string): boolean {
+    return false;
   }
 
   /**

@@ -134,6 +134,7 @@ class AiService {
       session: memorySession,
       tools,
       systemPrompt,
+      onTool: params.callback?.onTool,
       options: {
         stream: true,
         reasoning: {

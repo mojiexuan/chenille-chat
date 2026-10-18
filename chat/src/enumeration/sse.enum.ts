@@ -3,5 +3,6 @@
  */
 export enum SseEventName {
     AI_CHAT_MESSAGE = "ai:chat:message",
+    AI_CHAT_TOOL = "ai:chat:tool",
     AI_CHAT_SESSION_TITLE = "ai:chat:session:title",
 }

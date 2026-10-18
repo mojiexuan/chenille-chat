@@ -86,6 +86,15 @@ export async function chatSseHandler(
             data: message,
           });
         },
+        onTool: (tool) => {
+          if (aborted) {
+            return;
+          }
+          sseSend(reply, {
+            event: SseEventName.AI_CHAT_TOOL,
+            data: tool,
+          });
+        },
       },
     });
   } catch (err) {

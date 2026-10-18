@@ -73,6 +73,12 @@ export type Tool<
   isDestructive?(input: z.infer<Input>): boolean;
   // 是否并发安全
   isConcurrencySafe(input: z.infer<Input>): boolean;
+  // 是否为开放世界工具（结果不可预测）
+  isOpenWorld?(input: z.infer<Input>): boolean;
+  // 是否需要用户交互
+  requiresUserInteraction?(): boolean;
+  // 是否总不延迟加载
+  readonly alwaysLoad?: boolean;
 };
 
 /**
