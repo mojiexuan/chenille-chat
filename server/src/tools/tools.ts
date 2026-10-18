@@ -5,7 +5,8 @@ import {
   ToolDef,
   ToolCall,
   ToolMessage,
-  PreparedToolCall
+  PreparedToolCall,
+  ToolExecution
 } from "@/types";
 import z from "zod/v4";
 
@@ -78,34 +79,47 @@ function prepareToolCall(toolCall: ToolCall, tools: Tools): PreparedToolCall {
 /**
  * 运行工具
  */
-async function runTool(tool: Tool, toolCall: ToolCall, args: unknown): Promise<ToolMessage> {
+async function runTool(tool: Tool, toolCall: ToolCall, args: unknown): Promise<ToolExecution> {
+  const start = Date.now();
   try {
     const result = await tool.call(args);
     const outputParsed = tool.outputSchema.safeParse(result.data);
     if (!outputParsed.success) {
-      return { type: "tool", message: { role: "tool", toolCallId: toolCall.id, content: `工具输出错误: ${outputParsed.error.message}` } };
+      return {
+        duration: Date.now() - start,
+        message: {
+          type: "tool",
+          message: {
+            role: "tool",
+            toolCallId: toolCall.id,
+            content: `工具输出错误: ${outputParsed.error.message}`
+          }
+        }
+      };
     }
-    return { type: "tool", message: { role: "tool", toolCallId: toolCall.id, content: JSON.stringify(outputParsed.data) } };
+    return { duration: Date.now() - start, message: { type: "tool", message: { role: "tool", toolCallId: toolCall.id, content: JSON.stringify(outputParsed.data) } } };
   } catch (err) {
-    return { type: "tool", message: { role: "tool", toolCallId: toolCall.id, content: `工具执行错误: ${(err as Error).message}` } };
+    return { duration: Date.now() - start, message: { type: "tool", message: { role: "tool", toolCallId: toolCall.id, content: `工具执行错误: ${(err as Error).message}` } } };
   }
 }
 
 /**
  * 执行单个工具调用
  */
-export async function executeToolCall(toolCall: ToolCall, tools: Tools): Promise<ToolMessage> {
+export async function executeToolCall(toolCall: ToolCall, tools: Tools): Promise<ToolExecution> {
   const prepared = prepareToolCall(toolCall, tools);
-  if (!prepared.ok) return prepared.error;
+  if (!prepared.ok) {
+     return { message: prepared.error, duration: 0 };
+  }
   return runTool(prepared.tool, prepared.toolCall, prepared.args);
 }
 
 /**
  * 执行多个工具调用
  */
-export async function executeToolCalls(toolCalls: ToolCall[], tools: Tools): Promise<ToolMessage[]> {
+export async function executeToolCalls(toolCalls: ToolCall[], tools: Tools): Promise<ToolExecution[]> {
   // 初始化结果数组
-  const results: ToolMessage[] = new Array(toolCalls.length);
+  const results: ToolExecution[] = new Array(toolCalls.length);
   // 初始化缓冲区
   let buffer: { index: number; tool: Tool; toolCall: ToolCall; args: unknown }[] = [];
 
@@ -126,7 +140,7 @@ export async function executeToolCalls(toolCalls: ToolCall[], tools: Tools): Pro
     const prepared = prepareToolCall(toolCalls[i], tools);
     // 检查工具调用是否成功
     if (!prepared.ok) {
-      results[i] = prepared.error;
+      results[i] = { message: prepared.error, duration: 0 };
       continue;
     }
     // 检查工具是否并发并发安全

@@ -8,6 +8,13 @@
       "when": 1781568340700,
       "tag": "0000_dry_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792341256239,
+      "tag": "0001_rainy_cerise",
+      "breakpoints": true
     }
   ]
 }

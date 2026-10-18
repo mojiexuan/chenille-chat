@@ -1,9 +1,12 @@
 import {
+  AgentTurn,
   ChatCallback,
+  ChatResult,
   SystemEnvironment,
+  ToolMessage,
   UserMessage,
 } from "@/types";
-import { BizCode, AiRole, ReasoningEffort } from "@/enumeration";
+import { BizCode, AiRole, ReasoningEffort, ToolCallStatus } from "@/enumeration";
 import { ChatSseDto } from "@/dto";
 import {
   getSystemPrompt,
@@ -122,6 +125,12 @@ class AiService {
     const memorySession = new Session();
     memorySession.addMessage(...historyMessages);
 
+    // 记录工具调用状态与耗时
+    const toolStates = new Map<
+      string,
+      { status: ToolCallStatus; duration: number }
+    >();
+
     const chatAgent = new Agent({
       name: "",
       description: "",
@@ -134,7 +143,15 @@ class AiService {
       session: memorySession,
       tools,
       systemPrompt,
-      onTool: params.callback?.onTool,
+      onTool: (event)=>{
+        if (event.status !== ToolCallStatus.Running) {
+          toolStates.set(event.id, {
+            status: event.status,
+            duration: event.duration ?? 0,
+          });
+        }
+        params.callback?.onTool?.(event);
+      },
       options: {
         stream: true,
         reasoning: {
@@ -168,15 +185,70 @@ class AiService {
       return;
     }
 
-    await sessionService.addMessage(
-      params.userId,
-      session.id,
-      AiRole.Assistant,
-      result.message,
-      void 0,
-      result.reasoning,
-      result.usage,
-    )
+    // 提取本次生成的消息（排除历史上下文与已入库的用户消息）
+    const generated = memorySession
+      .getMessages()
+      .slice(contextMessages.length) as (ChatResult | ToolMessage)[];
+    // 收集助手消息中的工具调用入参
+    const toolCallArgs = new Map<
+      string,
+      { name: string; arguments?: string }
+    >();
+
+    for (const msg of generated) {
+      if (msg.type === "assistant") {
+        for (const call of msg.message.toolCalls ?? []) {
+          toolCallArgs.set(call.id, {
+            name: call.name,
+            arguments: call.arguments,
+          });
+        }
+      }
+    }
+
+    // 构建落库消息
+    const turns: AgentTurn[] = [];
+    for (let i = 0; i < generated.length; i++) {
+      const msg = generated[i];
+      if (msg.type === "assistant") {
+        const isLast = i === generated.length - 1;
+        turns.push({
+          role: AiRole.Assistant,
+          content: msg.message.content,
+          reasoning: isLast
+            ? result.reasoning ?? null
+            : msg.reasoning ?? null,
+          usage: isLast ? result.usage : void 0,
+        });
+      } else if (msg.type === "tool") {
+        const call = toolCallArgs.get(msg.message.toolCallId);
+        const state = toolStates.get(msg.message.toolCallId);
+        let args: unknown;
+        if (call?.arguments) {
+          try {
+            args = JSON.parse(call.arguments);
+          } catch {
+            args = call.arguments;
+          }
+        }
+        turns.push({
+          role: AiRole.Tool,
+          content: msg.message.content,
+          tool: {
+            toolCallId: msg.message.toolCallId,
+            name: call?.name ?? "",
+            arguments: args,
+            status: state?.status ?? ToolCallStatus.Success,
+            duration: state?.duration ?? 0,
+          },
+        });
+      }
+    }
+
+    // 落库本次生成的消息与工具记录
+    if (turns.length > 0) {
+      await sessionService.addAgentTurn(params.userId, session.id, turns);
+    }
   }
 
   /**

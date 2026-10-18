@@ -15,4 +15,14 @@ export enum AiRole {
   User = "user",
   Assistant = "assistant",
   System = "system",
+  Tool = "tool",
+}
+
+/**
+ * 工具调用状态枚举
+ */
+export enum ToolCallStatus {
+  Running = "running",
+  Success = "success",
+  Error = "error",
 }

@@ -1,6 +1,6 @@
-import { db, sessions, messages, aiTokenUsages, messageAttachments } from "@/db";
+import { db, sessions, messages, aiTokenUsages, messageAttachments, messageTools } from "@/db";
 import { eq, asc, desc, count, and, inArray } from "drizzle-orm";
-import { AiRole, MediaType } from "@/enumeration";
+import { AiRole, MediaType, ToolCallStatus } from "@/enumeration";
 import {
   Pagination,
   Message,
@@ -9,6 +9,9 @@ import {
   ChatUsage,
   ChatMessageAttachment,
   UserImageMessage,
+  ToolMessage,
+  ToolCall,
+  AgentTurn,
 } from "@/types";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
@@ -16,6 +19,7 @@ import { generateSessionTitle } from "@/session";
 import { logger } from "@/utils";
 import { UpdateSessionRequestDto } from "@/dto";
 import { ossService } from "@/services";
+import { ulid } from "ulid";
 
 /**
  * 会话服务
@@ -150,6 +154,65 @@ class SessionService {
   }
 
   /**
+   * 批量添加智能体生成的消息
+   * @param userId 用户ID
+   * @param sessionId 会话ID
+   * @param turns 智能体生成的消息
+   */
+  async addAgentTurn(userId: string, sessionId: string, turns: AgentTurn[]) {
+    if (turns.length === 0) {
+      return;
+    }
+    // 预生成消息ID，保证工具记录可稳定关联
+    const rows = turns.map((turn) => ({
+      id: ulid(),
+      sessionId,
+      role: turn.role,
+      content: turn.content,
+      reasoning: turn.reasoning ?? null,
+      promptTokens: turn.usage?.prompt_tokens || 0,
+      completionTokens: turn.usage?.completion_tokens || 0,
+      totalTokens: turn.usage?.total_tokens || 0,
+      cachedTokens: turn.usage?.prompt_tokens_details?.cached_tokens || 0,
+    }));
+    // 批量插入消息
+    await db.insert(messages).values(rows);
+    // 批量插入工具记录
+    const toolValues = turns.flatMap((turn, index) =>
+      turn.tool
+        ? [{
+          messageId: rows[index].id,
+          sessionId,
+          toolCallId: turn.tool.toolCallId,
+          name: turn.tool.name,
+          arguments: turn.tool.arguments ?? null,
+          status: turn.tool.status,
+          duration: turn.tool.duration,
+        }]
+        : [],
+    );
+    if (toolValues.length > 0) {
+      await db.insert(messageTools).values(toolValues);
+    }
+    // 记录token使用日志，不在意插入失败
+    for (let i = 0; i < turns.length; i++) {
+      const usage = turns[i].usage;
+      if (!usage) continue;
+      db.insert(aiTokenUsages)
+        .values({
+          userId,
+          sessionId,
+          messageId: rows[i].id,
+          promptTokens: usage.prompt_tokens || 0,
+          completionTokens: usage.completion_tokens || 0,
+          totalTokens: usage.total_tokens || 0,
+          cachedTokens: usage.prompt_tokens_details?.cached_tokens || 0,
+        })
+        .catch((e) => logger.warn(e, "记录token使用日志失败"));
+    }
+  }
+
+  /**
    * 获取消息
    * @param sessionId 会话ID
    */
@@ -157,9 +220,10 @@ class SessionService {
     return db.query.messages
       .findMany({
         where: eq(messages.sessionId, sessionId),
-        orderBy: asc(messages.createdAt),
+        orderBy: [asc(messages.createdAt), asc(messages.id)],
         with: {
           attachments: true,
+          tools: true,
         }
       });
   }
@@ -173,6 +237,7 @@ class SessionService {
       where: eq(messages.id, messageId),
       with: {
         attachments: true,
+        tools: true,
       }
     });
   }
@@ -278,13 +343,14 @@ class SessionService {
   buildContextMessages(
     dbMessages: (typeof messages.$inferSelect & {
       attachments: typeof messageAttachments.$inferSelect[];
+      tools: typeof messageTools.$inferSelect | null;
     })[],
   ): Message[] {
-    return dbMessages
-      .filter(
-        (msg) => msg.role === AiRole.User || msg.role === AiRole.Assistant,
-      )
-      .map((msg) => {
+    const filtered = dbMessages.filter(
+      (msg) => msg.role === AiRole.User || msg.role === AiRole.Assistant || msg.role === AiRole.Tool,
+    );
+    return filtered
+      .map((msg, index) => {
         if (msg.role === AiRole.User) {
           if (msg.attachments.length > 0) {
             return {
@@ -310,10 +376,40 @@ class SessionService {
             type: "user",
             message: { role: "user", content: msg.content },
           } as UserMessage;
+        } else if (msg.role === AiRole.Tool) {
+          return {
+            type: "tool",
+            message: {
+              role: "tool",
+              content: msg.content,
+              toolCallId: msg.tools?.toolCallId ?? ""
+            },
+          } as ToolMessage;
         }
+        // 助手消息：从紧随其后的工具记录重建 toolCalls
+        const toolCalls: ToolCall[] = [];
+        for (let i = index + 1; i < filtered.length; i++) {
+          const next = filtered[i];
+          if (next.role !== AiRole.Tool) break;
+          if (next.tools) {
+            toolCalls.push({
+              id: next.tools.toolCallId,
+              name: next.tools.name,
+              arguments:
+                next.tools.arguments != null
+                  ? JSON.stringify(next.tools.arguments)
+                  : void 0,
+            });
+          }
+        }
+
         return {
           type: "assistant",
-          message: { role: "assistant", content: msg.content },
+          message: {
+            role: "assistant",
+            content: msg.content,
+            toolCalls: toolCalls.length > 0 ? toolCalls : void 0,
+          },
         } as AssistantMessage;
       });
   }
@@ -328,7 +424,7 @@ class SessionService {
       return;
     }
     await db.delete(messages)
-    .where(and(eq(messages.sessionId, sessionId), inArray(messages.id, messageIds)));
+      .where(and(eq(messages.sessionId, sessionId), inArray(messages.id, messageIds)));
   }
 }
 

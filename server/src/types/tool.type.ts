@@ -13,6 +13,7 @@ import {
   UserMessage,
   ToolMessage
 } from "./message.type";
+import { ToolCallStatus } from "@/enumeration";
 
 export type Tool<
   Input extends z.ZodTypeAny = z.ZodTypeAny,
@@ -176,3 +177,29 @@ export interface ToolCall {
 export type PreparedToolCall =
   | { ok: true; tool: Tool; toolCall: ToolCall; args: unknown }
   | { ok: false; error: ToolMessage };
+
+/**
+ * 工具调用记录
+ */
+export interface ToolCallRecord {
+  // 工具调用ID
+  toolCallId: string;
+  // 工具名称
+  name: string;
+  // 工具入参
+  arguments?: unknown;
+  // 调用状态
+  status: ToolCallStatus;
+  // 执行耗时(ms)
+  duration: number;
+}
+
+/**
+ * 工具执行结果
+ */
+export interface ToolExecution {
+  // 工具消息
+  message: ToolMessage;
+  // 执行耗时(ms)
+  duration: number;
+}

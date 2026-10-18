@@ -9,5 +9,6 @@ export * from "./agent.schema";
 export * from "./user.setting.schema";
 export * from "./ai.token.usage.schema";
 export * from "./feedback.schema";
+export * from "./message.tool.schema";
 
 export * from "./relation";

@@ -1,8 +1,8 @@
 import { Session } from "@/session";
 import { ChatModel, ChatRequest, ChatUsage } from "./model.type";
-import { Tools } from "./tool.type";
+import { ToolCallRecord, Tools } from "./tool.type";
 import { SystemPrompt } from "./prompt.type";
-import { Message } from "./message.type";
+import { AiRole, ToolCallStatus } from "@/enumeration";
 
 /**
  * 智能体选项
@@ -28,7 +28,9 @@ export interface AgentToolEvent {
   // 工具名称
   name: string;
   // 工具调用状态
-  status: "running" | "success" | "error";
+  status: ToolCallStatus;
+  // 执行耗时(ms)
+  duration?: number;
 }
 
 /**
@@ -41,4 +43,20 @@ export interface AgentResult {
   usage?: ChatUsage;
   rounds: number;
   error?: string;
+}
+
+/**
+ * 智能体落库消息
+ */
+export interface AgentTurn {
+  // 消息角色
+  role: AiRole;
+  // 消息内容
+  content: string;
+  // 推理内容
+  reasoning?: string | null;
+  // 调用统计
+  usage?: ChatUsage;
+  // 工具调用记录（工具消息携带）
+  tool?: ToolCallRecord;
 }

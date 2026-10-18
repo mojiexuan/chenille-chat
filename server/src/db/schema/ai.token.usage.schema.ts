@@ -1,6 +1,8 @@
 import { pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
 import { ulid } from "ulid";
-import { users, sessions, messages } from "@/db";
+import { users } from "./user.schema";
+import { sessions } from "./session.schema";
+import { messages } from "./message.schema";
 
 export const aiTokenUsages = pgTable("c_ai_token_usages", {
   id: text("id")

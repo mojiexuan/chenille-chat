@@ -16,6 +16,7 @@ import {
   estimateTokens,
   estimateMessagesTokens,
 } from "@/utils";
+import { ToolCallStatus } from "@/enumeration";
 
 /**
  * 智能体
@@ -147,21 +148,24 @@ class Agent {
         this.emitTool({
           id: toolCall.id,
           name: toolCall.name,
-          status: "running",
+          status: ToolCallStatus.Running,
         });
       }
       // 执行工具调用
-      const toolMessages = await executeToolCalls(toolCalls, tools ?? []);
+      const toolExecutions = await executeToolCalls(toolCalls, tools ?? []);
+      const toolMessages = toolExecutions.map((execution) => execution.message);
       messages.push(...toolMessages);
       session?.addMessage(...toolMessages);
 
       for (let i = 0; i < toolCalls.length; i++) {
         const toolCall = toolCalls[i];
-        const result = toolMessages[i]?.message.content ?? "";
+        const execution = toolExecutions[i];
+        const result = execution?.message?.message.content ?? "";
         this.emitTool({
           id: toolCall.id,
           name: toolCall.name,
-          status: this.isToolError(result) ? "error" : "success",
+          status: this.isToolError(result) ? ToolCallStatus.Error : ToolCallStatus.Success,
+          duration: execution?.duration ?? 0,
         });
       }
 
