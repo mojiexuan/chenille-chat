@@ -1,7 +1,8 @@
 import { Session } from "@/session";
-import { ChatModel, ChatRequest } from "./model.type";
+import { ChatModel, ChatRequest, ChatUsage } from "./model.type";
 import { Tools } from "./tool.type";
 import { SystemPrompt } from "./prompt.type";
+import { Message } from "./message.type";
 
 /**
  * 智能体选项
@@ -13,7 +14,7 @@ export interface AgentOption {
   session?: Session;
   tools?: Tools;
   systemPrompt?: SystemPrompt;
-  maxToolRounds?: number;
+  maxToolRounds?: number; // 不传默认无限次
   options?: Omit<ChatRequest, "systemPrompt" | "messages">;
 }
 
@@ -22,7 +23,9 @@ export interface AgentOption {
  */
 export interface AgentResult {
   finished: boolean;
+  reasoning?: string;
   message: string;
+  usage?: ChatUsage;
   rounds: number;
   error?: string;
 }

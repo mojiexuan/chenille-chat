@@ -98,8 +98,9 @@ class WsService {
      * @param userId 用户ID
      * @returns 是否在线
      */
-    isOnline(userId: string): boolean {
-        return this.connections.has(userId);
+    async isOnline(userId: string): Promise<boolean> {
+        const online = await redis.exists(`${REDIS_WS_ONLINE_PREFIX}${userId}`);
+        return online > 0;
     }
 
     /**
@@ -109,7 +110,7 @@ class WsService {
      */
     handleConnection(socket: WebSocket, userId: string) {
         this.addConnection(userId, socket);
-        socket.on("message", (raw: Buffer) => {
+        socket.on("message", async (raw: Buffer) => {
             let msg: WsClientMessage;
             try {
                 msg = JSON.parse(raw.toString());
@@ -119,6 +120,10 @@ class WsService {
             }
 
             if (msg.action === WsClientAction.Ping) {
+                if (!(await this.isOnline(userId))) {
+                    socket.close(4001, "会话已过期"); 
+                    return;
+                }
                 this.sendToSocket(socket, { action: WsServerAction.Pong });
                 return;
             }

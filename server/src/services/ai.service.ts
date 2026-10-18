@@ -1,22 +1,19 @@
 import {
   ChatCallback,
-  ChatUsage,
   SystemEnvironment,
-  Message,
-  SystemPrompt,
+  UserMessage,
 } from "@/types";
-import { createAiModel } from "@/models";
 import { BizCode, AiRole, ReasoningEffort } from "@/enumeration";
 import { ChatSseDto } from "@/dto";
 import {
   getSystemPrompt,
   asSystemPrompt,
-  estimateSystemPromptTokens,
-  estimateTokens,
-  estimateMessagesTokens,
 } from "@/utils";
 import { sessionService, agentService, userService } from "@/services";
 import { logger, formatTime, getWeekDay } from "@/utils";
+import { getTools } from "@/tools";
+import { Session } from "@/session";
+import { Agent } from "@/agent";
 
 class AiService {
   constructor() { }
@@ -63,19 +60,19 @@ class AiService {
     if (params.data.regenerate) {
       const { messageId } = params.data.regenerate;
       const targetIndex = history.findIndex((msg) => msg.id === messageId);
-      if (targetIndex >= 0){
+      if (targetIndex >= 0) {
         let userIndex = targetIndex;
-        if(history[targetIndex].role !== AiRole.User){
-          for(let i = targetIndex - 1;i>= 0; i--){
-            if(history[i].role === AiRole.User){
+        if (history[targetIndex].role !== AiRole.User) {
+          for (let i = targetIndex - 1; i >= 0; i--) {
+            if (history[i].role === AiRole.User) {
               userIndex = i;
               break;
             }
           }
         }
 
-        const deleteMessageIds = history.slice(userIndex +1).map((msg) => msg.id);
-        if(deleteMessageIds.length > 0){
+        const deleteMessageIds = history.slice(userIndex + 1).map((msg) => msg.id);
+        if (deleteMessageIds.length > 0) {
           await sessionService.deleteMessages(session.id, deleteMessageIds);
           const deleteIdSet = new Set(deleteMessageIds);
           history = history.filter((msg) => !deleteIdSet.has(msg.id));
@@ -104,91 +101,81 @@ class AiService {
       return;
     }
 
-    // 调用AI模型
-    const aiModel = createAiModel({
-      provider: agent.provider.provider,
-      apiKey: agent.provider.apiKey,
-      model: agent.model.modelName,
-      baseURL: agent.provider.baseUrl,
-    });
-
-    // 缓存生成的内容
-    let reasoning: string | null = null;
-    let content = "";
-    let usage: ChatUsage | null = null;
+    // 获取启用的工具
+    const tools = getTools().filter((tool) => tool.isEnabled());
 
     // 构建系统提示词
-    let systemEnvironmentPrompt = await this.buildEnvironmentPrompt(
+    const systemEnvironmentPrompt = await this.buildEnvironmentPrompt(
       params.userId,
     );
-    let systemPrompt = asSystemPrompt(
-      getSystemPrompt([], systemEnvironmentPrompt),
+    const systemPrompt = asSystemPrompt(
+      getSystemPrompt(tools, systemEnvironmentPrompt),
     );
 
-    try {
-      await aiModel.generate({
+    // 拆分历史上下文与当前用户消息
+    const userMessage = contextMessages[
+      contextMessages.length - 1
+    ] as UserMessage;
+    const historyMessages = contextMessages.slice(0, -1);
+
+    // 创建内存会话并注入历史上下文
+    const memorySession = new Session();
+    memorySession.addMessage(...historyMessages);
+
+    const chatAgent = new Agent({
+      name: "",
+      description: "",
+      model: {
+        provider: agent.provider.provider,
+        apiKey: agent.provider.apiKey,
+        model: agent.model.modelName,
+        baseURL: agent.provider.baseUrl,
+      },
+      session: memorySession,
+      tools,
+      systemPrompt,
+      options: {
         stream: true,
-        systemPrompt: systemPrompt,
-        messages: contextMessages,
         reasoning: {
           effort: ReasoningEffort.High,
         },
         onAbort: params.callback?.onAbort,
         onChunk: (chunk) => {
-          // 缓存生成的内容
-          if (chunk.reasoning) {
-            if (!reasoning) {
-              reasoning = "";
-            }
-            reasoning += chunk.reasoning;
-          }
-          if (chunk.message.content) {
-            content += chunk.message.content;
-          }
-          usage = chunk.usage || null;
-          // 发送消息回调
-          if (params.callback && params.callback.onMessage) {
-            params.callback.onMessage({
-              sessionId: session.id,
-              reasoning: chunk.reasoning,
-              content: chunk.message.content,
-              usage: chunk.usage,
-              finished: chunk.finished,
-            });
-          }
-        },
-      });
-    } catch (err) {
-      logger.error(err);
-      // throw new BizException(BizCode.AI_CHAT_ERROR);
-      if (params.callback && params.callback.onMessage) {
-        params.callback.onMessage({
-          sessionId: session.id,
-          error: BizCode.AI_CHAT_ERROR.message,
-          finished: true,
-          content: "",
-        });
+          params.callback?.onMessage?.({
+            sessionId: session.id,
+            reasoning: chunk.reasoning,
+            content: chunk.message.content,
+            usage: chunk.usage,
+            finished: chunk.finished,
+          });
+        }
       }
+    });
+
+    // 运行智能体
+    const result = await chatAgent.run(userMessage);
+
+    // 运行异常
+    if (result.error) {
+      logger.error(result.error);
+      params.callback?.onMessage?.({
+        sessionId: session.id,
+        error: BizCode.AI_CHAT_ERROR.message,
+        finished: true,
+        content: "",
+      });
+      return;
     }
 
-    // 添加AI消息记录到会话
-    usage = this.calculateUsage(
-      usage,
-      systemPrompt,
-      contextMessages,
-      reasoning || "",
-      content,
-    );
-    // 添加AI消息记录到会话
-    sessionService.addMessage(
+    await sessionService.addMessage(
       params.userId,
       session.id,
       AiRole.Assistant,
-      content,
+      result.message,
       void 0,
-      reasoning,
-      usage,
-    );
+      result.reasoning,
+      result.usage,
+    )
   }
 
   /**
@@ -226,40 +213,6 @@ class AiService {
     return env;
   }
 
-  /**
-   * 计算AI模型调用的Token用量
-   */
-  private calculateUsage(
-    usage: ChatUsage | null,
-    systemPrompt: SystemPrompt,
-    messages: Message[],
-    reasoning: string,
-    content: string,
-  ) {
-    if (!usage) {
-      usage = {
-        prompt_tokens: 0,
-        completion_tokens: 0,
-        total_tokens: 0,
-        prompt_tokens_details: {
-          cached_tokens: 0,
-        },
-      };
-    }
-    if (usage.prompt_tokens === 0) {
-      usage.prompt_tokens =
-        estimateSystemPromptTokens(systemPrompt) +
-        estimateTokens(reasoning + content) +
-        estimateMessagesTokens(messages);
-    }
-    if (usage.completion_tokens === 0) {
-      usage.completion_tokens = estimateTokens(content);
-    }
-    if (usage.total_tokens === 0) {
-      usage.total_tokens = usage.prompt_tokens + usage.completion_tokens;
-    }
-    return usage;
-  }
 }
 
 export const aiService = new AiService();

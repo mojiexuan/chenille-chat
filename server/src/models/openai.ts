@@ -5,6 +5,7 @@ import {
   Message,
   SystemPrompt,
   Tool,
+  ToolCall,
 } from "@/types";
 import OpenAI from "openai";
 import { Stream } from "openai/core/streaming";
@@ -104,13 +105,13 @@ class OpenAiModel extends AiModel {
             .choices?.[0]?.message?.tool_calls || [];
           if (toolCalls.length > 0) {
             result.message.toolCalls = toolCalls.flatMap((call) => {
-              // if (call.type === "function") {
-              //   return {
-              //     id: call.id,
-              //     name: call.function?.name,
-              //     arguments: call.function?.arguments || void 0,
-              //   } as ChatToolCall;
-              // }
+              if (call.type === "function") {
+                return {
+                  id: call.id,
+                  name: call.function?.name ?? "",
+                  arguments: call.function?.arguments || void 0,
+                } as ToolCall;
+              }
               return [];
             });
           }
@@ -119,15 +120,37 @@ class OpenAiModel extends AiModel {
 
         let fullReasoning = "";
         let fullText = "";
+        // 累计工具调用
+        const toolCallAcc = new Map<number, ToolCall>();
 
         for await (const chunk of stream as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>) {
           if (aborted) {
             break;
           }
 
-          // TODO 流式工具调用暂未处理 console.log("流式工具调用", chunk.choices?.[0]?.delta?.tool_calls);
+          const delta = chunk.choices?.[0]?.delta;
+          const deltaToolCalls = delta?.tool_calls;
+          if(deltaToolCalls){
+            for(const call of deltaToolCalls){
+              const index = call.index ?? 0;
+              let acc = toolCallAcc.get(index);
+              if (!acc) {
+                acc = { id: call.id ?? "", name: call.function?.name ?? "", arguments: "" };
+                toolCallAcc.set(index, acc);
+              }
+              if (call.id) {
+                acc.id = call.id;
+              }
+              if (call.function?.name) {
+                acc.name = call.function.name;
+              }
+              if (call.function?.arguments) {
+                acc.arguments = (acc.arguments || "") + call.function.arguments;
+              }
+            }
+          }
 
-          const content = chunk.choices?.[0]?.delta?.content || "";
+          const content = delta?.content || "";
           const reasoningContent = (chunk.choices?.[0]?.delta as { reasoning_content?: string } | undefined)?.reasoning_content || "";
           const finishReason = chunk.choices?.[0]?.finish_reason;
 
@@ -146,7 +169,7 @@ class OpenAiModel extends AiModel {
             };
           }
 
-          result.finished = finishReason === "stop";
+          result.finished = finishReason === "stop" || finishReason === "tool_calls";
           if (reasoningContent.length > 0) {
             result.reasoning = reasoningContent;
           } else {
@@ -159,12 +182,15 @@ class OpenAiModel extends AiModel {
           result.reasoning = void 0;
           result.message.content = "";
 
-          if (finishReason === "stop") {
+          if (finishReason === "stop" || finishReason === "tool_calls") {
             break;
           }
         }
         result.reasoning = fullReasoning;
         result.message.content = fullText;
+        if (toolCallAcc.size > 0) {
+          result.message.toolCalls = [...toolCallAcc.values()];
+        }
         result.finished = true;
         return result;
       })

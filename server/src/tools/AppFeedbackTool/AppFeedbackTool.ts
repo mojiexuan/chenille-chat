@@ -2,6 +2,7 @@ import { z } from "zod/v4";
 import { buildTool } from "../tools";
 import { APP_FEEDBACK_TOOL_NAME, APP_FEEDBACK_TOOL_PROMPT } from "./prompt";
 import { lazySchema } from "@/utils";
+import { logger } from "@/utils";
 
 const inputSchema = lazySchema(() =>
   z.object({
@@ -20,6 +21,7 @@ const outputSchema = lazySchema(() =>
  * 应用反馈工具
  */
 export const AppFeedbackTool = buildTool({
+  isEnabled: () => true,
   name: APP_FEEDBACK_TOOL_NAME,
   searchHint: "反馈,崩溃,问题",
   maxResultSizeChars: 100_000,
@@ -36,6 +38,9 @@ export const AppFeedbackTool = buildTool({
     return "用于收集用户反馈的工具";
   },
   async call(args, onProgress) {
+    // 处理反馈逻辑
+    logger.info(`应用反馈: ${JSON.stringify(args)}`);
+    // 返回成功响应
     return {
       data: {
         status: "success",

@@ -39,8 +39,8 @@ export function estimateTokens(text: string): number {
 /**
  * 快速预估系统提示词 Token 用量
  */
-export function estimateSystemPromptTokens(systemPrompt: SystemPrompt) {
-  return estimateTokens(systemPrompt.join("\n"));
+export function estimateSystemPromptTokens(systemPrompt?: SystemPrompt) {
+  return estimateTokens(systemPrompt?.join("\n") || "");
 }
 
 /**
