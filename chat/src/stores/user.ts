@@ -1,4 +1,4 @@
-import type { User, UserSettings } from '@/types'
+import type { User, UserSettings, UserAgentProfile } from '@/types'
 
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
@@ -11,7 +11,9 @@ import {
     userInfoRequest, 
     userUsageAiTokenRequest, 
     userSettingsRequest, 
-    updateUserSettingsRequest 
+    patchUserSettingsRequest,
+    userAgentProfileRequest,
+    patchUserAgentProfileRequest,
 } from '@/request'
 import defaultAvatar from '@/assets/images/avatar.png'
 import { useModelStore } from './model'
@@ -28,6 +30,11 @@ export const useUserStore = defineStore('user', () => {
         // token: localStorage.getItem(TOKEN_KEY),
         settings: {
             isLocationEnabled: false,
+        },
+        agentProfile: {
+            agentNickname: void 0,
+            userAlias: void 0,
+            personaPrompt: void 0,
         },
     });
 
@@ -78,9 +85,10 @@ export const useUserStore = defineStore('user', () => {
         // 模型store
         const modelStore = useModelStore()
         try {
-            const [me, meSettings, _] = await Promise.all([
+            const [me, meSettings, agentProfile, _] = await Promise.all([
                 userInfoRequest(),
                 userSettingsRequest(),
+                userAgentProfileRequest(),
                 modelStore.refreshModelList(),
             ]);
             if (me.username) {
@@ -103,6 +111,9 @@ export const useUserStore = defineStore('user', () => {
             }
             if (meSettings) {
                 user.value.settings = meSettings
+            }
+            if (agentProfile) {
+                user.value.agentProfile = agentProfile
             }
             // 登录状态设置为true
             isLogin.value = true
@@ -153,10 +164,22 @@ export const useUserStore = defineStore('user', () => {
      * @author 陈佳宝
      * @date 2026-01-22
      */
-    async function updateUserSettings(data: Partial<UserSettings>): Promise<void> {
-        const settings = await updateUserSettingsRequest(data)
+    async function patchUserSettings(data: Partial<UserSettings>): Promise<void> {
+        const settings = await patchUserSettingsRequest(data)
         if (settings) {
             user.value.settings = settings
+        }
+    }
+
+    /**
+     * 更新用户助手配置
+     * @author 陈佳宝
+     * @date 2026-01-22
+     */
+    async function patchUserAgentProfile(data: Partial<UserAgentProfile>): Promise<void> {
+        const agentProfile = await patchUserAgentProfileRequest(data)
+        if (agentProfile) {
+            user.value.agentProfile = agentProfile
         }
     }
 
@@ -168,6 +191,7 @@ export const useUserStore = defineStore('user', () => {
         refreshUserInfo,
         logout,
         getUserUsageAiToken,
-        updateUserSettings,
+        patchUserSettings,
+        patchUserAgentProfile,
     }
 })

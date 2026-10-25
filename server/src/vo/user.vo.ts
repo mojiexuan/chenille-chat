@@ -1,4 +1,4 @@
-import { users, userSettings } from "@/db";
+import { users, userSettings, userAgentProfiles } from "@/db";
 
 export const userSafeInfo = {
   username: users.username,
@@ -16,4 +16,13 @@ export const userSafeInfo = {
  */
 export const userSettingsInfo = {
   isLocationEnabled: userSettings.isLocationEnabled,
+};
+
+/**
+ * 用户助手配置信息
+ */
+export const userAgentProfileInfo = {
+  agentNickname: userAgentProfiles.agentNickname,
+  userAlias: userAgentProfiles.userAlias,
+  personaPrompt: userAgentProfiles.personaPrompt,
 };

@@ -38,6 +38,32 @@
                 </div>
             </div>
         </div>
+        <!-- 团队管理 -->
+        <div class="setting-card">
+            <div class="setting-card-item" @click="handleTeamClick">
+                <div class="setting-card-item-left">
+                    <span class="setting-card-item-left-name">团队管理</span>
+                </div>
+                <div class="setting-card-item-right">
+                    <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12L31 24L19 36" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+            <!-- 个性化 -->
+            <div class="setting-card-item" @click="handleAgentProfileClick">
+                <div class="setting-card-item-left">
+                    <span class="setting-card-item-left-name">个性化</span>
+                </div>
+                <div class="setting-card-item-right">
+                    <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12L31 24L19 36" stroke="#3c3c43" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+        </div>
         <!-- 数据管理 -->
         <div class="setting-block">
             <h3>数据管理</h3>
@@ -95,14 +121,28 @@ const isLocationEnabled = ref(userStore.user.settings?.isLocationEnabled || fals
 
 // 监听位置开关变化
 watch(isLocationEnabled, async (val) => {
-    await userStore.updateUserSettings({ isLocationEnabled: val });
+    await userStore.patchUserSettings({ isLocationEnabled: val });
 });
 
 /**
  * 用户资料点击事件
  */
 function handleProfileClick() {
-    router.push({ name: 'Profile' });
+    router.push({ name: 'UserProfile' });
+}
+
+/**
+ * 团队管理点击事件
+ */
+function handleTeamClick() {
+    router.push({ name: 'TeamIndex' });
+}
+
+/**
+ * 个性化点击事件
+ */
+function handleAgentProfileClick() {
+    router.push({ name: 'AgentProfile' });
 }
 
 /**
@@ -150,6 +190,7 @@ onMounted(() => {
     border-radius: 8px;
     display: flex;
     align-items: center;
+    flex-direction: column;
 }
 
 .setting-card-user {
@@ -157,12 +198,24 @@ onMounted(() => {
 }
 
 .setting-card-item {
+    position: relative;
     width: 100%;
     min-height: 48px;
     padding: 12px 0;
     display: flex;
     align-items: center;
     gap: 16px;
+    cursor: pointer;
+}
+
+.setting-card-item:nth-last-child(n+2)::before {
+    content: "";
+    width: 100%;
+    height: .5px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: var(--ch-line-color);
 }
 
 .setting-card-item-user {

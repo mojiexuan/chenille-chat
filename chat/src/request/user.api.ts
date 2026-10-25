@@ -1,4 +1,4 @@
-import type { User, UserUsageAiToken, UserSettings } from '@/types';
+import type { User, UserUsageAiToken, UserSettings, UserAgentProfile } from '@/types';
 import { get, post, patch } from './fetch';
 
 /**
@@ -43,6 +43,20 @@ export const userSettingsRequest = () => {
 /**
  * 更新用户设置
  */
-export const updateUserSettingsRequest = (data: Partial<UserSettings>) => {
+export const patchUserSettingsRequest = (data: Partial<UserSettings>) => {
     return patch<UserSettings>("/user/me/settings", data);
+}
+
+/**
+ * 获取用户助手配置
+ */
+export const userAgentProfileRequest = () => {
+    return get<UserAgentProfile>("/user/me/agent/profile");
+}
+
+/**
+ * 更新用户助手配置
+ */
+export const patchUserAgentProfileRequest = (data: Partial<UserAgentProfile>) => {
+    return patch<UserAgentProfile>("/user/me/agent/profile", data);
 }

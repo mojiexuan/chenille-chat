@@ -11,6 +11,7 @@ export interface User {
     token?: string | null;
     usageToken?: UserUsageAiToken;
     settings?: UserSettings;
+    agentProfile?: UserAgentProfile;
 }
 
 /**
@@ -27,4 +28,13 @@ export interface UserUsageAiToken {
  */
 export interface UserSettings {
     isLocationEnabled: boolean;
+}
+
+/**
+ * 用户助手配置
+ */
+export interface UserAgentProfile {
+    agentNickname?: string;
+    userAlias?: string;
+    personaPrompt?: string;
 }

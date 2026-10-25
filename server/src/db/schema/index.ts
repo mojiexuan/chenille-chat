@@ -7,6 +7,7 @@ export * from "./message.schema";
 export * from "./message.attachment.schema";
 export * from "./agent.schema";
 export * from "./user.setting.schema";
+export * from "./user.agent.profiles.schema";
 export * from "./ai.token.usage.schema";
 export * from "./feedback.schema";
 export * from "./message.tool.schema";

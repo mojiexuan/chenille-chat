@@ -64,7 +64,7 @@ watch(() => route.params.sessionId, (newSessionId, _oldSessionId) => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 20px;
+  padding: 16px 30px;
 }
 
 .home-container-empty {

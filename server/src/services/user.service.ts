@@ -1,12 +1,12 @@
-import { db, users, loginLogs, aiTokenUsages, userSettings } from "@/db";
+import { db, users, loginLogs, aiTokenUsages, userSettings, userAgentProfiles } from "@/db";
 import { eq, desc, sum } from "drizzle-orm";
-import { userSafeInfo, userSettingsInfo } from "@/vo";
+import { userSafeInfo, userSettingsInfo, userAgentProfileInfo } from "@/vo";
 import { BizException } from "@/exception";
 import { BizCode, UserRole } from "@/enumeration";
 import { ossService } from "@/services";
 import { logger, formatNumber,convertFileToMemoryFile,validateFile } from "@/utils";
 import type { MultipartFile } from "@fastify/multipart";
-import { MeUpdateUserInfoDto, MeUserSettingsDto } from "@/dto";
+import { MeUpdateUserInfoDto, MeUserSettingsDto, MeUserAgentProfileDto } from "@/dto";
 import { USER_AVATAR_IMAGE_TYPES } from "@/constants";
 
 /**
@@ -154,6 +154,45 @@ class UserService {
       .insert(userSettings)
       .values({ userId, ...set })
       .onConflictDoUpdate({ target: userSettings.userId, set })
+      .returning();
+    return row;
+  }
+
+    /**
+   * 获取用户助手配置信息
+   * @param userId 用户ID
+   * @returns 用户助手配置信息
+   */
+  async getUserAgentProfile(userId: string) {
+    const [row] = await db
+      .select(userAgentProfileInfo)
+      .from(userAgentProfiles)
+      .where(eq(userAgentProfiles.userId, userId))
+      .limit(1);
+    return row;
+  }
+
+  /**
+   * 更新用户助手配置
+   */
+  async updateUserAgentProfile(userId: string, data: MeUserAgentProfileDto) {
+    const set: Record<string, unknown> = {};
+    if (data.agentNickname !== undefined) {
+      set.agentNickname = data.agentNickname;
+    }
+    if (data.userAlias !== undefined) {
+      set.userAlias = data.userAlias;
+    }
+    if (data.personaPrompt !== undefined) {
+      set.personaPrompt = data.personaPrompt;
+    }
+    if (Object.keys(set).length === 0) {
+      return;
+    }
+    const [row] = await db
+      .insert(userAgentProfiles)
+      .values({ userId, ...set })
+      .onConflictDoUpdate({ target: userAgentProfiles.userId, set })
       .returning();
     return row;
   }

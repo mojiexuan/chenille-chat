@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<script setup lang="ts" name="profile">
+<script setup lang="ts" name="UserProfile">
 import { ref, onMounted } from "vue";
 import { useUserStore } from "@/stores";
 import { useToast, useConfirm } from "@/composables";

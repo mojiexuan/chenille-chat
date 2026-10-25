@@ -18,22 +18,6 @@
                 </svg>
             </summary>
             <div class="home-container-assistant-message-thinking-content">
-                <!-- <MarkdownRender :custom-id="item.role + '-chat'" :content="item.reasoning"
-                            :typewriter="item.isStreaming" :smooth-streaming="item.isStreaming"
-                            :final="item.isStreaming" :max-live-nodes="item.isStreaming ? 320 : 0"
-                            :fade="!item.isStreaming" mode="chat" :code-block-monaco-options="{
-                                themes: ['vitesse-light'],
-                                theme: 'vitesse-light',
-                                MAX_HEIGHT: 640,
-                            }" :code-block-props="{
-                                stream: item.isStreaming,
-                                showTooltips: false,
-                                showExpandButton: false,
-                                showCollapseButton: false,
-                                showFontSizeButtons: false,
-                                showPreviewButton: false,
-                            }" :custom-markdown-it="customMarkdownIt">
-                        </MarkdownRender> -->
                 <MarkdownRenderer :content="item.reasoning"></MarkdownRenderer>
             </div>
         </details>
@@ -67,7 +51,7 @@
             <span>{{ item.error }}</span>
         </div>
         <!-- 状态功能栏 -->
-        <div :class="[`home-container-${item.role}-status-bar`]" v-if="!item.isStreaming && !sessionStore.isReplying">
+        <div :class="[`home-container-${item.role}-status-bar`]" v-if="!item.isStreaming && !sessionStore.isReplying && isLastOfRole(index)">
             <!-- 复制 -->
             <svg class="home-container-status-bar-button" width="20" height="20" viewBox="0 0 48 48" fill="none"
                 xmlns="http://www.w3.org/2000/svg" @click="handleCopyTextClick(item.content)">
@@ -188,6 +172,24 @@ const modelStore = useModelStore();
 
 // 预览图片
 const previewPicture = usePreviewPicture();
+
+/**
+ * 判断是否是最后一个角色的消息
+ * @param index 消息索引
+ * @returns 是否是最后一个角色的消息
+ */
+function isLastOfRole(index: number) {
+    const messages = sessionStore.currentSession.messages;
+    return index === messages.length - 1 || toGroupRole(messages[index + 1]?.role) !== toGroupRole(messages[index]?.role);
+}
+
+/**
+ * 归并消息角色，tool 角色与 assistant 视为同一角色
+ * @param role 消息角色
+ */
+function toGroupRole(role?: string) {
+    return role === "tool" ? "assistant" : role;
+}
 
 /**
  * 复制文本到剪贴板

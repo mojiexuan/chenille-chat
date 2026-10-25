@@ -84,4 +84,8 @@ export interface ChatToolEvent {
   name: string;
   /** 工具状态 */
   status: "running" | "success" | "error";
+  /** 工具耗时 */
+  duration?: number;
+  /** 工具参数 */
+  arguments?: string;
 }

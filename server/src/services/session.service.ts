@@ -229,6 +229,68 @@ class SessionService {
   }
 
   /**
+   * 获取显示的消息
+   * @param sessionId 会话ID
+   */
+  async getDisplayMessages(sessionId: string) {
+    const rows = await this.getMessages(sessionId);
+    const result = [];
+    for (const row of rows) {
+      // 获取最后一个
+      const last = result[result.length - 1];
+      // 工具
+      if (row.role === AiRole.Tool && last?.role === AiRole.Assistant) {
+        if (!last.tools) {
+          last.tools = [];
+        }
+        last.tools.push({
+          id: row.tools?.toolCallId ?? "",
+          name: row.tools?.name ?? "",
+          status: row.tools?.status ?? ToolCallStatus.Success,
+          duration: row.tools?.duration ?? 0,
+          arguments: row.tools?.arguments ?? void 0,
+        });
+        continue;
+      }
+
+      // 助手消息
+      if (row.role === AiRole.Assistant && last?.role === AiRole.Assistant) {
+        last.content += row.content;
+        if (row.reasoning) {
+          last.reasoning = (last.reasoning ?? "") + row.reasoning;
+        }
+        if (row.totalTokens > 0) {
+          last.promptTokens = row.promptTokens;
+          last.completionTokens = row.completionTokens;
+          last.totalTokens = row.totalTokens;
+          last.cachedTokens = row.cachedTokens;
+        }
+        continue;
+      }
+
+      // 系统消息, 不显示
+      if(row.role === AiRole.System){
+        continue;
+      }
+
+      const { tools: record, ...rest } = row;
+      result.push({
+        ...rest,
+        tools: record
+          ? [{
+            id: record.toolCallId,
+            name: record.name,
+            status: record.status,
+            duration: record.duration ?? 0,
+            arguments: record.arguments ?? void 0,
+          }]
+          : void 0,
+      });
+    }
+    return result;
+  }
+
+  /**
    * 获取消息
    * @param messageId 消息ID
    */

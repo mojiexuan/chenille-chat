@@ -2,7 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { userService } from "@/services";
-import { meUpdateUserInfoDto, meUserSettingsDto } from "@/dto";
+import { meUpdateUserInfoDto, meUserSettingsDto, meUserAgentProfileDto } from "@/dto";
 
 /**
  * 获取用户信息
@@ -119,4 +119,41 @@ export async function meUpdateUserSettingsHandler(
   }
   const settings = await userService.updateUserSettings(userId, parsed.data);
   return reply.success(settings, "用户设置更新成功");
+}
+
+/**
+ * 获取用户助手配置信息
+ */
+export async function meUserAgentProfileHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const userId = request.userId;
+  if (!userId) {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  const profile = await userService.getUserAgentProfile(userId);
+  return reply.success(profile, "用户助手配置");
+}
+
+/**
+ * 更新用户助手配置
+ */
+export async function meUpdateUserAgentProfileHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const parsed = meUserAgentProfileDto.safeParse(request.body);
+  if (!parsed.success) {
+    throw new BizException(
+      BizCode.PARAM_INVALID,
+      parsed.error.issues[0]?.message,
+    );
+  }
+  const userId = request.userId;
+  if (!userId) {
+    throw new BizException(BizCode.AUTH_UNAUTHORIZED);
+  }
+  const profile = await userService.updateUserAgentProfile(userId, parsed.data);
+  return reply.success(profile, "用户助手配置更新成功");
 }

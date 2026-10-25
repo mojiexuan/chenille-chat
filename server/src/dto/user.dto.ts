@@ -22,3 +22,23 @@ export const meUserSettingsDto = z.object({
 });
 
 export type MeUserSettingsDto = z.infer<typeof meUserSettingsDto>;
+
+/**
+ * 更新用户助手配置DTO
+ */
+export const meUserAgentProfileDto = z.object({
+  agentNickname: z.string().trim().max(20, "助手昵称最多20个字符").transform((v)=>{
+    return sanitizeUserText(v, { replaceHtmlAndPathChars: true });
+  }).optional(),
+  userAlias: z.string().trim().max(20, "用户别名最多20个字符").transform((v)=>{
+    return sanitizeUserText(v, { replaceHtmlAndPathChars: true });
+  }).optional(),
+  personaPrompt: z.string().trim().optional(),
+}).refine((data) => {
+  if (data.personaPrompt && data.personaPrompt.length > 2000) {
+    throw new Error("个人描述最多2000个字符");
+  }
+  return true;
+});
+
+export type MeUserAgentProfileDto = z.infer<typeof meUserAgentProfileDto>;

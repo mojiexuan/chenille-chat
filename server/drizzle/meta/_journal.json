@@ -15,6 +15,13 @@
       "when": 1792341256239,
       "tag": "0001_rainy_cerise",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792918704986,
+      "tag": "0002_bitter_baron_strucker",
+      "breakpoints": true
     }
   ]
 }

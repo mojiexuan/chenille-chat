@@ -132,8 +132,8 @@ class AiService {
     >();
 
     const chatAgent = new Agent({
-      name: "",
-      description: "",
+      name: "对话智能体",
+      description: "根据用户请求，生成聊天回复。",
       model: {
         provider: agent.provider.provider,
         apiKey: agent.provider.apiKey,
@@ -215,9 +215,7 @@ class AiService {
         turns.push({
           role: AiRole.Assistant,
           content: msg.message.content,
-          reasoning: isLast
-            ? result.reasoning ?? null
-            : msg.reasoning ?? null,
+          reasoning: msg.reasoning ?? null,
           usage: isLast ? result.usage : void 0,
         });
       } else if (msg.type === "tool") {

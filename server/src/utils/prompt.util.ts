@@ -162,6 +162,7 @@ function getSystemEnvironmentSection(env: SystemEnvironment): string {
     `<${SYSTEM_REMINDER_TAG}}>`,
     ...prependBullets(items),
     `</${SYSTEM_REMINDER_TAG}}>`,
+    "这只是背景，不必刻意关注。",
   ].join("\n");
 }
 

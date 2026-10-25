@@ -1,7 +1,8 @@
 import z from "zod/v4";
-import { lazySchema, parseWithSchema } from "@/utils";
-import { agentService, clientService } from "@/services";
+import { asSystemPrompt, lazySchema, parseWithSchema } from "@/utils";
+import { agentService } from "@/services";
 import { logger } from "@/utils";
+import { Agent } from "@/agent";
 
 /**
  * 加载指示器
@@ -87,34 +88,29 @@ export async function generateGerundIndicator(content: string) {
     logger.error("动名词指示器生成智能体未配置");
     return ["加载中", "处理中", "工作中"];
   }
-  const result = await clientService.chat(
-    {
-      provider: agent.provider.provider,
-      apiKey: agent.provider.apiKey,
-      baseURL: agent.provider.baseUrl,
-      model: agent.model.modelName,
-    },
-    {
-      messages: [
-        {
-          type: "system",
-          message: LOADING_INDICATOR_PROMPT,
-        },
-        {
-          type: "user",
-          message: {
-            role: "user",
-            content: content,
-          },
-        },
-      ],
-      jsonSchema: indicatorSchema(),
-    },
-  );
+
+  const chatAgent = new Agent({
+    name:"动名词指示器生成智能体",
+    description:"根据用户请求，生成动名词指示器，以增加等待时间的用户体验。",
+    model: {
+        provider: agent.provider.provider,
+        apiKey: agent.provider.apiKey,
+        model: agent.model.modelName,
+        baseURL: agent.provider.baseUrl,
+      },
+      systemPrompt: asSystemPrompt([LOADING_INDICATOR_PROMPT]),
+      options:{
+        jsonSchema: indicatorSchema(),
+      }
+  });
+
+  // 运行智能体
+  const result = await chatAgent.run(content);
+
   const indicator: string[] =
     parseWithSchema(
       indicatorSchema(),
-      result.message.content,
+      result.message,
     )?.indicator || [];
   if (indicator.length < 3) {
     indicator.push("加载中");

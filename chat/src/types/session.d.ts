@@ -22,7 +22,7 @@ export interface Session extends SessionItem {
  */
 export interface Message {
     id: string;
-    role: 'user' | 'assistant';
+    role: 'user' | 'assistant' | 'system' | 'tool';
     content: string;
     reasoning?: string;
     promptTokens?: number,

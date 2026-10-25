@@ -3,7 +3,7 @@ import { ulid } from "ulid";
 import { users } from "@/db";
 
 /**
- * 用户表
+ * 用户设置表
  */
 export const userSettings = pgTable("c_user_settings", {
     id: text("id").primaryKey().$defaultFn(() => ulid()),

@@ -9,6 +9,8 @@ import {
   meUsageAiTokenHandle,
   meUserSettingsHandler,
   meUpdateUserSettingsHandler,
+  meUserAgentProfileHandler,
+  meUpdateUserAgentProfileHandler,
   chatAttachmentHandler,
   chatSseHandler,
   chatGerundIndicatorHandler,
@@ -49,6 +51,8 @@ export async function v1Router(fastify: FastifyInstance) {
       scope.get("/user/me/ai/token", meUsageAiTokenHandle);
       scope.get("/user/me/settings", meUserSettingsHandler);
       scope.patch("/user/me/settings", meUpdateUserSettingsHandler);
+      scope.get("/user/me/agent/profile", meUserAgentProfileHandler);
+      scope.patch("/user/me/agent/profile", meUpdateUserAgentProfileHandler);
       scope.post("/chat/attachment", chatAttachmentHandler);
       scope.post("/chat/sse", chatSseHandler);
       scope.post("/chat/gerund", chatGerundIndicatorHandler);

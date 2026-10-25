@@ -39,7 +39,7 @@ export interface AgentToolEvent {
 export interface AgentResult {
   finished: boolean;
   reasoning?: string;
-  message: string;
+  message: string; // 智能体响应消息
   usage?: ChatUsage;
   rounds: number;
   error?: string;

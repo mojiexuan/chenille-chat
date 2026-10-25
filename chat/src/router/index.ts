@@ -7,11 +7,11 @@ import BlankLayout from '@/layouts/BlankLayout.vue';
 
 declare module 'vue-router' {
   interface RouteMeta {
-    layout?: 'default' | 'blank';
-    requiresAuth?: boolean;
-    title?: string;
-    needBack?: boolean;
-    redirectName?: string;
+    layout?: 'default' | 'blank'; // 布局类型
+    requiresAuth?: boolean; // 是否需要登录
+    title?: string; // 页面标题
+    needBack?: boolean; // 是否需要返回按钮
+    redirectName?: string; // 返回按钮的路由名称
   }
 }
 
@@ -35,14 +35,26 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'setting',
         name: 'Setting',
-        component: () => import('@/views/SettingView.vue'),
+        component: () => import('@/views/settings/SettingView.vue'),
         meta: { title: '设置', requiresAuth: true },
       },
       {
         path: 'profile',
-        name: 'Profile',
-        component: () => import('@/views/ProfileView.vue'),
+        name: 'UserProfile',
+        component: () => import('@/views/settings/user/ProfileView.vue'),
         meta: { title: '个人中心', requiresAuth: true, needBack: true, redirectName: 'Setting' },
+      },
+      {
+        path: 'team',
+        name: 'TeamIndex',
+        component: () => import('@/views/settings/team/IndexView.vue'),
+        meta: { title: '团队管理', requiresAuth: true, needBack: true, redirectName: 'Setting' },
+      },
+      {
+        path: 'agent/profile',
+        name: 'AgentProfile',
+        component: () => import('@/views/settings/agent/ProfileView.vue'),
+        meta: { title: '个性化', requiresAuth: true, needBack: true, redirectName: 'Setting' },
       },
     ],
   },
