@@ -1,10 +1,10 @@
 import { pgTable, text, varchar, timestamp, date, index } from "drizzle-orm/pg-core";
-import { ulid } from "ulid";
+import { nextUlid } from "@/utils";
 import { users } from "./user.schema";
 import { sql } from "drizzle-orm";
 
 export const sessions = pgTable("c_sessions", {
-    id: text("id").primaryKey().$defaultFn(() => ulid()),
+    id: text("id").primaryKey().$defaultFn(() => nextUlid()),
     userId: text("user_id")
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),

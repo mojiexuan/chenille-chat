@@ -1,6 +1,6 @@
 import { pgTable, pgSequence, varchar, timestamp, text } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { ulid } from "ulid";
+import { nextUlid } from "@/utils";
 import { UserGender, UserRole, UserStatus } from "@/enumeration";
 
 /**
@@ -14,7 +14,7 @@ export const usernameSeq = pgSequence("c_users_username_seq", {
  * 用户表
  */
 export const users = pgTable("c_users", {
-  id: text("id").primaryKey().$defaultFn(() => ulid()),
+  id: text("id").primaryKey().$defaultFn(() => nextUlid()),
   username: varchar("username", { length: 50 })
     .notNull()
     .unique()

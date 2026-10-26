@@ -16,10 +16,9 @@ import {
 import { BizException } from "@/exception";
 import { BizCode } from "@/enumeration";
 import { generateSessionTitle } from "@/session";
-import { logger } from "@/utils";
+import { logger, nextUlid } from "@/utils";
 import { UpdateSessionRequestDto } from "@/dto";
 import { ossService } from "@/services";
-import { ulid } from "ulid";
 
 /**
  * 会话服务
@@ -165,7 +164,7 @@ class SessionService {
     }
     // 预生成消息ID，保证工具记录可稳定关联
     const rows = turns.map((turn) => ({
-      id: ulid(),
+      id: nextUlid(),
       sessionId,
       role: turn.role,
       content: turn.content,

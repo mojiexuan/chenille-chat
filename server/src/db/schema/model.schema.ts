@@ -6,7 +6,7 @@ import {
   timestamp,
   boolean,
 } from "drizzle-orm/pg-core";
-import { ulid } from "ulid";
+import { nextUlid } from "@/utils";
 import { modelProviders } from "./model.provider.schema";
 import { ReasoningEffort } from "@/enumeration";
 
@@ -14,7 +14,7 @@ import { ReasoningEffort } from "@/enumeration";
  * 模型表
  */
 export const models = pgTable("c_models", {
-  id: text("id").primaryKey().$defaultFn(() => ulid()),
+  id: text("id").primaryKey().$defaultFn(() => nextUlid()),
   providerId: text("provider_id")
     .notNull()
     .references(() => modelProviders.id, { onDelete: "cascade" }),

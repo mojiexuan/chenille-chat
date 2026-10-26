@@ -8,14 +8,14 @@ import {
   doublePrecision,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { ulid } from "ulid";
+import { nextUlid } from "@/utils";
 import { users } from "./user.schema";
 import { LoginType, LoginStatus } from "@/enumeration";
 
 export const loginLogs = pgTable(
   "c_login_logs",
   {
-    id: text("id").primaryKey().$defaultFn(() => ulid()),
+    id: text("id").primaryKey().$defaultFn(() => nextUlid()),
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),

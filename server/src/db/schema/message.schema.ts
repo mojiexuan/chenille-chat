@@ -9,7 +9,7 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { ulid } from "ulid";
+import { nextUlid } from "@/utils";
 import { sessions } from "./session.schema";
 import { AiRole } from "@/enumeration";
 
@@ -18,7 +18,7 @@ export const messages = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => ulid()),
+      .$defaultFn(() => nextUlid()),
     sessionId: text("session_id")
       .notNull()
       .references(() => sessions.id, { onDelete: "cascade" }),

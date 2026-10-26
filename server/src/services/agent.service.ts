@@ -87,8 +87,7 @@ class AgentService {
     return db
       .select(agentSafeVo)
       .from(agents)
-      .leftJoin(models, eq(agents.modelId, models.id))
-      .orderBy(asc(agents.id));
+      .leftJoin(models, eq(agents.modelId, models.id));
   }
 
   /**

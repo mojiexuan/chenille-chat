@@ -5,14 +5,14 @@ import {
   timestamp,
   boolean,
 } from "drizzle-orm/pg-core";
-import { ulid } from "ulid";
+import { nextUlid } from "@/utils";
 import { AiProvider } from "@/enumeration";
 
 /**
  * 模型供应商表（存 API Key、中转地址等凭证信息）
  */
 export const modelProviders = pgTable("c_model_providers", {
-  id: text("id").primaryKey().$defaultFn(() => ulid()),
+  id: text("id").primaryKey().$defaultFn(() => nextUlid()),
   provider: varchar("model_provider", { length: 20 }).$type<AiProvider>()
     .default(AiProvider.OpenAI)
     .notNull()

@@ -5,13 +5,13 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./user.schema";
-import { ulid } from "ulid";
+import { nextUlid } from "@/utils";
 import { FeedbackStatus } from "@/enumeration";
 
 export const AppFeedback = pgTable(
   "c_app_feedback",
   {
-    id: text("id").primaryKey().$defaultFn(() => ulid()),
+    id: text("id").primaryKey().$defaultFn(() => nextUlid()),
     userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     description: text("description").notNull(),
     imageUrl: text("image_url"),

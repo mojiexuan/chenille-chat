@@ -1,12 +1,12 @@
 import { pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
-import { ulid } from "ulid";
+import { nextUlid } from "@/utils";
 import { users } from "@/db";
 
 /**
  * 用户智能体配置表
  */
 export const userAgentProfiles = pgTable("c_user_agent_profiles", {
-    id: text("id").primaryKey().$defaultFn(() => ulid()),
+    id: text("id").primaryKey().$defaultFn(() => nextUlid()),
     userId: text("user_id")
         .notNull()
         .unique()

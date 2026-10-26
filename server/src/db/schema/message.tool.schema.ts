@@ -7,7 +7,7 @@ import {
   index,
   integer,
 } from "drizzle-orm/pg-core";
-import { ulid } from "ulid";
+import { nextUlid } from "@/utils";
 import { messages } from "./message.schema";
 import { sessions } from "./session.schema";
 import { ToolCallStatus } from "@/enumeration";
@@ -20,7 +20,7 @@ export const messageTools = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => ulid()),
+      .$defaultFn(() => nextUlid()),
     messageId: text("message_id").references(() => messages.id, {
       onDelete: "cascade",
     }),
